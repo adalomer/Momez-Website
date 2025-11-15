@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Momez - Sipariş Yönetimi</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#D90429",
+              "background-light": "#F8F9FA",
+              "background-dark": "#1a1a1a",
+              "surface-light": "#FFFFFF",
+              "surface-dark": "#2a2a2a",
+              "text-light": "#212529",
+              "text-dark": "#f0f0f0",
+              "text-muted-light": "#6C757D",
+              "text-muted-dark": "#a0a0a0",
+              "border-light": "#e9ecef",
+              "border-dark": "#3a3a3a",
+              "status-yeni": "#007BFF",
+              "status-hazirlaniyor": "#FFC107",
+              "status-kargoda": "#6F42C1",
+              "status-teslim": "#28A745",
+              "status-iptal": "#6C757D",
+            },
+            fontFamily: {
+              "display": ["Plus Jakarta Sans", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.5rem", "lg": "0.75rem", "xl": "1rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings:
+            'FILL' 0,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 20
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-text-light dark:text-text-dark">
+<div class="flex min-h-screen">
+<aside class="w-64 flex-shrink-0 bg-surface-light dark:bg-surface-dark border-r border-border-light dark:border-border-dark flex-col hidden lg:flex">
+<div class="flex h-full flex-col justify-between p-4">
+<div class="flex flex-col gap-6">
+<div class="flex items-center gap-3 px-2">
+<div class="bg-primary flex items-center justify-center rounded-full size-10">
+<span class="text-white text-2xl font-bold">m</span>
+</div>
+<div class="flex flex-col">
+<h1 class="text-text-light dark:text-text-dark text-base font-bold leading-normal">momez</h1>
+<p class="text-text-muted-light dark:text-text-muted-dark text-sm font-normal leading-normal">Admin Panel</p>
+</div>
+</div>
+<nav class="flex flex-col gap-2">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-muted-light dark:text-text-muted-dark hover:bg-primary/10 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<p class="text-sm font-medium leading-normal">Dashboard</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">shopping_cart</span>
+<p class="text-sm font-medium leading-normal">Siparişler</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-muted-light dark:text-text-muted-dark hover:bg-primary/10 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<p class="text-sm font-medium leading-normal">Ürünler</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-muted-light dark:text-text-muted-dark hover:bg-primary/10 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">group</span>
+<p class="text-sm font-medium leading-normal">Müşteriler</p>
+</a>
+</nav>
+</div>
+<div class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-muted-light dark:text-text-muted-dark hover:bg-primary/10 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<p class="text-sm font-medium leading-normal">Ayarlar</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-muted-light dark:text-text-muted-dark hover:bg-primary/10 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">logout</span>
+<p class="text-sm font-medium leading-normal">Çıkış Yap</p>
+</a>
+</div>
+</div>
+</aside>
+<main class="flex-1 p-4 sm:p-6 lg:p-8">
+<div class="w-full max-w-7xl mx-auto">
+<header class="mb-6">
+<p class="text-text-light dark:text-text-dark text-3xl font-extrabold tracking-tight">Sipariş Yönetimi</p>
+</header>
+<div class="bg-surface-light dark:bg-surface-dark p-4 rounded-lg border border-border-light dark:border-border-dark mb-6">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+<div class="lg:col-span-2">
+<label class="flex flex-col w-full">
+<div class="flex w-full flex-1 items-stretch rounded-lg h-11 bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark focus-within:ring-2 focus-within:ring-primary">
+<div class="text-text-muted-light dark:text-text-muted-dark flex items-center justify-center pl-3">
+<span class="material-symbols-outlined">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden text-text-light dark:text-text-dark focus:outline-0 focus:ring-0 border-none bg-transparent h-full placeholder:text-text-muted-light dark:placeholder:text-text-muted-dark pl-2 text-sm" placeholder="Sipariş no, müşteri adı veya ürün ara..." value=""/>
+</div>
+</label>
+</div>
+<div>
+<select class="form-select w-full h-11 rounded-lg bg-background-light dark:bg-background-dark border-border-light dark:border-border-dark text-text-light dark:text-text-dark text-sm focus:ring-primary focus:border-primary">
+<option>Tüm Durumlar</option>
+<option>Yeni</option>
+<option>Hazırlanıyor</option>
+<option>Kargoda</option>
+<option>Teslim Edildi</option>
+<option>İptal</option>
+</select>
+</div>
+<div>
+<input class="form-input w-full h-11 rounded-lg bg-background-light dark:bg-background-dark border-border-light dark:border-border-dark text-text-light dark:text-text-dark text-sm focus:ring-primary focus:border-primary" type="date"/>
+</div>
+</div>
+</div>
+<div class="flex gap-2 pb-6 overflow-x-auto">
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-primary text-white px-4">
+<p class="text-sm font-medium">Tümü</p>
+</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark hover:bg-primary/10 hover:border-primary/50 px-4 transition-colors">
+<p class="text-sm font-medium">Yeni</p>
+</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark hover:bg-primary/10 hover:border-primary/50 px-4 transition-colors">
+<p class="text-sm font-medium">Hazırlanıyor</p>
+</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark hover:bg-primary/10 hover:border-primary/50 px-4 transition-colors">
+<p class="text-sm font-medium">Kargoda</p>
+</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark hover:bg-primary/10 hover:border-primary/50 px-4 transition-colors">
+<p class="text-sm font-medium">Teslim Edildi</p>
+</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark hover:bg-primary/10 hover:border-primary/50 px-4 transition-colors">
+<p class="text-sm font-medium">İptal</p>
+</button>
+</div>
+<div class="overflow-hidden rounded-lg border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark">
+<div class="overflow-x-auto">
+<table class="min-w-full divide-y divide-border-light dark:divide-border-dark">
+<thead class="bg-background-light dark:bg-background-dark">
+<tr>
+<th class="px-6 py-3 text-left text-xs font-bold text-text-muted-light dark:text-text-muted-dark uppercase tracking-wider" scope="col">Sipariş ID</th>
+<th class="px-6 py-3 text-left text-xs font-bold text-text-muted-light dark:text-text-muted-dark uppercase tracking-wider" scope="col">Müşteri</th>
+<th class="px-6 py-3 text-left text-xs font-bold text-text-muted-light dark:text-text-muted-dark uppercase tracking-wider" scope="col">Tarih</th>
+<th class="px-6 py-3 text-left text-xs font-bold text-text-muted-light dark:text-text-muted-dark uppercase tracking-wider" scope="col">Tutar</th>
+<th class="px-6 py-3 text-left text-xs font-bold text-text-muted-light dark:text-text-muted-dark uppercase tracking-wider" scope="col">Durum</th>
+<th class="relative px-6 py-3" scope="col"><span class="sr-only">İşlemler</span></th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border-light dark:divide-border-dark">
+<tr class="hover:bg-background-light dark:hover:bg-background-dark transition-colors">
+<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-primary">#12548</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-text-light dark:text-text-dark">
+<div class="flex items-center gap-3">
+<span>Elif Yılmaz</span>
+<div class="flex items-center gap-1.5">
+<button class="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"><span class="material-symbols-outlined text-green-500">sms</span></button>
+<button class="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"><span class="material-symbols-outlined text-blue-500">chat</span></button>
+<button class="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"><span class="material-symbols-outlined text-gray-500">mail</span></button>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-text-muted-light dark:text-text-muted-dark">12.08.2023</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-text-muted-light dark:text-text-muted-dark">₺2,499.90</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-status-teslim/10 text-status-teslim">Teslim Edildi</span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<button class="text-primary hover:text-primary/80">Detayları Gör</button>
+</td>
+</tr>
+<tr class="hover:bg-background-light dark:hover:bg-background-dark transition-colors">
+<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-primary">#12547</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-text-light dark:text-text-dark">
+<div class="flex items-center gap-3">
+<span>Ahmet Kaya</span>
+<div class="flex items-center gap-1.5">
+<button class="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"><span class="material-symbols-outlined text-green-500">sms</span></button>
+<button class="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"><span class="material-symbols-outlined text-blue-500">chat</span></button>
+<button class="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"><span class="material-symbols-outlined text-gray-500">mail</span></button>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-text-muted-light dark:text-text-muted-dark">12.08.2023</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-text-muted-light dark:text-text-muted-dark">₺1,799.00</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm">
+<div class="flex flex-col gap-1.5 items-start">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-status-kargoda/10 text-status-kargoda">Kargoda</span>
+<div class="flex items-center gap-1.5 text-text-muted-light dark:text-text-muted-dark">
+<span class="material-symbols-outlined text-green-500 text-sm">sms</span>
+<p class="text-xs">Otomatik bildirim gönderildi.</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<button class="text-primary hover:text-primary/80">Detayları Gör</button>
+</td>
+</tr>
+<tr class="hover:bg-background-light dark:hover:bg-background-dark transition-colors">
+<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-primary">#12546</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-text-light dark:text-text-dark">
+<div class="flex items-center gap-3">
+<span>Zeynep Demir</span>
+<div class="flex items-center gap-1.5">
+<button class="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"><span class="material-symbols-outlined text-green-500">sms</span></button>
+<button class="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"><span class="material-symbols-outlined text-blue-500">chat</span></button>
+<button class="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"><span class="material-symbols-outlined text-gray-500">mail</span></button>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-text-muted-light dark:text-text-muted-dark">11.08.2023</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-text-muted-light dark:text-text-muted-dark">₺3,150.50</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-status-hazirlaniyor/20 text-status-hazirlaniyor dark:text-[#FFD66B]">Hazırlanıyor</span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<button class="text-primary hover:text-primary/80">Detayları Gör</button>
+</td>
+</tr>
+<tr class="hover:bg-background-light dark:hover:bg-background-dark transition-colors">
+<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-primary">#12545</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-text-light dark:text-text-dark">
+<div class="flex items-center gap-3">
+<span>Mustafa Çelik</span>
+<div class="flex items-center gap-1.5">
+<button class="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"><span class="material-symbols-outlined text-green-500">sms</span></button>
+<button class="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"><span class="material-symbols-outlined text-blue-500">chat</span></button>
+<button class="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"><span class="material-symbols-outlined text-gray-500">mail</span></button>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-text-muted-light dark:text-text-muted-dark">11.08.2023</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-text-muted-light dark:text-text-muted-dark">₺980.00</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-status-yeni/10 text-status-yeni">Yeni</span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<button class="text-primary hover:text-primary/80">Detayları Gör</button>
+</td>
+</tr>
+<tr class="hover:bg-background-light dark:hover:bg-background-dark transition-colors">
+<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-primary">#12544</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-text-light dark:text-text-dark">
+<div class="flex items-center gap-3">
+<span>Ayşe Arslan</span>
+<div class="flex items-center gap-1.5">
+<button class="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"><span class="material-symbols-outlined text-green-500">sms</span></button>
+<button class="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"><span class="material-symbols-outlined text-blue-500">chat</span></button>
+<button class="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"><span class="material-symbols-outlined text-gray-500">mail</span></button>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-text-muted-light dark:text-text-muted-dark">10.08.2023</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-text-muted-light dark:text-text-muted-dark">₺1,200.00</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-status-iptal/10 text-status-iptal">İptal</span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<button class="text-primary hover:text-primary/80">Detayları Gör</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="flex items-center justify-between border-t border-border-light dark:border-border-dark px-4 py-3 sm:px-6">
+<div class="flex flex-1 justify-between sm:hidden">
+<a class="relative inline-flex items-center rounded-md border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark px-4 py-2 text-sm font-medium text-text-muted-light dark:text-text-muted-dark hover:bg-background-light dark:hover:bg-background-dark" href="#">Previous</a>
+<a class="relative ml-3 inline-flex items-center rounded-md border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark px-4 py-2 text-sm font-medium text-text-muted-light dark:text-text-muted-dark hover:bg-background-light dark:hover:bg-background-dark" href="#">Next</a>
+</div>
+<div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+<div>
+<p class="text-sm text-text-muted-light dark:text-text-muted-dark">
+<span class="font-medium">1</span> - <span class="font-medium">10</span> arası gösteriliyor. Toplam: <span class="font-medium">97</span>
+</p>
+</div>
+<div>
+<nav aria-label="Pagination" class="isolate inline-flex -space-x-px rounded-md shadow-sm">
+<a class="relative inline-flex items-center rounded-l-md px-2 py-2 text-text-muted-light dark:text-text-muted-dark ring-1 ring-inset ring-border-light dark:ring-border-dark hover:bg-background-light dark:hover:bg-background-dark focus:z-20 focus:outline-offset-0" href="#">
+<span class="sr-only">Previous</span>
+<span class="material-symbols-outlined h-5 w-5">chevron_left</span>
+</a>
+<a aria-current="page" class="relative z-10 inline-flex items-center bg-primary/10 px-4 py-2 text-sm font-semibold text-primary focus:z-20" href="#">1</a>
+<a class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-text-light dark:text-text-dark ring-1 ring-inset ring-border-light dark:ring-border-dark hover:bg-background-light dark:hover:bg-background-dark focus:z-20" href="#">2</a>
+<a class="relative hidden items-center px-4 py-2 text-sm font-semibold text-text-light dark:text-text-dark ring-1 ring-inset ring-border-light dark:ring-border-dark hover:bg-background-light dark:hover:bg-background-dark focus:z-20 md:inline-flex" href="#">3</a>
+<span class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-text-muted-light dark:text-text-muted-dark ring-1 ring-inset ring-border-light dark:ring-border-dark">...</span>
+<a class="relative hidden items-center px-4 py-2 text-sm font-semibold text-text-light dark:text-text-dark ring-1 ring-inset ring-border-light dark:ring-border-dark hover:bg-background-light dark:hover:bg-background-dark focus:z-20 md:inline-flex" href="#">8</a>
+<a class="relative inline-flex items-center rounded-r-md px-2 py-2 text-text-muted-light dark:text-text-muted-dark ring-1 ring-inset ring-border-light dark:ring-border-dark hover:bg-background-light dark:hover:bg-background-dark focus:z-20 focus:outline-offset-0" href="#">
+<span class="sr-only">Next</span>
+<span class="material-symbols-outlined h-5 w-5">chevron_right</span>
+</a>
+</nav>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+
+</body></html>

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+
+<html class="light" lang="tr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Kullanıcı Yönetimi - Momez Admin Paneli</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ee2b2b",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#221010",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-gray-800 dark:text-gray-200">
+<div class="flex min-h-screen">
+<!-- SideNavBar -->
+<aside class="w-64 flex-shrink-0 bg-white dark:bg-background-dark/50 border-r border-gray-200 dark:border-gray-700">
+<div class="flex h-full flex-col justify-between p-4">
+<div class="flex flex-col gap-4">
+<div class="flex items-center gap-3 px-3">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" data-alt="Momez company logo" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBNptTEEabjsYK4MwH-Qsl8XCEe-zFldEsooQxBWmL9IJ2VGKtDCt-RvUuz-g5GsKVYEKLCNmbecqO5hS55oC-yom2_LfmeG78EHPPlmyBiWJtSReieOZ5wwklokUKQvoTkvO8ZbkJ6ZrvyyCOXDDxMrGSVYdKOzJ-9qBbIzJAgomXDkDC7usW3hLN82wE3EYHsmdVsCnkc4HSylXGrEHKN7hqUNcGD40o89Nx4jqY5dISyX_CUWSfwPpvPRuww0xn03xRtPOrBimYz");'></div>
+<div class="flex flex-col">
+<h1 class="text-gray-900 dark:text-white text-base font-medium leading-normal">Momez Admin</h1>
+<p class="text-gray-500 dark:text-gray-400 text-sm font-normal leading-normal">admin@momez.com</p>
+</div>
+</div>
+<nav class="flex flex-col gap-2 mt-4">
+<a class="flex items-center gap-3 px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<p class="text-sm font-medium leading-normal">Dashboard</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg" href="#">
+<span class="material-symbols-outlined">shopping_cart</span>
+<p class="text-sm font-medium leading-normal">Siparişler</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<p class="text-sm font-medium leading-normal">Ürünler</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">group</span>
+<p class="text-sm font-medium leading-normal">Kullanıcı Yönetimi</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg" href="#">
+<span class="material-symbols-outlined">bar_chart</span>
+<p class="text-sm font-medium leading-normal">Raporlar</p>
+</a>
+</nav>
+</div>
+<div class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg" href="#">
+<span class="material-symbols-outlined">settings</span>
+<p class="text-sm font-medium leading-normal">Ayarlar</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg" href="#">
+<span class="material-symbols-outlined">logout</span>
+<p class="text-sm font-medium leading-normal">Çıkış Yap</p>
+</a>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 p-6 lg:p-8">
+<div class="max-w-7xl mx-auto">
+<!-- Breadcrumbs -->
+<div class="flex flex-wrap gap-2 mb-6">
+<a class="text-gray-500 dark:text-gray-400 text-sm font-medium leading-normal hover:text-primary" href="#">Admin Paneli</a>
+<span class="text-gray-500 dark:text-gray-400 text-sm font-medium leading-normal">/</span>
+<span class="text-gray-800 dark:text-white text-sm font-medium leading-normal">Kullanıcı Yönetimi</span>
+</div>
+<!-- PageHeading -->
+<div class="flex flex-wrap justify-between items-start gap-4 mb-6">
+<div class="flex flex-col gap-2">
+<h1 class="text-gray-900 dark:text-white text-3xl font-bold tracking-tight">Kullanıcı Rolleri ve Yetkileri</h1>
+<p class="text-gray-500 dark:text-gray-400 text-base font-normal leading-normal">Mevcut kullanıcıları yönetin, yeni kullanıcılar ekleyin ve yetkilerini düzenleyin.</p>
+</div>
+</div>
+<!-- Toolbar & Search -->
+<div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-4">
+<!-- SearchBar -->
+<div class="w-full md:max-w-xs">
+<label class="flex flex-col h-11 w-full">
+<div class="flex w-full flex-1 items-stretch rounded-lg h-full">
+<div class="text-gray-500 dark:text-gray-400 flex bg-white dark:bg-background-dark/50 border border-gray-300 dark:border-gray-600 items-center justify-center pl-3.5 rounded-l-lg border-r-0">
+<span class="material-symbols-outlined text-xl">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-r-lg text-gray-800 dark:text-gray-200 focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark/50 h-full placeholder:text-gray-500 dark:placeholder:text-gray-400 px-4 border-l-0 text-sm font-normal leading-normal" placeholder="Kullanıcı adı veya e-posta ile ara..."/>
+</div>
+</label>
+</div>
+<!-- ToolBar -->
+<div class="flex w-full md:w-auto justify-end gap-2">
+<button class="flex items-center justify-center p-2.5 h-11 border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark/50 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
+<span class="material-symbols-outlined text-xl">filter_list</span>
+</button>
+<button class="flex items-center justify-center p-2.5 h-11 border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark/50 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
+<span class="material-symbols-outlined text-xl">download</span>
+</button>
+<button class="flex items-center justify-center overflow-hidden rounded-lg h-11 bg-primary text-white gap-2 text-sm font-bold leading-normal tracking-wide min-w-0 px-4 hover:bg-primary/90 transition-colors">
+<span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">add</span>
+<span class="truncate">Yeni Kullanıcı Ekle</span>
+</button>
+</div>
+</div>
+<!-- Users Table -->
+<div class="bg-white dark:bg-background-dark/50 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-sm text-left">
+<thead class="bg-gray-50 dark:bg-gray-800/50 text-xs text-gray-600 dark:text-gray-400 uppercase">
+<tr>
+<th class="px-6 py-3 font-medium" scope="col">Kullanıcı Adı</th>
+<th class="px-6 py-3 font-medium" scope="col">E-posta</th>
+<th class="px-6 py-3 font-medium" scope="col">Rol</th>
+<th class="px-6 py-3 font-medium" scope="col">Son Giriş</th>
+<th class="px-6 py-3 font-medium text-right" scope="col">Eylemler</th>
+</tr>
+</thead>
+<tbody>
+<tr class="border-b dark:border-gray-700">
+<td class="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap">Ali Veli</td>
+<td class="px-6 py-4">ali.veli@momez.com</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 text-xs font-medium text-red-800 bg-red-100 dark:text-red-200 dark:bg-red-900/50 rounded-full">Admin</span>
+</td>
+<td class="px-6 py-4">24.05.2024 10:30</td>
+<td class="px-6 py-4 text-right">
+<button class="p-2 text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-primary rounded-md"><span class="material-symbols-outlined text-xl">edit</span></button>
+<button class="p-2 text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-primary rounded-md"><span class="material-symbols-outlined text-xl">delete</span></button>
+</td>
+</tr>
+<tr class="border-b dark:border-gray-700">
+<td class="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap">Ayşe Yılmaz</td>
+<td class="px-6 py-4">ayse.yilmaz@momez.com</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 text-xs font-medium text-blue-800 bg-blue-100 dark:text-blue-200 dark:bg-blue-900/50 rounded-full">Çalışan</span>
+</td>
+<td class="px-6 py-4">23.05.2024 15:45</td>
+<td class="px-6 py-4 text-right">
+<button class="p-2 text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-primary rounded-md"><span class="material-symbols-outlined text-xl">edit</span></button>
+<button class="p-2 text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-primary rounded-md"><span class="material-symbols-outlined text-xl">delete</span></button>
+</td>
+</tr>
+<tr class="border-b dark:border-gray-700">
+<td class="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap">Mehmet Kaya</td>
+<td class="px-6 py-4">mehmet.kaya@momez.com</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 text-xs font-medium text-blue-800 bg-blue-100 dark:text-blue-200 dark:bg-blue-900/50 rounded-full">Çalışan</span>
+</td>
+<td class="px-6 py-4">22.05.2024 09:12</td>
+<td class="px-6 py-4 text-right">
+<button class="p-2 text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-primary rounded-md"><span class="material-symbols-outlined text-xl">edit</span></button>
+<button class="p-2 text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-primary rounded-md"><span class="material-symbols-outlined text-xl">delete</span></button>
+</td>
+</tr>
+<tr class="">
+<td class="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap">Fatma Demir</td>
+<td class="px-6 py-4">fatma.demir@momez.com</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 text-xs font-medium text-blue-800 bg-blue-100 dark:text-blue-200 dark:bg-blue-900/50 rounded-full">Çalışan</span>
+</td>
+<td class="px-6 py-4">24.05.2024 11:05</td>
+<td class="px-6 py-4 text-right">
+<button class="p-2 text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-primary rounded-md"><span class="material-symbols-outlined text-xl">edit</span></button>
+<button class="p-2 text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-primary rounded-md"><span class="material-symbols-outlined text-xl">delete</span></button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Add/Edit User Modal (Initially hidden) -->
+<!-- For a real application, this would be controlled by JS. For this static design, it's just here for structure. -->
+<!--
+    <div class="fixed inset-0 bg-black/30 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-background-dark rounded-xl shadow-lg w-full max-w-lg">
+            <div class="p-6 border-b dark:border-gray-700">
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white">Yeni Kullanıcı Ekle</h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Yeni bir yönetici veya çalışan hesabı oluşturun.</p>
+            </div>
+            <div class="p-6 space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Kullanıcı Adı</label>
+                        <input type="text" id="name" class="form-input w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark/50 focus:ring-primary focus:border-primary">
+                    </div>
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">E-posta Adresi</label>
+                        <input type="email" id="email" class="form-input w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark/50 focus:ring-primary focus:border-primary">
+                    </div>
+                </div>
+                 <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Şifre</label>
+                    <input type="password" id="password" class="form-input w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark/50 focus:ring-primary focus:border-primary">
+                </div>
+                <div>
+                    <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Rol</h3>
+                    <div class="flex gap-4">
+                        <label class="flex items-center gap-2">
+                            <input type="radio" name="role" class="form-radio text-primary focus:ring-primary">
+                            <span>Admin</span>
+                        </label>
+                        <label class="flex items-center gap-2">
+                            <input type="radio" name="role" class="form-radio text-primary focus:ring-primary" checked>
+                            <span>Çalışan</span>
+                        </label>
+                    </div>
+                </div>
+                 <div>
+                    <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Yetkiler</h3>
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-2">
+                            <input type="checkbox" class="form-checkbox rounded text-primary focus:ring-primary">
+                            <span>Sipariş Yönetimi</span>
+                        </label>
+                         <label class="flex items-center gap-2">
+                            <input type="checkbox" class="form-checkbox rounded text-primary focus:ring-primary">
+                            <span>Ürün & Stok Yönetimi</span>
+                        </label>
+                         <label class="flex items-center gap-2">
+                            <input type="checkbox" class="form-checkbox rounded text-primary focus:ring-primary">
+                            <span>Raporları Görüntüleme</span>
+                        </label>
+                         <label class="flex items-center gap-2">
+                            <input type="checkbox" class="form-checkbox rounded text-primary focus:ring-primary">
+                            <span>Kullanıcıları Yönetme (Sadece Admin)</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="p-6 bg-gray-50 dark:bg-gray-800/50 rounded-b-xl flex justify-end gap-3">
+                <button class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600">İptal</button>
+                <button class="px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary/90">Kaydet</button>
+            </div>
+        </div>
+    </div>
+    -->
+</body></html>

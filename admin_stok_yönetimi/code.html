@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+
+<html class="light" lang="tr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Momez - Stok Yönetimi</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#ee2b2b",
+            "background-light": "#f8f6f6",
+            "background-dark": "#221010",
+          },
+          fontFamily: {
+            "display": ["Manrope"]
+          },
+          borderRadius: {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+  </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-gray-800 dark:text-gray-200">
+<div class="flex h-screen w-full">
+<!-- SideNavBar -->
+<aside class="flex w-64 flex-col border-r border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-background-dark">
+<div class="flex flex-col gap-4">
+<div class="flex items-center gap-3">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" data-alt="momez brand logo" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDnqSiS5Ips5_ipx-ppxjkvDn51BVO9HgQrWv49NW3oP1FaTQhZloarzcUdJ1JyWj3bDUKnXti9AtGiRLvTDdGROz75p6goeafO5f9tpPvskIul0oyDj3fkackza1WB_wtRgkbke2d0WXrEQuKn5UPP2Z9EIfdLFVt-7pKoJmsdygjYU7I9Ev93Prd771yRo6bAX2W1yfNTNqFMQXs0QtUcGrlxNHdyLZQYwNLLG6SkNk3EgZs15EpCNToNgtz2CdVeneSWuV1by97O");'></div>
+<div class="flex flex-col">
+<h1 class="text-base font-bold text-gray-900 dark:text-white">momez</h1>
+<p class="text-sm font-normal text-gray-500 dark:text-gray-400">E-commerce Panel</p>
+</div>
+</div>
+<nav class="mt-4 flex flex-col gap-2">
+<a class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800" href="#">
+<span class="material-symbols-outlined text-gray-800 dark:text-gray-200">dashboard</span>
+<p class="text-sm font-medium">Dashboard</p>
+</a>
+<a class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800" href="#">
+<span class="material-symbols-outlined text-gray-800 dark:text-gray-200">shopping_cart</span>
+<p class="text-sm font-medium">Orders</p>
+</a>
+<a class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800" href="#">
+<span class="material-symbols-outlined text-gray-800 dark:text-gray-200">sell</span>
+<p class="text-sm font-medium">Products</p>
+</a>
+<a class="flex items-center gap-3 rounded-lg bg-red-100 px-3 py-2 text-primary dark:bg-primary/20" href="#">
+<span class="material-symbols-outlined text-primary">inventory_2</span>
+<p class="text-sm font-medium text-primary">Inventory</p>
+</a>
+</nav>
+</div>
+<div class="mt-auto flex flex-col gap-1">
+<a class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800" href="#">
+<span class="material-symbols-outlined text-gray-800 dark:text-gray-200">settings</span>
+<p class="text-sm font-medium">Settings</p>
+</a>
+<a class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800" href="#">
+<span class="material-symbols-outlined text-gray-800 dark:text-gray-200">logout</span>
+<p class="text-sm font-medium">Logout</p>
+</a>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 overflow-y-auto">
+<div class="mx-auto max-w-7xl p-6 lg:p-8">
+<!-- PageHeading -->
+<div class="flex flex-wrap items-center justify-between gap-4">
+<div class="flex flex-col gap-1">
+<h1 class="text-3xl font-black tracking-tight text-gray-900 dark:text-white">Stok Yönetimi</h1>
+<p class="text-base font-normal text-gray-500 dark:text-gray-400">Ürün stoklarını numara bazında yönetin ve güncelleyin.</p>
+</div>
+<button class="flex h-10 cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg bg-white px-4 text-sm font-bold text-gray-800 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-700 dark:text-white dark:ring-gray-600 dark:hover:bg-gray-600">
+<span class="material-symbols-outlined text-base">download</span>
+<span class="truncate">Rapor İndir</span>
+</button>
+</div>
+<!-- Stats -->
+<div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+<div class="flex flex-col gap-2 rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-800">
+<p class="text-base font-medium text-gray-600 dark:text-gray-300">Toplam Ürün Sayısı</p>
+<p class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">254</p>
+</div>
+<div class="flex flex-col gap-2 rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-800">
+<p class="text-base font-medium text-gray-600 dark:text-gray-300">Düşük Stoktaki Ürünler</p>
+<p class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">28</p>
+</div>
+<div class="flex flex-col gap-2 rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-800">
+<p class="text-base font-medium text-gray-600 dark:text-gray-300">Stok Dışı Ürünler</p>
+<p class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">12</p>
+</div>
+</div>
+<!-- Toolbar and Table container -->
+<div class="mt-6 rounded-xl border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
+<!-- ToolBar -->
+<div class="flex flex-wrap items-center justify-between gap-4 border-b border-gray-200 p-4 dark:border-gray-700">
+<div class="flex items-center gap-2">
+<div class="relative w-full max-w-xs">
+<div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+<span class="material-symbols-outlined text-gray-500">search</span>
+</div>
+<input class="block w-full rounded-lg border-gray-300 bg-gray-50 py-2 pl-10 pr-3 text-sm focus:border-primary focus:ring-primary dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400" placeholder="Ürün adı veya SKU ara..." type="text"/>
+</div>
+<!-- Chips -->
+<div class="hidden items-center gap-2 sm:flex">
+<button class="flex h-9 shrink-0 cursor-pointer items-center justify-center gap-x-2 rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-800 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">Tümü</button>
+<button class="flex h-9 shrink-0 cursor-pointer items-center justify-center gap-x-2 rounded-lg bg-transparent px-4 text-sm font-medium text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700">Stokta</button>
+<button class="flex h-9 shrink-0 cursor-pointer items-center justify-center gap-x-2 rounded-lg bg-transparent px-4 text-sm font-medium text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700">Düşük Stok</button>
+<button class="flex h-9 shrink-0 cursor-pointer items-center justify-center gap-x-2 rounded-lg bg-transparent px-4 text-sm font-medium text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700">Stok Tükendi</button>
+</div>
+</div>
+<button class="flex h-10 min-w-0 cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg bg-primary px-4 text-sm font-bold leading-normal tracking-wide text-white hover:bg-primary/90">
+<span class="material-symbols-outlined text-lg">upload</span>
+<span class="truncate">Toplu Güncelle</span>
+</button>
+</div>
+<!-- Inventory Table -->
+<div class="overflow-x-auto">
+<table class="min-w-full divide-y divide-gray-200 text-sm dark:divide-gray-700">
+<thead class="bg-gray-50 dark:bg-gray-700/50">
+<tr>
+<th class="px-6 py-3 text-left font-semibold text-gray-600 dark:text-gray-300" scope="col">Ürün</th>
+<th class="px-4 py-3 text-center font-semibold text-gray-600 dark:text-gray-300" scope="col">38</th>
+<th class="px-4 py-3 text-center font-semibold text-gray-600 dark:text-gray-300" scope="col">39</th>
+<th class="px-4 py-3 text-center font-semibold text-gray-600 dark:text-gray-300" scope="col">40</th>
+<th class="px-4 py-3 text-center font-semibold text-gray-600 dark:text-gray-300" scope="col">41</th>
+<th class="px-4 py-3 text-center font-semibold text-gray-600 dark:text-gray-300" scope="col">42</th>
+<th class="px-6 py-3 text-right font-semibold text-gray-600 dark:text-gray-300" scope="col">Eylemler</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
+<!-- Table Row 1 -->
+<tr>
+<td class="whitespace-nowrap px-6 py-4">
+<div class="flex items-center gap-4">
+<div class="h-12 w-12 flex-shrink-0 rounded-lg bg-cover bg-center" data-alt="Red running shoe" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA-K9XeWFKx_3jtkUwwkoq9Lp0Q-f01TUz1-gd7LSmN6MCjEAzxMj7FpgM-g2JTmJmV6UZKMp4JPsqU4bbatqziIb6NDV2sq_qPdCZqya2ZcHH8ZWeya44LYpyv5Zv6yPicz62tp4v_0Gpn105d6BOBRWmXCk_wvgLbW0kJhAqc-Jvh8pvZK_JO12XNo-BLMIDQuzkzIYYXbMcxTfzvK0rzG4D4wU8hgswdZXl2PpnkhvEMw0ehP2m09GLMX_mlyJ1EKiPkCNGQ9uer');"></div>
+<div>
+<div class="font-medium text-gray-900 dark:text-white">Momez Runner Pro</div>
+<div class="text-gray-500 dark:text-gray-400">SKU: MZ-RP-001</div>
+</div>
+</div>
+</td>
+<td class="whitespace-nowrap px-4 py-4 text-center">
+<input class="w-16 rounded-md border-gray-300 bg-transparent text-center focus:border-primary focus:ring-primary dark:border-gray-600 dark:text-white" type="number" value="15"/>
+</td>
+<td class="whitespace-nowrap px-4 py-4 text-center">
+<input class="w-16 rounded-md border-gray-300 bg-transparent text-center focus:border-primary focus:ring-primary dark:border-gray-600 dark:text-white" type="number" value="25"/>
+</td>
+<td class="whitespace-nowrap px-4 py-4 text-center">
+<input class="w-16 rounded-md border-yellow-400 bg-yellow-50 text-center text-yellow-800 focus:border-primary focus:ring-primary dark:border-yellow-600 dark:bg-yellow-900/50 dark:text-yellow-300" type="number" value="3"/>
+</td>
+<td class="whitespace-nowrap px-4 py-4 text-center">
+<input class="w-16 rounded-md border-gray-300 bg-transparent text-center focus:border-primary focus:ring-primary dark:border-gray-600 dark:text-white" type="number" value="18"/>
+</td>
+<td class="whitespace-nowrap px-4 py-4 text-center">
+<input class="w-16 rounded-md border-red-300 bg-red-50 text-center text-red-800 focus:border-primary focus:ring-primary dark:border-red-600 dark:bg-red-900/50 dark:text-red-300" type="number" value="0"/>
+</td>
+<td class="whitespace-nowrap px-6 py-4 text-right">
+<button class="rounded-md bg-primary/10 px-3 py-1 text-xs font-semibold text-primary hover:bg-primary/20 dark:bg-primary/20 dark:hover:bg-primary/30">Güncelle</button>
+</td>
+</tr>
+<!-- Table Row 2 -->
+<tr>
+<td class="whitespace-nowrap px-6 py-4">
+<div class="flex items-center gap-4">
+<div class="h-12 w-12 flex-shrink-0 rounded-lg bg-cover bg-center" data-alt="White casual sneaker" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCkM0cB9ERaTP5Xg3MAcVyxwPS8UB9tA1LjG_kPrkvsuLP7ZU1CsT3HLG2st0h3ofeclV1cj1lCwnQ0E4HLDld9yHUwAj52Mri8JRq29gfIh4sDs32ubb_z_U9pHe-wl4IhsmDyH4z8cu2hZjA0xq8vsS2c2dcvLFZgPblMUiH3MeF-g9qXkSjL4V0flsAMUqu6dmsng-b-qX6b-cxctF-6tka2NN65Ryea0Zr9FUcXX-JOZc3Mc5EPr3yqk48LjmMKB_wWFdCUgOud');"></div>
+<div>
+<div class="font-medium text-gray-900 dark:text-white">Momez Casual V2</div>
+<div class="text-gray-500 dark:text-gray-400">SKU: MZ-CS-002</div>
+</div>
+</div>
+</td>
+<td class="whitespace-nowrap px-4 py-4 text-center">
+<input class="w-16 rounded-md border-gray-300 bg-transparent text-center focus:border-primary focus:ring-primary dark:border-gray-600 dark:text-white" type="number" value="30"/>
+</td>
+<td class="whitespace-nowrap px-4 py-4 text-center">
+<input class="w-16 rounded-md border-gray-300 bg-transparent text-center focus:border-primary focus:ring-primary dark:border-gray-600 dark:text-white" type="number" value="45"/>
+</td>
+<td class="whitespace-nowrap px-4 py-4 text-center">
+<input class="w-16 rounded-md border-gray-300 bg-transparent text-center focus:border-primary focus:ring-primary dark:border-gray-600 dark:text-white" type="number" value="50"/>
+</td>
+<td class="whitespace-nowrap px-4 py-4 text-center">
+<input class="w-16 rounded-md border-gray-300 bg-transparent text-center focus:border-primary focus:ring-primary dark:border-gray-600 dark:text-white" type="number" value="12"/>
+</td>
+<td class="whitespace-nowrap px-4 py-4 text-center">
+<input class="w-16 rounded-md border-gray-300 bg-transparent text-center focus:border-primary focus:ring-primary dark:border-gray-600 dark:text-white" type="number" value="22"/>
+</td>
+<td class="whitespace-nowrap px-6 py-4 text-right">
+<button class="rounded-md bg-primary/10 px-3 py-1 text-xs font-semibold text-primary hover:bg-primary/20 dark:bg-primary/20 dark:hover:bg-primary/30">Güncelle</button>
+</td>
+</tr>
+<!-- Table Row 3 -->
+<tr>
+<td class="whitespace-nowrap px-6 py-4">
+<div class="flex items-center gap-4">
+<div class="h-12 w-12 flex-shrink-0 rounded-lg bg-cover bg-center" data-alt="Black training shoe" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDXOaoRD-OQalztWhEfs301p8nj1qvT5ABPNJYPK718by1IqnhOaShEVx4Jy3dFV94jhKBFvrsdqI891JT9coshi6JjOC1R1P3EuCB_i5tlgS7WYQJCmvGlKbFpYr_5njl4jSNnO235kxHMxJR1IsTDfeqhTjB2H57YF7yEpFynThnAn90tOIR4aBRppqvadx8ntwLpp3-_Vho5ReuDlj7yYEx9USxGwfRcDnyvWAZ4gl0i2bcbjLRJ2lIz0CBQlyHmVPeBFTHap9dc');"></div>
+<div>
+<div class="font-medium text-gray-900 dark:text-white">Momez Trainer X</div>
+<div class="text-gray-500 dark:text-gray-400">SKU: MZ-TR-003</div>
+</div>
+</div>
+</td>
+<td class="whitespace-nowrap px-4 py-4 text-center">
+<input class="w-16 rounded-md border-yellow-400 bg-yellow-50 text-center text-yellow-800 focus:border-primary focus:ring-primary dark:border-yellow-600 dark:bg-yellow-900/50 dark:text-yellow-300" type="number" value="8"/>
+</td>
+<td class="whitespace-nowrap px-4 py-4 text-center">
+<input class="w-16 rounded-md border-yellow-400 bg-yellow-50 text-center text-yellow-800 focus:border-primary focus:ring-primary dark:border-yellow-600 dark:bg-yellow-900/50 dark:text-yellow-300" type="number" value="5"/>
+</td>
+<td class="whitespace-nowrap px-4 py-4 text-center">
+<input class="w-16 rounded-md border-gray-300 bg-transparent text-center focus:border-primary focus:ring-primary dark:border-gray-600 dark:text-white" type="number" value="11"/>
+</td>
+<td class="whitespace-nowrap px-4 py-4 text-center">
+<input class="w-16 rounded-md border-gray-300 bg-transparent text-center focus:border-primary focus:ring-primary dark:border-gray-600 dark:text-white" type="number" value="14"/>
+</td>
+<td class="whitespace-nowrap px-4 py-4 text-center">
+<input class="w-16 rounded-md border-red-300 bg-red-50 text-center text-red-800 focus:border-primary focus:ring-primary dark:border-red-600 dark:bg-red-900/50 dark:text-red-300" type="number" value="0"/>
+</td>
+<td class="whitespace-nowrap px-6 py-4 text-right">
+<button class="rounded-md bg-primary/10 px-3 py-1 text-xs font-semibold text-primary hover:bg-primary/20 dark:bg-primary/20 dark:hover:bg-primary/30">Güncelle</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

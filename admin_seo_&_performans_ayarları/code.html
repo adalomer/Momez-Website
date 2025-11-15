@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SEO &amp; Performance Settings - momez Admin</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ee2b2b",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#221010",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+<div class="relative flex min-h-screen w-full">
+<!-- SideNavBar -->
+<div class="flex-shrink-0 w-64 bg-white dark:bg-[#1C1C1C] border-r border-gray-200 dark:border-gray-800">
+<div class="flex h-full min-h-[700px] flex-col justify-between p-4">
+<div class="flex flex-col gap-4">
+<div class="flex items-center gap-3 px-3 py-2">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" data-alt="momez brand logo" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuClz6-7d_FQNcgvB21RzEuPR_xDGQOIMPLS6mCI-8BczsZ1xrHIkeBufkxbXngXrqgCWVwgXYbqw9IhlrFJQDad7QUivXnE9s4AVxL5FJW3sNCWBsiEK_lsjW83KJnd2H48rIbW5vYI_sBRKjljSRTCXTaKrl8fdz1YNNxeyGBcz_QHd-xN6drDX_CkA_c6iv5yBOvndlj1PttI5XBXvSv7Ja0_Jl25xbzyLwONOxOWyOFFj129fjOyM3tHj_sKyZ8u3fMrQykToFh2");'></div>
+<div class="flex flex-col">
+<h1 class="text-gray-900 dark:text-gray-100 text-base font-medium leading-normal">momez</h1>
+<p class="text-gray-500 dark:text-gray-400 text-sm font-normal leading-normal">Admin Panel</p>
+</div>
+</div>
+<div class="flex flex-col gap-2 mt-4">
+<a class="flex items-center gap-3 px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg" href="#">
+<span class="material-symbols-outlined text-gray-800 dark:text-gray-200">dashboard</span>
+<p class="text-sm font-medium">Dashboard</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg" href="#">
+<span class="material-symbols-outlined text-gray-800 dark:text-gray-200">inventory_2</span>
+<p class="text-sm font-medium">Products</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg" href="#">
+<span class="material-symbols-outlined text-gray-800 dark:text-gray-200">receipt_long</span>
+<p class="text-sm font-medium">Orders</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg" href="#">
+<span class="material-symbols-outlined text-gray-800 dark:text-gray-200">group</span>
+<p class="text-sm font-medium">Customers</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/10 text-primary" href="#">
+<span class="material-symbols-outlined font-bold">settings</span>
+<p class="text-sm font-medium">Settings</p>
+</a>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg" href="#">
+<span class="material-symbols-outlined text-gray-800 dark:text-gray-200">help_outline</span>
+<p class="text-sm font-medium">Help</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg" href="#">
+<span class="material-symbols-outlined text-gray-800 dark:text-gray-200">logout</span>
+<p class="text-sm font-medium">Logout</p>
+</a>
+</div>
+</div>
+</div>
+<!-- Main Content -->
+<main class="flex-1 p-8 overflow-y-auto">
+<div class="max-w-4xl mx-auto">
+<!-- Breadcrumbs -->
+<div class="flex flex-wrap gap-2 mb-4">
+<a class="text-gray-500 dark:text-gray-400 text-sm font-medium leading-normal" href="#">Dashboard</a>
+<span class="text-gray-500 dark:text-gray-400 text-sm font-medium leading-normal">/</span>
+<a class="text-gray-500 dark:text-gray-400 text-sm font-medium leading-normal" href="#">Settings</a>
+<span class="text-gray-500 dark:text-gray-400 text-sm font-medium leading-normal">/</span>
+<span class="text-gray-900 dark:text-gray-100 text-sm font-medium leading-normal">SEO &amp; Performance</span>
+</div>
+<!-- PageHeading -->
+<div class="flex flex-wrap justify-between items-center gap-4 mb-6">
+<p class="text-gray-900 dark:text-gray-100 text-3xl font-bold leading-tight tracking-tight">SEO &amp; Performance Settings</p>
+<button class="bg-primary text-white font-semibold text-sm py-2 px-5 rounded-lg flex items-center gap-2">
+<span class="material-symbols-outlined">save</span>
+                        Save Changes
+                    </button>
+</div>
+<!-- Tabs -->
+<div class="border-b border-gray-200 dark:border-gray-700">
+<div class="flex gap-8">
+<a class="flex items-center justify-center border-b-2 border-primary text-primary pb-3" href="#">
+<p class="text-sm font-bold">SEO</p>
+</a>
+<a class="flex items-center justify-center border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 pb-3" href="#">
+<p class="text-sm font-bold">Performance</p>
+</a>
+<a class="flex items-center justify-center border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 pb-3" href="#">
+<p class="text-sm font-bold">Integrations</p>
+</a>
+<a class="flex items-center justify-center border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 pb-3" href="#">
+<p class="text-sm font-bold">Security &amp; Backup</p>
+</a>
+</div>
+</div>
+<!-- Settings Content -->
+<div class="mt-8 space-y-8">
+<!-- Section: Meta Tags -->
+<div class="bg-white dark:bg-gray-900/50 p-6 rounded-xl border border-gray-200 dark:border-gray-800">
+<h2 class="text-gray-900 dark:text-gray-100 text-lg font-bold">Meta Tags per Page</h2>
+<p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Manage default and page-specific meta titles and descriptions.</p>
+<div class="mt-6 space-y-6">
+<div>
+<label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="default-title">Default Meta Title</label>
+<input class="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 shadow-sm focus:border-primary focus:ring-primary text-sm dark:text-gray-200" id="default-title" type="text" value="momez - Premium Shoes for Modern Style"/>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="default-description">Default Meta Description</label>
+<textarea class="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 shadow-sm focus:border-primary focus:ring-primary text-sm dark:text-gray-200" id="default-description" rows="3">Discover the latest collection of premium shoes at momez. Quality craftsmanship, modern designs, and unparalleled comfort.</textarea>
+</div>
+</div>
+</div>
+<!-- Section: Clean URLs -->
+<div class="bg-white dark:bg-gray-900/50 p-6 rounded-xl border border-gray-200 dark:border-gray-800">
+<h2 class="text-gray-900 dark:text-gray-100 text-lg font-bold">Clean URL Structure</h2>
+<p class="text-gray-500 dark:text-gray-400 text-sm mt-1">We automatically generate SEO-friendly URLs for your products and pages.</p>
+<div class="mt-4 space-y-2 text-sm">
+<p class="text-gray-600 dark:text-gray-300">
+<span class="font-semibold text-gray-800 dark:text-gray-100">Product Page Example:</span>
+<code class="ml-2 bg-gray-100 dark:bg-gray-800 p-1 rounded-md text-primary">/products/urban-sneaker-v2</code>
+</p>
+<p class="text-gray-600 dark:text-gray-300">
+<span class="font-semibold text-gray-800 dark:text-gray-100">Category Page Example:</span>
+<code class="ml-2 bg-gray-100 dark:bg-gray-800 p-1 rounded-md text-primary">/category/running-shoes</code>
+</p>
+</div>
+</div>
+<!-- Section: Performance -->
+<div class="bg-white dark:bg-gray-900/50 p-6 rounded-xl border border-gray-200 dark:border-gray-800">
+<h2 class="text-gray-900 dark:text-gray-100 text-lg font-bold">Performance Optimization</h2>
+<p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Configure settings to improve your site's loading speed.</p>
+<div class="mt-6 space-y-6">
+<div class="flex items-center justify-between">
+<div>
+<h3 class="text-sm font-medium text-gray-800 dark:text-gray-200">Automatic WebP Conversion</h3>
+<p class="text-xs text-gray-500 dark:text-gray-400">Convert uploaded images to the next-gen WebP format.</p>
+</div>
+<button aria-checked="true" class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-primary" role="switch" type="button">
+<span class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out translate-x-5"></span>
+</button>
+</div>
+<div class="flex items-center justify-between">
+<div>
+<h3 class="text-sm font-medium text-gray-800 dark:text-gray-200">Image Compression</h3>
+<p class="text-xs text-gray-500 dark:text-gray-400">Automatically compress images to reduce file size.</p>
+</div>
+<button aria-checked="true" class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-primary" role="switch" type="button">
+<span class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out translate-x-5"></span>
+</button>
+</div>
+<div class="flex items-center justify-between">
+<div>
+<h3 class="text-sm font-medium text-gray-800 dark:text-gray-200">Enable Server Caching</h3>
+<p class="text-xs text-gray-500 dark:text-gray-400">Store common responses to speed up page loads for repeat visitors.</p>
+</div>
+<button aria-checked="false" class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-gray-200 dark:bg-gray-700" role="switch" type="button">
+<span class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out translate-x-0"></span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

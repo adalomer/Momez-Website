@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>momez - Modern E-Commerce</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#ee2b2b",
+            "background-light": "#ffffff",
+            "background-dark": "#111111",
+          },
+          fontFamily: {
+            "display": ["Plus Jakarta Sans", "sans-serif"]
+          },
+          borderRadius: { "DEFAULT": "0.5rem", "lg": "0.75rem", "xl": "1rem", "full": "9999px" },
+        },
+      },
+    }
+  </script>
+</head>
+<body class="font-display bg-background-light dark:bg-background-dark text-gray-900 dark:text-gray-100">
+<div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<div class="px-4 sm:px-10 md:px-20 lg:px-40 flex flex-1 justify-center py-5">
+<div class="layout-content-container flex flex-col w-full max-w-[1280px] flex-1">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-gray-200 dark:border-gray-800 px-4 md:px-0 py-4 gap-4">
+<div class="flex items-center gap-10">
+<div class="flex items-center gap-2 text-gray-900 dark:text-gray-100">
+<div class="size-8 text-primary">
+<svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M44 4H30.6666V17.3334H17.3334V30.6666H4V44H44V4Z" fill="currentColor"></path>
+</svg>
+</div>
+<h2 class="text-2xl font-bold leading-tight tracking-[-0.015em] dark:text-white">momez</h2>
+</div>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-sm font-medium text-gray-600 hover:text-primary transition-colors dark:text-gray-300 dark:hover:text-primary" href="#">Erkek</a>
+<a class="text-sm font-medium text-gray-600 hover:text-primary transition-colors dark:text-gray-300 dark:hover:text-primary" href="#">Kadın</a>
+<a class="text-sm font-medium text-gray-600 hover:text-primary transition-colors dark:text-gray-300 dark:hover:text-primary" href="#">Spor</a>
+<a class="text-sm font-medium text-gray-600 hover:text-primary transition-colors dark:text-gray-300 dark:hover:text-primary" href="#">Yeni</a>
+<a class="text-sm font-medium text-gray-600 hover:text-primary transition-colors dark:text-gray-300 dark:hover:text-primary" href="#">Çok Satanlar</a>
+</nav>
+</div>
+<div class="flex items-center justify-end gap-3 flex-1">
+<div class="relative w-full max-w-sm hidden lg:block">
+<input class="w-full h-10 pl-10 pr-4 text-sm bg-gray-100 dark:bg-gray-800 border border-transparent rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent dark:text-gray-200" placeholder="Ürün adı veya kodu ile ara..." type="text"/>
+<div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+<span class="material-symbols-outlined text-gray-400">search</span>
+</div>
+</div>
+<button class="flex lg:hidden max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+<span class="material-symbols-outlined">search</span>
+</button>
+<button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+<span class="material-symbols-outlined">favorite</span>
+</button>
+<button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+<span class="material-symbols-outlined">shopping_bag</span>
+</button>
+<button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+<span class="material-symbols-outlined">person</span>
+</button>
+</div>
+</header>
+<main class="flex flex-col gap-10 md:gap-16 mt-5">
+<div class="px-4">
+<div class="flex min-h-[480px] flex-col gap-6 bg-cover bg-center bg-no-repeat rounded-xl items-center justify-center p-4 text-center" data-alt="Dynamic shot of a pair of new, stylish sneakers on a clean background" style='background-image: linear-gradient(rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.3) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuDSR0qkXxVJMLhVBkcJgychgN-YyFqRb9WXWmXihZfbO3luwqS1C1KJmlUj53NBm5FzGpbnl4Bi-dmhoL256wBd6DeK3pJ27wtmDg9UybqVsoEf2d4QO5ZYTfGCMjTUa9kTmGMjgFSe4jUwjxF7WDEuFYer2is3N34qBTYJwH2enBLBxydCzBa1zcgq7XQmzYhavihEs5fXZK79tU12cpaeT5zZpqfUHRYzdkitN17KEfkAJrFo657qLP7npY0K3pkyEAvDZBNYYOeA");'>
+<div class="flex flex-col gap-2">
+<h1 class="text-white text-4xl font-black leading-tight tracking-[-0.033em] md:text-6xl">Yeni Sezon, Yeni Tarz</h1>
+<h2 class="text-white text-base font-normal leading-normal md:text-lg">En yeni premium ayakkabı koleksiyonunu keşfet.</h2>
+</div>
+<div class="flex-wrap gap-3 flex justify-center">
+<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-primary text-white text-base font-bold leading-normal tracking-[0.015em] hover:bg-red-700 transition-colors shadow-lg shadow-red-500/20">
+<span class="truncate">Erkek Koleksiyonu</span>
+</button>
+<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-base font-bold leading-normal tracking-[0.015em] hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+<span class="truncate">Kadın Koleksiyonu</span>
+</button>
+</div>
+</div>
+</div>
+<div>
+<div class="flex justify-between items-center px-4 pb-4 pt-5">
+<h2 class="text-gray-900 dark:text-white text-2xl md:text-3xl font-bold leading-tight tracking-[-0.015em]">Öne Çıkan Kampanyalar</h2>
+<a class="text-sm font-semibold text-primary hover:underline" href="#">Tümünü Gör</a>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-4">
+<div class="bg-cover bg-center flex flex-col gap-3 rounded-xl justify-end p-6 aspect-[4/3] sm:aspect-video" data-alt="Stylish shoes with a discount tag graphic overlay" style='background-image: linear-gradient(0deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuCFBBVHRAz_qLxAt57b4wKX8T9Rj07AjBerCfmnPt3Tnlo2UORBkXOwWn-6W3FePogzEn4uFb2Cmz5woiymuKA64GeNdFIafxEyTwOmIWV9Y3Xs894khMFPPrRp64Qt9RO8dCyD_zvCaVxa-1pzgbfKwpDLA2zfebeCHb-c_Nd9jCA-6XwLS8a5-eBQJ6PTqJlWdVKxYk_qA-mQifm-V1MOqfqn66JYn8w1GPYdN7k5gbSPYl3pSFspsXJjlYr-R9eJxJhUHFX6R3KP");'>
+<h3 class="text-white text-xl font-bold leading-tight line-clamp-2">Sezon İndirimleri</h3>
+<button class="w-fit flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-md h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-red-700 transition-colors">
+<span class="truncate">İncele</span>
+</button>
+</div>
+<div class="bg-cover bg-center flex flex-col gap-3 rounded-xl justify-end p-6 aspect-[4/3] sm:aspect-video" data-alt="Two pairs of shoes displayed side-by-side to represent a 2 for 1 offer" style='background-image: linear-gradient(0deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuAEZqeS36_Za78Nz8G411P8kxwQ-6132WyyjBYu73ot8__UnT_NByWmMXuG8tO2NZ8cwa4nOxDLU99TRRSVAT-bTyqhJsuE8nnNii71NfClX63dzjb7EduhOkW-zj26ZNGg50Hb9nT5IolhGDRnxBzvF8bDgnYdosiplbFV4hZi7xOBigiWQPsbg3eqfUsW5AiGPy0RSvu1_9T7P-fxSTR266M5sFKR5hGWwM6WuNcX12YTDh36xSrXlUipe_QXeUTiK9mmahHn-PzJ");'>
+<h3 class="text-white text-xl font-bold leading-tight line-clamp-2">1 Alana 1 Bedava</h3>
+<button class="w-fit flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-md h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-red-700 transition-colors">
+<span class="truncate">İncele</span>
+</button>
+</div>
+<div class="bg-cover bg-center flex flex-col gap-3 rounded-xl justify-end p-6 aspect-[4/3] sm:aspect-video" data-alt="Abstract design with text 'Online Exclusive'" style='background-image: linear-gradient(0deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuB6WQsdNrikUM5bOERHLpHsiAQ-7hEWselufvJQ9xglno7h3faQIl2OAsFYAkWOUcWpUZZtAOt1zwrBV3px_mNjLs5doJUZPXRWD3DJxY3dyEYPKqyBuiae1lGmCLHQGejZpeWLxqj_-lWDHYyT6o45PsRZ52t3zmfAvfMJ4DbQ8RjPtM_Xdyg1vQwxYPS6mK8rwYWmVmH5j8GE08moblGYw2T1vxcfl4JhlJpetzNpTr7SMWBSh9FsW1rYXxsFwNgALSsjgQnfJNLO");'>
+<h3 class="text-white text-xl font-bold leading-tight line-clamp-2">Online Özel Fırsatlar</h3>
+<button class="w-fit flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-md h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-red-700 transition-colors">
+<span class="truncate">İncele</span>
+</button>
+</div>
+</div>
+</div>
+<div>
+<div class="flex justify-between items-center px-4 pb-4 pt-5">
+<h2 class="text-gray-900 dark:text-white text-2xl md:text-3xl font-bold leading-tight tracking-[-0.015em]">Yeni Ürünler</h2>
+<a class="text-sm font-semibold text-primary hover:underline" href="#">Tümünü Gör</a>
+</div>
+<div class="relative">
+<div class="flex overflow-x-auto gap-6 pb-4 -mx-4 px-4 scrollbar-hide">
+<div class="group flex-shrink-0 w-72">
+<div class="relative overflow-hidden rounded-xl">
+<img class="h-auto w-full object-cover aspect-square transition-transform duration-300 group-hover:scale-105" data-alt="White and red stylish running shoe" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBCmJEwjU4mDUa-tdlyXUbtVHCztzKpsu7LZLCA-52rPjlmvJLM3ZfJ6HdxN026oTcx1ReKuS0NLW3q5d5l0lr2TtbeXsixriVoTcBriFZpPanxO2DLluGHPsfh3AfrIg3CVEAsk0iLvDF5SvdVHrEHZyriUjofaZsraAeK-W-TASPumlksYbMR7AwlkGVhX3v9DSyadne7LOt14h65GpLp5O6_3uMEi9Up54djW64fiM2x4IxHCkcF0SaA8qKVCshTxQNLVIMJtC-d"/>
+<button class="absolute top-3 right-3 p-2 rounded-full bg-white/80 dark:bg-black/50 text-gray-800 dark:text-white hover:bg-white dark:hover:bg-black transition-colors">
+<span class="material-symbols-outlined">favorite</span>
+</button>
+</div>
+<div class="mt-3 text-left">
+<h3 class="text-base font-bold text-gray-900 dark:text-white">AeroGlide Pro</h3>
+<p class="text-lg font-semibold text-primary mt-1">$120.00</p>
+</div>
+</div>
+<div class="group flex-shrink-0 w-72">
+<div class="relative overflow-hidden rounded-xl">
+<img class="h-auto w-full object-cover aspect-square transition-transform duration-300 group-hover:scale-105" data-alt="Classic black leather sneaker" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCV6AhynUBwCYBNeTgXkMPappy8KVc3zyougx7j5200HA9CCC-QQJFe6anXv11cEx_BZCb3GRwG5yNvrmy1bXGRfWzUqDOkQNSy6iBsh5Yn85QMgHDnV-bbZCBNllWxE1_S_Glhs9stFl4Ivmpvl7DpNbtUcglMu9k9bVd1tQigX9Qv5ZKSOh3gzOMoccRYV8L9cXRyJb9Iya0TaK3Im2z8bFR9ENucMXbJBay4Tq54ljftBcmzhHpafbQ5RsXMNy0jdVlcJU1iej4a"/>
+<button class="absolute top-3 right-3 p-2 rounded-full bg-white/80 dark:bg-black/50 text-gray-800 dark:text-white hover:bg-white dark:hover:bg-black transition-colors">
+<span class="material-symbols-outlined">favorite</span>
+</button>
+</div>
+<div class="mt-3 text-left">
+<h3 class="text-base font-bold text-gray-900 dark:text-white">Urban Classic</h3>
+<p class="text-lg font-semibold text-primary mt-1">$95.00</p>
+</div>
+</div>
+<div class="group flex-shrink-0 w-72">
+<div class="relative overflow-hidden rounded-xl">
+<img class="h-auto w-full object-cover aspect-square transition-transform duration-300 group-hover:scale-105" data-alt="Colorful high-top basketball shoe" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDQRMMBDpoluwOnUqO4eoU7eQXqr4XQfpNIxpTLgRIR9a0JGAGbwlT5rnx0yr-Jc9NQhf0m5tn7cMy0muESRzjy0Wxk4IFLZa0UaBvYWFUihWlFRwBdb4bUSbUSSpAHIOarO9Rs-XwmsJLdcVzOPxuoMNbXqBal7j-5IjkM3oBthFzzmgkkS2QE1ym0BRaF3pAuIBt62kB_fO66vzi2v4S8U65qqMCR6ZQesh1hQ-WfFa2o9oCkb15pq2iNiAlehOT1T9hysiEl_Fo3"/>
+<button class="absolute top-3 right-3 p-2 rounded-full bg-white/80 dark:bg-black/50 text-gray-800 dark:text-white hover:bg-white dark:hover:bg-black transition-colors">
+<span class="material-symbols-outlined">favorite</span>
+</button>
+</div>
+<div class="mt-3 text-left">
+<h3 class="text-base font-bold text-gray-900 dark:text-white">Street Dunker</h3>
+<p class="text-lg font-semibold text-primary mt-1">$150.00</p>
+</div>
+</div>
+<div class="group flex-shrink-0 w-72">
+<div class="relative overflow-hidden rounded-xl">
+<img class="h-auto w-full object-cover aspect-square transition-transform duration-300 group-hover:scale-105" data-alt="Sleek white casual shoe" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDla01TnUqZmIM68NqEMpqm8QB7cF9k6okV4-Yj4nHGa1nunAvEnPuYSyvu59-WQhWQiVBzfFut5K5ywXhW0vlaSxA-ZhJog5aTZpdNeN56BFi7bPAqe44wITw3mLN6aCDam6JLcjbK6NBkSxXQ8ht4mfWLX1DYaK0v7aXIQobmmlTlnvD-x0tZjl8C7bnZVTfC2HvARulwHS5RLQUS6mglYHsxyTNtfTxY0nbfP2Y_oHSd00HqI4m-TGFAy6-yqTek1EQIrtJYmI8y"/>
+<button class="absolute top-3 right-3 p-2 rounded-full bg-white/80 dark:bg-black/50 text-gray-800 dark:text-white hover:bg-white dark:hover:bg-black transition-colors">
+<span class="material-symbols-outlined">favorite</span>
+</button>
+</div>
+<div class="mt-3 text-left">
+<h3 class="text-base font-bold text-gray-900 dark:text-white">Minimalist Walk</h3>
+<p class="text-lg font-semibold text-primary mt-1">$80.00</p>
+</div>
+</div>
+<div class="group flex-shrink-0 w-72">
+<div class="relative overflow-hidden rounded-xl">
+<img class="h-auto w-full object-cover aspect-square transition-transform duration-300 group-hover:scale-105" data-alt="Bright yellow sports shoe" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-eKGgFtBN_BH3mOOXW9WAjQ746_rhkmlKV9EfDvigwFCD3Qx0xdFzAY2FmEOKj9QNYteQVW8IxwdI3ebn7LPhmXDuzjuymKLxVwzNHorm8YmdEgHusxGnkTaO41WP9BuxetwoW_elkRmnBbwb_zHKvNS-LG1y2P-4UpNwGi-qIq4wm6UKz3-a5GpUeYDGc920miE2onUqlxsCa1fO-NppUk1K1EXowjeb7RIcsa7RyZKzc4ur00egEcDZqSyQFwA3ijfb5b3S6MA0"/>
+<button class="absolute top-3 right-3 p-2 rounded-full bg-white/80 dark:bg-black/50 text-gray-800 dark:text-white hover:bg-white dark:hover:bg-black transition-colors">
+<span class="material-symbols-outlined">favorite</span>
+</button>
+</div>
+<div class="mt-3 text-left">
+<h3 class="text-base font-bold text-gray-900 dark:text-white">Flash Runner</h3>
+<p class="text-lg font-semibold text-primary mt-1">$110.00</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div>
+<div class="flex justify-between items-center px-4 pb-4 pt-5">
+<h2 class="text-gray-900 dark:text-white text-2xl md:text-3xl font-bold leading-tight tracking-[-0.015em]">Çok Satanlar</h2>
+<a class="text-sm font-semibold text-primary hover:underline" href="#">Tümünü Gör</a>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 px-4">
+<div class="group">
+<div class="relative overflow-hidden rounded-xl">
+<img class="h-auto w-full object-cover aspect-square transition-transform duration-300 group-hover:scale-105" data-alt="Vintage style red and white sneaker" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAZUIHwXCfe_owS0Nh0PqZE2s_2xoEHB6vIYCBjj0mdGPd3Yw1rc7XhVxkRXq1tbbbetCLtTdzkNGN90khICyIfofQXz8R3IoBlNUPB-nDHF4gSmr6O0u_tqC1Jic0eVABRLdvje24UBhnMQh-4d-5w_TQ_g6C55-YEWAPo0K_VZGyZ0By2NbYIooxyiM73BQ6kCUQD0EZazfgdstL8B2krbE-TgUg0-9sm0uI5Zw-yUIHEFfaqrKzNqDwcsAZSpem92MHjZwLZ11ei"/>
+<button class="absolute top-3 right-3 p-2 rounded-full bg-white/80 dark:bg-black/50 text-gray-800 dark:text-white hover:bg-white dark:hover:bg-black transition-colors">
+<span class="material-symbols-outlined">favorite</span>
+</button>
+</div>
+<div class="mt-3">
+<h3 class="text-base font-bold text-gray-900 dark:text-white">Retro Runner '88</h3>
+<p class="text-lg font-semibold text-primary mt-1">$135.00</p>
+</div>
+</div>
+<div class="group">
+<div class="relative overflow-hidden rounded-xl">
+<img class="h-auto w-full object-cover aspect-square transition-transform duration-300 group-hover:scale-105" data-alt="Iconic checkered slip-on shoe" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC84BrZfQrv7pbKlG72hSqdmV9rH7y7qM7aRdQY7R2uD_HavnFtOrLYMbTITU_gytKNAOakhQ1d9HNwjymAded_mBJQpD30XaLXgPu-mIWK8JS8sc_iJN5wgFotBTjU6RMGHP_737JA4gE5td6EMwsyme7DwmFEHXdD991pH3GKd9ddAuGrhu2fYlh3vMsIuXbRdb5Bl52b_LwbEP_tjlB3H-uKhS4wwJNCiV7A2BpLCmrIYsv_NiPjtIIiEhMMA43jScyE6y5Eoh-l"/>
+<button class="absolute top-3 right-3 p-2 rounded-full bg-white/80 dark:bg-black/50 text-gray-800 dark:text-white hover:bg-white dark:hover:bg-black transition-colors">
+<span class="material-symbols-outlined">favorite</span>
+</button>
+</div>
+<div class="mt-3">
+<h3 class="text-base font-bold text-gray-900 dark:text-white">Checkerboard Slip</h3>
+<p class="text-lg font-semibold text-primary mt-1">$70.00</p>
+</div>
+</div>
+<div class="group">
+<div class="relative overflow-hidden rounded-xl">
+<img class="h-auto w-full object-cover aspect-square transition-transform duration-300 group-hover:scale-105" data-alt="All-white modern sneaker with a clean design" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCiWdh8uSoFPPTmPtq4gJ1FVu3L8UH7KGI6YvxuXZgX5TwNOAOr0vLxWUFELEx5KZXF56rTLaawqtXBzSFx2oD8nS08uhyAU2eGCnJT1qfPB4kwyZz9PegBkV9e2G_3BE-a4gY2hvep1LACPwW3qMGRVreXqig52kFly6mWrNXPCqvWAnW-iABNNio3wiOkpavhXRnqDGB08KdnsbO3LOkPnW4W8s7zCQe4aBrFoCLRPcUMxLSSzSYVsM-VDYpVQDjvCGQqP7NnVNTS"/>
+<button class="absolute top-3 right-3 p-2 rounded-full bg-white/80 dark:bg-black/50 text-gray-800 dark:text-white hover:bg-white dark:hover:bg-black transition-colors">
+<span class="material-symbols-outlined">favorite</span>
+</button>
+</div>
+<div class="mt-3">
+<h3 class="text-base font-bold text-gray-900 dark:text-white">Pure White Comfort</h3>
+<p class="text-lg font-semibold text-primary mt-1">$90.00</p>
+</div>
+</div>
+<div class="group">
+<div class="relative overflow-hidden rounded-xl">
+<img class="h-auto w-full object-cover aspect-square transition-transform duration-300 group-hover:scale-105" data-alt="Futuristic and colorful athletic shoe" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNzepx08QkHOe3Vqp19bCrC2sf9KQ5OIGav9lqZovNKX9O74Jh4LnnHTUB1FNISzPL-_XAPG5r5isdwpaqQKMUB3dqftOHwTyCrF_SN4NfIvxZ-4XEK5g4cbVO0yCe6C5ywyVHNB6tWndxL6JzhxvGhxnyStJGhvJEoT8yQfTP-39O7eL46_QWxI3BHCxJrieKTboW-Wnqrj5EVPYJfD6_RUAzyg9AspOHjQGTU0-sZeLxJEaebQ4L9WTyft-2CM0VzQdk7TM6dOyp"/>
+<button class="absolute top-3 right-3 p-2 rounded-full bg-white/80 dark:bg-black/50 text-gray-800 dark:text-white hover:bg-white dark:hover:bg-black transition-colors">
+<span class="material-symbols-outlined">favorite</span>
+</button>
+</div>
+<div class="mt-3">
+<h3 class="text-base font-bold text-gray-900 dark:text-white">Future Racer X</h3>
+<p class="text-lg font-semibold text-primary mt-1">$180.00</p>
+</div>
+</div>
+</div>
+</div>
+<footer class="mt-10 border-t border-gray-200 dark:border-gray-800 px-4 pt-10 pb-5">
+<div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+<div>
+<h3 class="font-bold text-lg text-gray-900 dark:text-white">Mağaza</h3>
+<ul class="mt-4 space-y-3 text-gray-600 dark:text-gray-300 text-sm">
+<li><a class="hover:text-primary transition-colors" href="#">Erkek</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Kadın</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Spor</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Yeni Gelenler</a></li>
+</ul>
+</div>
+<div>
+<h3 class="font-bold text-lg text-gray-900 dark:text-white">Yardım</h3>
+<ul class="mt-4 space-y-3 text-gray-600 dark:text-gray-300 text-sm">
+<li><a class="hover:text-primary transition-colors" href="#">Bize Ulaşın</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">SSS</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Kargo</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">İadeler</a></li>
+</ul>
+</div>
+<div>
+<h3 class="font-bold text-lg text-gray-900 dark:text-white">Şirket</h3>
+<ul class="mt-4 space-y-3 text-gray-600 dark:text-gray-300 text-sm">
+<li><a class="hover:text-primary transition-colors" href="#">Hakkımızda</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Kariyer</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Gizlilik Politikası</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Hizmet Şartları</a></li>
+</ul>
+</div>
+<div>
+<h3 class="font-bold text-lg text-gray-900 dark:text-white">Bizi Takip Edin</h3>
+<div class="flex mt-4 space-x-4">
+<a class="text-gray-500 hover:text-primary transition-colors" href="#">
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path></svg>
+</a>
+<a class="text-gray-500 hover:text-primary transition-colors" href="#">
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path clip-rule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.024.06 1.378.06 3.808s-.012 2.784-.06 3.808c-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.024.048-1.378.06-3.808.06s-2.784-.013-3.808-.06c-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.048-1.024-.06-1.378-.06-3.808s.012-2.784.06-3.808c.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 013.48 3.04c.636-.247 1.363.416 2.427-.465C7.001 2.013 7.355 2 8.385 2h3.93zM12 6.865a5.135 5.135 0 100 10.27 5.135 5.135 0 000-10.27zm0 8.468a3.333 3.333 0 110-6.666 3.333 3.333 0 010 6.666zm5.338-9.87a1.2 1.2 0 100-2.4 1.2 1.2 0 000 2.4z" fill-rule="evenodd"></path></svg>
+</a>
+<a class="text-gray-500 hover:text-primary transition-colors" href="#">
+<svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.71v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path></svg>
+</a>
+</div>
+</div>
+</div>
+<div class="mt-10 pt-8 border-t border-gray-200 dark:border-gray-800 text-center text-gray-500 dark:text-gray-400 text-sm">
+<p>© 2024 momez. Tüm Hakları Saklıdır.</p>
+</div>
+</footer>
+</main>
+</div>
+</div>
+</div>
+</div>
+<style>
+    .scrollbar-hide::-webkit-scrollbar {
+      display: none;
+    }
+    .scrollbar-hide {
+      -ms-overflow-style: none;
+      scrollbar-width: none; 
+    }
+  </style>
+</body></html>

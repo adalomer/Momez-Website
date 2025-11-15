@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Product Detail Page - momez</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    "primary": "#ee2b2b",
+                    "background-light": "#ffffff",
+                    "background-dark": "#111111",
+                },
+                fontFamily: {
+                    "display": ["Plus Jakarta Sans", "sans-serif"]
+                },
+                borderRadius: {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+                },
+            },
+        },
+    }
+    </script>
+<style>
+    .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        font-size: 20px;
+    }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-800 dark:text-slate-200">
+<div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200/80 dark:border-slate-800/80 px-4 sm:px-10 lg:px-20 py-4 bg-white dark:bg-background-dark">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-4 text-slate-900 dark:text-white">
+<div class="size-6 text-primary">
+<svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M44 4H30.6666V17.3334H17.3334V30.6666H4V44H44V4Z" fill="currentColor"></path>
+</svg>
+</div>
+<h2 class="text-xl font-bold tracking-[-0.015em]">momez</h2>
+</div>
+<div class="hidden md:flex items-center gap-9">
+<a class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white" href="#">New Arrivals</a>
+<a class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white" href="#">Men</a>
+<a class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white" href="#">Women</a>
+<a class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white" href="#">Kids</a>
+<a class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white" href="#">Sale</a>
+</div>
+</div>
+<div class="flex flex-1 justify-end gap-2">
+<button class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800">
+<span class="material-symbols-outlined text-slate-500">search</span>
+</button>
+<button class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800">
+<span class="material-symbols-outlined text-slate-500">favorite</span>
+</button>
+<button class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800">
+<span class="material-symbols-outlined text-slate-500">shopping_bag</span>
+</button>
+<button class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800">
+<span class="material-symbols-outlined text-slate-500">person</span>
+</button>
+</div>
+</header>
+<main class="flex flex-1 justify-center py-10 sm:py-16 px-4 sm:px-6 lg:px-8">
+<div class="layout-content-container flex flex-col w-full max-w-6xl flex-1">
+<div class="flex flex-wrap gap-2 px-4 sm:px-0 mb-8">
+<a class="text-slate-500 dark:text-slate-400 text-sm font-medium hover:text-primary" href="#">Home</a>
+<span class="text-slate-400 dark:text-slate-500 text-sm font-medium">/</span>
+<a class="text-slate-500 dark:text-slate-400 text-sm font-medium hover:text-primary" href="#">Men's Shoes</a>
+<span class="text-slate-400 dark:text-slate-500 text-sm font-medium">/</span>
+<span class="text-slate-900 dark:text-slate-50 text-sm font-medium">Air Runner Pro</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20 px-4 sm:px-0">
+<div class="flex flex-col gap-4">
+<div class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-xl bg-slate-100 dark:bg-slate-900" data-alt="Side view of the Air Runner Pro sneaker" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuD0M4v6C7e_jbAzJBPClnkhZtAYX27Gsqcz79XLWCnDD51YDeGD1x0xPvNHqwwU8PEJDgOYEaIwToJdNA61j-xZwsK97_iiBXcWGJXZrcXg7uNsLtgSy8qa1TKzQlhZzYOcZCnWLXsI45Shv72KdRHQX-njE-EKUtZIdXDbKKC6IFwwMDwX0Roq_vShYPAA-cdWHGJBGrBwaG_MjgohUbK99N1eTD1dCcxrEtzBS8419YoQldTx_umimEOMccQYGexP-QZC15ueFBBS");'></div>
+<div class="grid grid-cols-5 gap-3">
+<div class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-lg cursor-pointer border-2 border-primary bg-slate-100 dark:bg-slate-900" data-alt="Top view of the Air Runner Pro sneaker" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCBmOg98-u-V5NYDdShoi1eoJbagn3ppq1WA4IrasONWMkvi5mPO8EaSZ-pXty3swtphoTDFCD1exQvHMObm16bYD_0RWxL4Jtyulxv8Aj0LkJn2zxou5te1Dc5WrjleIXltkFxiFTtgYHP7lGDA2OVr8XZ3V0vdGypsfncU4J33zBjkpH8H1orKx2bPoJ9G8XPGjXU_LPiLf0G8FdsEBDilghsxwOb7iNpAePAJXTBzSlh0vrtutHxuA-pORdND142pa1iJ95Ci1HV");'></div>
+<div class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-lg cursor-pointer border-2 border-transparent hover:border-primary/50 bg-slate-100 dark:bg-slate-900" data-alt="Sole view of the Air Runner Pro sneaker" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCfqw9iKhCkJQjf8UPkHO2gSllXHuuHlBbal7AlbUhT9TMH_xmEJyv8octKWTcuqV9vbydKMecBGTBzsIxIED87c3pPxzITvzVMBMt4xFU0zlOfWVQ_ltmhdKRtW2HcvAFCG2TppxxOIbbmJafTBLfrgSN1fmv944vjMpG_pFFFaCQHcsy33slqjVyUY8C5VOVQGlLE67TWtySV_vVYt3rfR2TBPveohenNjNAqKwut6wWlArqUENIqdT3Vc459QVOqPpaZnEl0ano-");'></div>
+<div class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-lg cursor-pointer border-2 border-transparent hover:border-primary/50 bg-slate-100 dark:bg-slate-900" data-alt="Detailed shot of the shoe's fabric" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCBssdUKW9G8Zaj1kMLxrpsMHN7xNPedltkAWsQzYJIOzNJqpgPdY20tL5zAEwUI5k9fkOrfx2tEY642dQhU15q_N8jyeJoUDrNpLHdXztiuCjlvaHVbCirDrVBU3yS_BU10iHWyoouJMAkKqTL_QQZXZqwTrNXEXg2LxHMHrANDfvTts3On75jNJuCEV_WMyfMTDbqItNzZBUXVB2EPmUa6YptxZg3BkfzVEztoY5d7cjNAodufubMRlF9MYhLu89svSpqeelAQ-Vr");'></div>
+<div class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-lg cursor-pointer border-2 border-transparent hover:border-primary/50 bg-slate-100 dark:bg-slate-900" data-alt="Angled shot of the Air Runner Pro sneaker" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDxpv84OmAfPINlxtu9lacKBMH89ztObF6xsZALUTyk5BUpT1qlH2DYIlNl6jX_Ka8yTJ57O4eMPnPIHXoRWDzetmVarDw2aV0biANrgkRhOocgF9eyG0m7M891YhRaWHIwUL0zIjcroC3eUFJSr4Vp0AlVWn1eg-YeA7QVz269sQ06wuwToDBCei-9Q-iphVwFMNmISFy3GvhnE5olGr9H0EcYnCS0jFkV8It3pmIJxfGsn93GyxQOzZM8Nvm2KEZ7aA1MnIHepVdP");'></div>
+<div class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-lg cursor-pointer border-2 border-transparent hover:border-primary/50 bg-slate-100 dark:bg-slate-900" data-alt="Back heel view of the Air Runner Pro sneaker" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAcezJz3W4nf0OwvpxD0f1RdnB2AurWeoQX1yVHKxl_Z4jE6Wv9NER46wC1UiQE3GQBiL_dtmaBjBjOT1CmnsD_jtuixXNa_XgDPWp3oAgNLVKmLYQMpgNfauylWTBokXcco7-hitn3JLSjjFC-pAZE81jwbz72iG3aFSPuHrlxrw3QzV0VuiSvPrdqS0W9buphQOEVh0RvOfH7mrTjEyHFCHTVO9kcq-scTs6-t6wLU1gDCBjmAyIp4cqs0IWUEDZhKp6BzpR_FO1J");'></div>
+</div>
+</div>
+<div class="flex flex-col gap-8">
+<div class="flex flex-col gap-3">
+<h1 class="text-slate-900 dark:text-white text-3xl sm:text-4xl font-bold tracking-tight">Air Runner Pro</h1>
+<p class="text-primary text-3xl font-bold">$129.99</p>
+</div>
+<div class="flex flex-col gap-4">
+<div class="flex justify-between items-center">
+<label class="text-slate-900 dark:text-white font-semibold text-base">Select Size</label>
+<span class="text-green-600 dark:text-green-500 text-sm font-medium">In Stock</span>
+</div>
+<div class="grid grid-cols-4 sm:grid-cols-5 gap-3">
+<button class="flex items-center justify-center p-3 h-12 rounded-lg bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 font-semibold text-sm hover:border-primary dark:hover:border-primary">39</button>
+<button class="flex items-center justify-center p-3 h-12 rounded-lg bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 font-semibold text-sm hover:border-primary dark:hover:border-primary">40</button>
+<button class="flex items-center justify-center p-3 h-12 rounded-lg bg-primary text-white border border-primary font-semibold text-sm">41</button>
+<button class="flex items-center justify-center p-3 h-12 rounded-lg bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 font-semibold text-sm hover:border-primary dark:hover:border-primary">42</button>
+<button class="flex items-center justify-center p-3 h-12 rounded-lg bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 font-semibold text-sm hover:border-primary dark:hover:border-primary">43</button>
+<button class="flex items-center justify-center p-3 h-12 rounded-lg bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 font-semibold text-sm hover:border-primary dark:hover:border-primary">44</button>
+<button class="flex items-center justify-center p-3 h-12 rounded-lg bg-slate-100 dark:bg-slate-950 text-slate-400 dark:text-slate-600 border border-slate-200 dark:border-slate-800 font-semibold text-sm cursor-not-allowed">45</button>
+<button class="flex items-center justify-center p-3 h-12 rounded-lg bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 font-semibold text-sm hover:border-primary dark:hover:border-primary">46</button>
+</div>
+</div>
+<div class="flex items-stretch gap-4">
+<button class="flex flex-1 max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-14 bg-primary text-white gap-2 text-base font-bold tracking-[0.015em] min-w-0 px-6 hover:bg-primary/90 transition-colors">
+<span>Add to Cart</span>
+</button>
+<button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-14 bg-white dark:bg-slate-900 text-primary border border-slate-200 dark:border-slate-800 gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-5 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+<span class="material-symbols-outlined text-xl">favorite</span>
+</button>
+</div>
+<div class="flex flex-col gap-4 pt-6 border-t border-slate-200 dark:border-slate-800">
+<h3 class="text-lg font-bold text-slate-900 dark:text-white">Product Description</h3>
+<div class="text-slate-600 dark:text-slate-400 text-base leading-relaxed space-y-4">
+<p>
+                                    Experience unparalleled comfort and style with the Air Runner Pro. Designed for the modern athlete, this shoe features a lightweight, breathable mesh upper and a responsive foam midsole for ultimate cushioning. Whether you're hitting the track or the streets, the Air Runner Pro delivers performance and a sleek, contemporary look.
+                                </p>
+<ul class="list-disc list-inside space-y-2">
+<li>Lightweight mesh upper for breathability.</li>
+<li>Responsive foam cushioning for all-day comfort.</li>
+<li>Durable rubber outsole for superior traction.</li>
+<li>Made in: Vietnam</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</div>
+
+</body></html>
