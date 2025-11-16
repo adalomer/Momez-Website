@@ -1,28 +1,39 @@
-import { updateSession } from '@/lib/supabase/middleware'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
-  // Skip Supabase check if URL is not configured (for local development without Supabase)
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const { pathname } = request.nextUrl
   
-  // Supabase yapılandırılmamışsa tüm sayfalara izin ver (demo mod)
-  if (!supabaseUrl || supabaseUrl === 'your_supabase_project_url') {
-    return NextResponse.next()
+  // Admin sayfaları için auth kontrolü
+  if (pathname.startsWith('/admin')) {
+    const token = request.cookies.get('auth_token')?.value
+    
+    if (!token) {
+      // Login sayfasına yönlendir
+      return NextResponse.redirect(new URL('/auth/login?redirect=/admin', request.url))
+    }
+    
+    // Token'ı kontrol et (basit kontrol, production'da JWT verify yap)
+    try {
+      // Burada gerçek JWT verify yapılmalı
+      // Şimdilik cookie varlığı yeterli
+      return NextResponse.next()
+    } catch {
+      return NextResponse.redirect(new URL('/auth/login', request.url))
+    }
   }
   
-  // Supabase yapılandırılmışsa auth kontrolü yap
-  return await updateSession(request)
+  // Profil sayfaları için auth kontrolü
+  if (pathname.startsWith('/profil')) {
+    const token = request.cookies.get('auth_token')?.value
+    
+    if (!token) {
+      return NextResponse.redirect(new URL('/auth/login?redirect=' + pathname, request.url))
+    }
+  }
+  
+  return NextResponse.next()
 }
 
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * Feel free to modify this pattern to include more paths.
-     */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
-  ],
+  matcher: ['/admin/:path*', '/profil/:path*']
 }

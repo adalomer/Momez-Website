@@ -2,65 +2,87 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { Heart, Trash2 } from 'lucide-react'
+import { Trash2, ShoppingCart } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import toast, { Toaster } from 'react-hot-toast'
+import { favoritesAPI, authAPI, cartAPI } from '@/lib/api'
 
-// Favoriler sayfası - Supabase kurulunca gerçek verilerle çalışacak
+interface FavoriteItem {
+  id: number
+  product_id: number
+  product_name: string
+  product_slug: string
+  price: number
+  image_url: string
+  in_stock: boolean
+}
 
 export default function FavoritesPage() {
-  // Demo favoriler
-  const favorites = [
-    {
-      id: 1,
-      name: 'AeroGlide Pro',
-      price: 1899,
-      image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&h=800&fit=crop',
-      slug: 'aeroglide-pro',
-      inStock: true,
-    },
-    {
-      id: 2,
-      name: 'Urban Classic',
-      price: 1499,
-      image: 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=800&h=800&fit=crop',
-      slug: 'urban-classic',
-      inStock: true,
-    },
-    {
-      id: 3,
-      name: 'Street Dunker',
-      price: 2299,
-      image: 'https://images.unsplash.com/photo-1551107696-a4b0c5a0d9a2?w=800&h=800&fit=crop',
-      slug: 'street-dunker',
-      inStock: false,
-    },
-  ]
+  const router = useRouter()
+  const [favorites, setFavorites] = useState<FavoriteItem[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    checkAuthAndLoadFavorites()
+  }, [])
+
+  const checkAuthAndLoadFavorites = async () => {
+    try {
+      const userResult = await authAPI.me()
+      if (!userResult.success) {
+        router.push('/auth/login?redirect=/favoriler')
+        return
+      }
+      
+      const favResult = await favoritesAPI.get()
+      if (favResult.success) {
+        setFavorites(favResult.data || [])
+      }
+    } catch (error) {
+      console.error('Favorites load error:', error)
+      toast.error('Favoriler yüklenemedi')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const removeFavorite = async (itemId: number) => {
+    try {
+      const result = await favoritesAPI.remove(itemId)
+      if (result.success) {
+        setFavorites(items => items.filter(i => i.id !== itemId))
+        toast.success('Favorilerden çıkarıldı')
+      } else {
+        toast.error('Çıkarılamadı')
+      }
+    } catch (error) {
+      toast.error('Bir hata oluştu')
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Toaster position="top-center" />
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4">Yükleniyor...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen py-8">
+      <Toaster position="top-center" />
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
-              Favorilerim
-            </h1>
-            <p className="text-slate-600 dark:text-slate-400">
-              {favorites.length} ürün
-            </p>
-          </div>
-          
-          {favorites.length > 0 && (
-            <button 
-              className="px-4 py-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg font-medium transition-colors"
-              onClick={() => alert('Tüm favoriler temizlendi (Demo)')}
-            >
-              Tümünü Temizle
-            </button>
-          )}
-        </div>
+        <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-8">
+          Favorilerim
+        </h1>
 
         {favorites.length === 0 ? (
-          <div className="text-center py-16">
-            <Heart className="h-16 w-16 text-slate-400 mx-auto mb-4" />
+          <div className="text-center py-16 bg-white dark:bg-slate-800 rounded-xl">
             <p className="text-slate-600 dark:text-slate-400 text-lg mb-4">
               Henüz favori ürününüz yok
             </p>
@@ -68,69 +90,52 @@ export default function FavoritesPage() {
               href="/"
               className="inline-block px-6 py-3 bg-primary hover:bg-primary/90 text-white font-bold rounded-lg transition-colors"
             >
-              Alışverişe Başla
+              Ürünleri Keşfet
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {favorites.map((product) => (
-              <div key={product.id} className="group">
-                <div className="relative">
-                  <Link href={`/urun/${product.slug}`} className="block">
-                    <div className="relative overflow-hidden rounded-xl aspect-square bg-slate-200 dark:bg-slate-800 mb-3">
-                      <Image
-                        src={product.image}
-                        alt={product.name}
-                        fill
-                        className="object-cover transition-transform duration-300 group-hover:scale-105"
-                      />
-                      {!product.inStock && (
-                        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                          <span className="bg-white dark:bg-slate-800 px-4 py-2 rounded-lg font-medium text-sm">
-                            Stokta Yok
-                          </span>
-                        </div>
-                      )}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {favorites.map((item) => (
+              <div key={item.id} className="group bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+                <Link href={`/urun/${item.product_slug}`} className="block relative aspect-square bg-slate-100 dark:bg-slate-700">
+                  <Image
+                    src={item.image_url}
+                    alt={item.product_name}
+                    fill
+                    className="object-cover group-hover:scale-110 transition"
+                  />
+                  {!item.in_stock && (
+                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                      <span className="text-white font-semibold">Stokta Yok</span>
                     </div>
-                  </Link>
-                  
-                  <button 
-                    className="absolute top-3 right-3 p-2 rounded-full bg-white/90 dark:bg-black/70 hover:bg-white dark:hover:bg-black transition-colors"
-                    onClick={() => alert('Favorilerden kaldırıldı (Demo)')}
-                  >
-                    <Trash2 className="h-5 w-5 text-red-600" />
-                  </button>
-                </div>
+                  )}
+                </Link>
                 
-                <div className="text-left">
-                  <Link href={`/urun/${product.slug}`}>
-                    <h3 className="text-base font-bold text-slate-900 dark:text-white line-clamp-1 hover:text-primary">
-                      {product.name}
+                <div className="p-4 space-y-3">
+                  <Link href={`/urun/${item.product_slug}`}>
+                    <h3 className="font-semibold text-slate-900 dark:text-white group-hover:text-primary transition line-clamp-2">
+                      {item.product_name}
                     </h3>
                   </Link>
-                  <p className="text-lg font-semibold text-primary mt-1">
-                    ₺{product.price.toLocaleString('tr-TR')}
+                  
+                  <p className="text-lg font-bold text-primary">
+                    ₺{Number(item.price).toFixed(2)}
                   </p>
                   
-                  {product.inStock && (
-                    <button 
-                      className="mt-2 w-full px-4 py-2 bg-primary hover:bg-primary/90 text-white text-sm font-medium rounded-lg transition-colors"
-                      onClick={() => alert('Sepete eklendi (Demo)')}
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => removeFavorite(item.id)}
+                      className="flex-1 px-4 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition flex items-center justify-center gap-2"
                     >
-                      Sepete Ekle
+                      <Trash2 className="w-4 h-4" />
+                      Çıkar
                     </button>
-                  )}
+                  </div>
                 </div>
               </div>
             ))}
           </div>
         )}
-
-        <div className="mt-8 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-          <p className="text-sm text-blue-800 dark:text-blue-300">
-            ℹ️ <strong>Favoriler sadece kayıtlı kullanıcılar için.</strong> Supabase kurulumu ve giriş yapıldıktan sonra favorileriniz kaydedilecek ve tüm cihazlarınızda senkronize olacaktır.
-          </p>
-        </div>
       </div>
     </div>
   )

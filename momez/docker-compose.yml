@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: momez-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: momez_db
+      MYSQL_USER: momez_user
+      MYSQL_PASSWORD: momez_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - momez-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  # Next.js Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: momez-app
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_HOST=mysql
+      - DATABASE_PORT=3306
+      - DATABASE_NAME=momez_db
+      - DATABASE_USER=momez_user
+      - DATABASE_PASSWORD=momez_password
+      - NEXT_PUBLIC_API_URL=http://localhost:3000
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - momez-network
+    volumes:
+      - ./public:/app/public
+      - uploads:/app/uploads
+
+  # phpMyAdmin (Opsiyonel - Database yönetimi için)
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: momez-phpmyadmin
+    restart: always
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: rootpassword
+    depends_on:
+      - mysql
+    networks:
+      - momez-network
+
+volumes:
+  mysql_data:
+    driver: local
+  uploads:
+    driver: local
+
+networks:
+  momez-network:
+    driver: bridge

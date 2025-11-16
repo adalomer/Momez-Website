@@ -1,240 +1,223 @@
-import Link from 'next/link'
-import { Heart } from 'lucide-react'
+'use client'
+
+import { Heart, ShoppingCart } from 'lucide-react'
 import Image from 'next/image'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import { productsAPI, categoriesAPI } from '@/lib/api'
+import toast, { Toaster } from 'react-hot-toast'
 
 export default function HomePage() {
-  // Demo data - Bu veriler daha sonra Supabase'den gelecek
-  const campaigns = [
-    {
-      id: 1,
-      title: 'Sezon İndirimleri',
-      image: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=800&h=600&fit=crop',
-    },
-    {
-      id: 2,
-      title: '1 Alana 1 Bedava',
-      image: 'https://images.unsplash.com/photo-1460353581641-37baddab0fa2?w=800&h=600&fit=crop',
-    },
-    {
-      id: 3,
-      title: 'Online Özel Fırsatlar',
-      image: 'https://images.unsplash.com/photo-1605348532760-6753d2c43329?w=800&h=600&fit=crop',
-    },
-  ]
+  const [products, setProducts] = useState<any[]>([])
+  const [categories, setCategories] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
 
-  const newProducts = [
-    {
-      id: 1,
-      name: 'AeroGlide Pro',
-      price: 1899,
-      image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&h=800&fit=crop',
-      slug: 'aeroglide-pro',
-    },
-    {
-      id: 2,
-      name: 'Urban Classic',
-      price: 1499,
-      image: 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=800&h=800&fit=crop',
-      slug: 'urban-classic',
-    },
-    {
-      id: 3,
-      name: 'Street Dunker',
-      price: 2299,
-      image: 'https://images.unsplash.com/photo-1551107696-a4b0c5a0d9a2?w=800&h=800&fit=crop',
-      slug: 'street-dunker',
-    },
-    {
-      id: 4,
-      name: 'Runner Elite',
-      price: 1799,
-      image: 'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=800&h=800&fit=crop',
-      slug: 'runner-elite',
-    },
-  ]
+  useEffect(() => {
+    loadData()
+  }, [])
 
-  const categories = [
-    { name: 'Erkek', slug: 'erkek', image: 'https://images.unsplash.com/photo-1449505278894-297fdb3edbc1?w=600&h=800&fit=crop' },
-    { name: 'Kadın', slug: 'kadin', image: 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=600&h=800&fit=crop' },
-    { name: 'Spor', slug: 'spor', image: 'https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=600&h=800&fit=crop' },
-    { name: 'Çocuk', slug: 'cocuk', image: 'https://images.unsplash.com/photo-1514989940723-e8e51635b782?w=600&h=800&fit=crop' },
-  ]
+  const loadData = async () => {
+    try {
+      setLoading(true)
+      
+      // Ürünleri çek
+      const productsRes = await productsAPI.getAll({ limit: 8 })
+      if (productsRes.success) {
+        setProducts(productsRes.data)
+      }
+      
+      // Kategorileri çek
+      const categoriesRes = await categoriesAPI.getAll()
+      if (categoriesRes.success) {
+        setCategories(categoriesRes.data.slice(0, 6))
+      }
+    } catch (error) {
+      console.error('Data load error:', error)
+      toast.error('Veriler yüklenirken hata oluştu')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Toaster position="top-center" />
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#ee2b2b] mx-auto"></div>
+          <p className="mt-4 text-gray-600">Yükleniyor...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-slate-900 to-slate-800 text-white">
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1460353581641-37baddab0fa2?w=1920&h=800&fit=crop')] bg-cover bg-center opacity-20"></div>
-        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-24 md:py-32">
-          <div className="flex flex-col items-center text-center gap-6">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight">
-              Yeni Sezon, Yeni Tarz
+      <Toaster position="top-center" />
+      
+      {/* Hero Banner */}
+      <section className="relative h-[500px] bg-gradient-to-r from-[#ee2b2b] to-red-700 mb-16">
+        <div className="container mx-auto px-4 h-full flex items-center">
+          <div className="text-white max-w-2xl">
+            <h1 className="text-5xl font-bold mb-4">
+              Yeni Sezon Koleksiyonu
             </h1>
-            <p className="text-lg md:text-xl text-slate-200 max-w-2xl">
-              En yeni premium ayakkabı koleksiyonunu keşfet.
+            <p className="text-xl mb-8">
+              En trend ayakkabı modelleri ve özel indirimler sizi bekliyor
             </p>
-            <div className="flex flex-wrap gap-4 justify-center mt-4">
-              <Link
-                href="/kategori/erkek"
-                className="px-8 py-3 bg-primary hover:bg-primary/90 text-white font-bold rounded-lg shadow-lg shadow-primary/20 transition-all"
-              >
-                Erkek Koleksiyonu
-              </Link>
-              <Link
-                href="/kategori/kadin"
-                className="px-8 py-3 bg-white hover:bg-slate-100 text-slate-900 font-bold rounded-lg transition-all"
-              >
-                Kadın Koleksiyonu
-              </Link>
+            <Link
+              href="/kategori/tum-urunler"
+              className="inline-block bg-white text-[#ee2b2b] px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition"
+            >
+              Alışverişe Başla
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <div className="container mx-auto px-4">
+        {/* Kategoriler */}
+        <section className="mb-16">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-2xl font-bold">Kategoriler</h2>
+            <Link href="/kategoriler" className="text-[#ee2b2b] hover:underline">
+              Tümünü Gör
+            </Link>
+          </div>
+          
+          {categories.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              Henüz kategori eklenmemiş
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Categories Section */}
-      <section className="py-16 bg-slate-50 dark:bg-slate-900/50">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="text-3xl font-bold text-slate-900 dark:text-white">Kategoriler</h2>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {categories.map((category) => (
-              <Link
-                key={category.slug}
-                href={`/kategori/${category.slug}`}
-                className="group relative overflow-hidden rounded-xl aspect-[3/4] bg-slate-200 dark:bg-slate-800"
-              >
-                <Image
-                  src={category.image}
-                  alt={category.name}
-                  fill
-                  className="object-cover transition-transform duration-300 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-                <div className="absolute bottom-0 left-0 right-0 p-4">
-                  <h3 className="text-xl font-bold text-white">{category.name}</h3>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Campaigns Section */}
-      <section className="py-16">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="text-3xl font-bold text-slate-900 dark:text-white">Öne Çıkan Kampanyalar</h2>
-            <Link href="/kampanyalar" className="text-sm font-semibold text-primary hover:underline">
-              Tümünü Gör
-            </Link>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {campaigns.map((campaign) => (
-              <div
-                key={campaign.id}
-                className="group relative overflow-hidden rounded-xl aspect-video bg-slate-200 dark:bg-slate-800"
-              >
-                <Image
-                  src={campaign.image}
-                  alt={campaign.title}
-                  fill
-                  className="object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-                <div className="absolute bottom-0 left-0 right-0 p-6 flex flex-col gap-3">
-                  <h3 className="text-xl font-bold text-white">{campaign.title}</h3>
-                  <button className="w-fit px-4 py-2 bg-primary hover:bg-primary/90 text-white text-sm font-bold rounded-md transition-colors">
-                    İncele
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* New Products Section */}
-      <section className="py-16 bg-slate-50 dark:bg-slate-900/50">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="text-3xl font-bold text-slate-900 dark:text-white">Yeni Ürünler</h2>
-            <Link href="/yeni-urunler" className="text-sm font-semibold text-primary hover:underline">
-              Tümünü Gör
-            </Link>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {newProducts.map((product) => (
-              <Link
-                key={product.id}
-                href={`/urun/${product.slug}`}
-                className="group"
-              >
-                <div className="relative overflow-hidden rounded-xl aspect-square bg-slate-200 dark:bg-slate-800 mb-3">
-                  <Image
-                    src={product.image}
-                    alt={product.name}
-                    fill
-                    className="object-cover transition-transform duration-300 group-hover:scale-105"
-                  />
-                  <button className="absolute top-3 right-3 p-2 rounded-full bg-white/80 dark:bg-black/50 hover:bg-white dark:hover:bg-black transition-colors">
-                    <Heart className="h-5 w-5 text-slate-800 dark:text-white" />
-                  </button>
-                </div>
-                <div className="text-left">
-                  <h3 className="text-base font-bold text-slate-900 dark:text-white line-clamp-1">
-                    {product.name}
-                  </h3>
-                  <p className="text-lg font-semibold text-primary mt-1">
-                    ₺{product.price.toLocaleString('tr-TR')}
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+              {categories.map((category) => (
+                <Link
+                  key={category.id}
+                  href={`/kategori/${category.slug}`}
+                  className="group"
+                >
+                  <div className="aspect-square rounded-lg overflow-hidden bg-gray-100 mb-2">
+                    {category.image_url ? (
+                      <Image
+                        src={category.image_url}
+                        alt={category.name}
+                        width={200}
+                        height={200}
+                        className="w-full h-full object-cover group-hover:scale-110 transition"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-gray-400">
+                        {category.name}
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-center font-medium group-hover:text-[#ee2b2b] transition">
+                    {category.name}
                   </p>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
+                  <p className="text-center text-sm text-gray-500">
+                    {category.product_count || 0} ürün
+                  </p>
+                </Link>
+              ))}
+            </div>
+          )}
+        </section>
 
-      {/* Features Section */}
-      <section className="py-16">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="flex flex-col items-center text-center gap-3">
-              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                <svg className="w-8 h-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">Ücretsiz Kargo</h3>
-              <p className="text-sm text-slate-600 dark:text-slate-400">
-                500 TL ve üzeri alışverişlerde ücretsiz kargo
-              </p>
+        {/* Ürünler */}
+        <section>
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h2 className="text-2xl font-bold mb-2">Öne Çıkan Ürünler</h2>
+              <p className="text-gray-600">En çok satılan ve beğenilen ürünler</p>
             </div>
-            <div className="flex flex-col items-center text-center gap-3">
-              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                <svg className="w-8 h-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">Güvenli Alışveriş</h3>
-              <p className="text-sm text-slate-600 dark:text-slate-400">
-                SSL sertifikası ile güvenli ödeme
-              </p>
-            </div>
-            <div className="flex flex-col items-center text-center gap-3">
-              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                <svg className="w-8 h-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">Kolay İade</h3>
-              <p className="text-sm text-slate-600 dark:text-slate-400">
-                14 gün içinde kolay iade ve değişim
-              </p>
-            </div>
+            <Link href="/kategori/tum-urunler" className="text-[#ee2b2b] hover:underline">
+              Tümünü Gör
+            </Link>
           </div>
-        </div>
-      </section>
+          
+          {products.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-gray-500 mb-4">Henüz ürün eklenmemiş</p>
+              <Link 
+                href="/admin/urunler/yeni" 
+                className="inline-block bg-[#ee2b2b] text-white px-6 py-2 rounded-lg hover:bg-red-700 transition"
+              >
+                İlk ürünü ekle
+              </Link>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {products.map((product) => (
+                <div key={product.id} className="group">
+                  <Link href={`/urun/${product.slug}`}>
+                    <div className="aspect-square rounded-lg overflow-hidden bg-gray-100 mb-3 relative">
+                      {product.images && product.images[0] ? (
+                        <Image
+                          src={product.images[0].image_url}
+                          alt={product.name}
+                          fill
+                          className="object-cover group-hover:scale-110 transition"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-gray-400">
+                          Görsel Yok
+                        </div>
+                      )}
+                      {!product.in_stock && (
+                        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                          <span className="text-white font-semibold">Stokta Yok</span>
+                        </div>
+                      )}
+                    </div>
+                  </Link>
+                  
+                  <div className="space-y-2">
+                    <Link href={`/urun/${product.slug}`}>
+                      <h3 className="font-semibold group-hover:text-[#ee2b2b] transition line-clamp-2">
+                        {product.name}
+                      </h3>
+                    </Link>
+                    
+                    <div className="flex items-center justify-between">
+                      <p className="text-lg font-bold text-[#ee2b2b]">
+                        ₺{Number(product.price).toFixed(2)}
+                      </p>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => toast.error('Favorilere eklemek için giriş yapın', {
+                            duration: 2000,
+                            icon: '🔒'
+                          })}
+                          className="p-2 hover:bg-gray-100 rounded-full transition"
+                        >
+                          <Heart className="w-5 h-5" />
+                        </button>
+                        <button
+                          onClick={() => {
+                            if (!product.in_stock) {
+                              toast.error('Bu ürün stokta yok')
+                            } else {
+                              toast.error('Sepete eklemek için giriş yapın', {
+                                duration: 2000,
+                                icon: '🔒'
+                              })
+                            }
+                          }}
+                          className="p-2 bg-[#ee2b2b] text-white rounded-full hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                          disabled={!product.in_stock}
+                        >
+                          <ShoppingCart className="w-5 h-5" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      </div>
     </div>
   )
 }

@@ -1,128 +1,192 @@
 'use client'
 
 import Link from 'next/link'
-
-// Kayıt sayfası - Supabase Auth kurulunca çalışacak
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+import { authAPI } from '@/lib/api'
+import toast, { Toaster } from 'react-hot-toast'
 
 export default function SignupPage() {
+  const router = useRouter()
+  
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
+  const [password, setPassword] = useState('')
+  const [passwordConfirm, setPasswordConfirm] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    if (!name || !email || !password) {
+      toast.error('Lütfen gerekli alanları doldurun')
+      return
+    }
+    
+    if (password.length < 6) {
+      toast.error('Şifre en az 6 karakter olmalı')
+      return
+    }
+    
+    if (password !== passwordConfirm) {
+      toast.error('Şifreler eşleşmiyor')
+      return
+    }
+    
+    setLoading(true)
+    
+    try {
+      const result = await authAPI.register(email, password, name, phone)
+      
+      if (result.success) {
+        toast.success('Kayıt başarılı! Yönlendiriliyorsunuz...')
+        setTimeout(() => {
+          router.push('/')
+          router.refresh()
+        }, 1000)
+      } else {
+        toast.error(result.error || 'Kayıt başarısız')
+      }
+    } catch (error) {
+      toast.error('Kayıt olurken hata oluştu')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4">
+    <div className="min-h-screen flex items-center justify-center py-12 px-4 bg-gray-50">
+      <Toaster position="top-center" />
+      
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 mb-4">
-            <div className="w-10 h-10 text-primary">
+          <Link href="/" className="inline-flex items-center gap-2 mb-6">
+            <div className="w-10 h-10 text-[#ee2b2b]">
               <svg fill="currentColor" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
                 <path d="M44 4H30.6666V17.3334H17.3334V30.6666H4V44H44V4Z"></path>
               </svg>
             </div>
-            <span className="text-2xl font-bold text-slate-900 dark:text-white">momez</span>
+            <span className="text-2xl font-bold text-[#ee2b2b]">momez</span>
           </Link>
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
-            Hesap Oluştur
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Hesap Oluşturun
           </h1>
-          <p className="text-slate-600 dark:text-slate-400">
-            Üyelik avantajlarından yararlanın
+          <p className="text-gray-600">
+            Alışverişe başlamak için kayıt olun
           </p>
         </div>
 
-        <div className="bg-white dark:bg-slate-800 rounded-xl p-8 border border-slate-200 dark:border-slate-700">
-          <form className="space-y-6" onSubmit={(e) => {
-            e.preventDefault()
-            alert('Kayıt olunuyor... (Supabase kurulunca çalışacak)')
-          }}>
+        <div className="bg-white rounded-xl p-8 shadow-lg">
+          <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
-                Ad Soyad
+              <label htmlFor="name" className="block text-sm font-medium text-gray-900 mb-2">
+                Ad Soyad *
               </label>
               <input
                 id="name"
                 type="text"
                 required
-                className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
-                placeholder="Adınız Soyadınız"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#ee2b2b] focus:border-transparent"
+                placeholder="Ahmet Yılmaz"
+                disabled={loading}
               />
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
-                E-posta
+              <label htmlFor="email" className="block text-sm font-medium text-gray-900 mb-2">
+                E-posta *
               </label>
               <input
                 id="email"
                 type="email"
                 required
-                className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#ee2b2b] focus:border-transparent"
                 placeholder="ornek@email.com"
+                disabled={loading}
               />
             </div>
 
             <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
+              <label htmlFor="phone" className="block text-sm font-medium text-gray-900 mb-2">
                 Telefon
               </label>
               <input
                 id="phone"
                 type="tel"
-                className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#ee2b2b] focus:border-transparent"
                 placeholder="+90 555 123 4567"
+                disabled={loading}
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
-                Şifre
+              <label htmlFor="password" className="block text-sm font-medium text-gray-900 mb-2">
+                Şifre *
               </label>
               <input
                 id="password"
                 type="password"
                 required
-                className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#ee2b2b] focus:border-transparent"
                 placeholder="••••••••"
+                disabled={loading}
               />
+              <p className="text-xs text-gray-500 mt-1">En az 6 karakter</p>
             </div>
 
             <div>
-              <label htmlFor="password-confirm" className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
-                Şifre Tekrar
+              <label htmlFor="passwordConfirm" className="block text-sm font-medium text-gray-900 mb-2">
+                Şifre Tekrar *
               </label>
               <input
-                id="password-confirm"
+                id="passwordConfirm"
                 type="password"
                 required
-                className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
+                value={passwordConfirm}
+                onChange={(e) => setPasswordConfirm(e.target.value)}
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#ee2b2b] focus:border-transparent"
                 placeholder="••••••••"
+                disabled={loading}
               />
             </div>
 
-            <label className="flex items-start gap-2 text-sm text-slate-700 dark:text-slate-300">
-              <input type="checkbox" required className="mt-1 rounded" />
-              <span>
-                <Link href="/kullanim-kosullari" className="text-primary hover:underline">Kullanım koşullarını</Link>
-                {' '}ve{' '}
-                <Link href="/gizlilik-politikasi" className="text-primary hover:underline">gizlilik politikasını</Link>
-                {' '}okudum, kabul ediyorum.
+            <div className="flex items-start gap-2 text-sm">
+              <input type="checkbox" required className="mt-1 rounded text-[#ee2b2b] focus:ring-[#ee2b2b]" />
+              <span className="text-gray-700">
+                <Link href="/kvkk" className="text-[#ee2b2b] hover:underline">
+                  Kullanım koşullarını
+                </Link>{' '}
+                ve{' '}
+                <Link href="/gizlilik" className="text-[#ee2b2b] hover:underline">
+                  gizlilik politikasını
+                </Link>{' '}
+                okudum, kabul ediyorum.
               </span>
-            </label>
+            </div>
 
             <button
               type="submit"
-              className="w-full px-6 py-4 bg-primary hover:bg-primary/90 text-white font-bold rounded-lg transition-colors"
+              disabled={loading}
+              className="w-full px-6 py-4 bg-[#ee2b2b] hover:bg-red-700 text-white font-bold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Kayıt Ol
+              {loading ? 'Kayıt olunuyor...' : 'Kayıt Ol'}
             </button>
           </form>
 
-          <div className="mt-6 text-center text-sm text-slate-600 dark:text-slate-400">
+          <div className="mt-6 text-center text-sm text-gray-600">
             Zaten hesabınız var mı?{' '}
-            <Link href="/auth/login" className="text-primary hover:underline font-medium">
+            <Link href="/auth/login" className="text-[#ee2b2b] hover:underline font-medium">
               Giriş Yapın
             </Link>
-          </div>
-
-          <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700">
-            <p className="text-center text-sm text-slate-600 dark:text-slate-400">
-              ⚠️ Supabase kurulumu tamamlanınca kayıt olabileceksiniz
-            </p>
           </div>
         </div>
       </div>
