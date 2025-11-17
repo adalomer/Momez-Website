@@ -1,10 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { Edit, X, Save } from 'lucide-react'
 import toast, { Toaster } from 'react-hot-toast'
 
 interface Customer {
-  id: number
+  id: string
   full_name: string
   email: string
   phone?: string
@@ -16,6 +17,12 @@ export default function CustomersPage() {
   const [customers, setCustomers] = useState<Customer[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
+  const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null)
+  const [editForm, setEditForm] = useState({
+    full_name: '',
+    email: '',
+    phone: ''
+  })
 
   useEffect(() => {
     fetchCustomers()
@@ -42,6 +49,44 @@ export default function CustomersPage() {
     customer.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     customer.email?.toLowerCase().includes(searchTerm.toLowerCase())
   )
+
+  const openEditModal = (customer: Customer) => {
+    setEditingCustomer(customer)
+    setEditForm({
+      full_name: customer.full_name || '',
+      email: customer.email || '',
+      phone: customer.phone || ''
+    })
+  }
+
+  const handleUpdateCustomer = async () => {
+    if (!editingCustomer) return
+
+    if (!editForm.full_name || !editForm.email) {
+      toast.error('İsim ve email gerekli')
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/admin/customers/${editingCustomer.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editForm)
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        toast.success('Müşteri güncellendi')
+        setEditingCustomer(null)
+        fetchCustomers()
+      } else {
+        toast.error(data.error || 'Güncelleme başarısız')
+      }
+    } catch (error) {
+      toast.error('Bir hata oluştu')
+    }
+  }
 
   return (
     <div className="p-6">
@@ -94,13 +139,16 @@ export default function CustomersPage() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Kayıt Tarihi
                   </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    İşlemler
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredCustomers.map((customer) => (
                   <tr key={customer.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      #{customer.id}
+                      #{customer.id.slice(0, 8)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       {customer.full_name || '-'}
@@ -123,6 +171,15 @@ export default function CustomersPage() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {new Date(customer.created_at).toLocaleDateString('tr-TR')}
                     </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      <button
+                        onClick={() => openEditModal(customer)}
+                        className="text-blue-600 hover:text-blue-900 font-medium flex items-center gap-1"
+                      >
+                        <Edit className="h-4 w-4" />
+                        Düzenle
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -136,6 +193,82 @@ export default function CustomersPage() {
           </p>
         </div>
       </div>
+
+      {/* Edit Modal */}
+      {editingCustomer && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-md w-full p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-gray-900">
+                Müşteri Düzenle
+              </h2>
+              <button
+                onClick={() => setEditingCustomer(null)}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Ad Soyad *
+                </label>
+                <input
+                  type="text"
+                  value={editForm.full_name}
+                  onChange={(e) => setEditForm(prev => ({ ...prev, full_name: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ee2b2b]"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  E-posta *
+                </label>
+                <input
+                  type="email"
+                  value={editForm.email}
+                  onChange={(e) => setEditForm(prev => ({ ...prev, email: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ee2b2b]"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Telefon
+                </label>
+                <input
+                  type="tel"
+                  value={editForm.phone}
+                  onChange={(e) => setEditForm(prev => ({ ...prev, phone: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ee2b2b]"
+                  placeholder="5XX XXX XX XX"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => setEditingCustomer(null)}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                İptal
+              </button>
+              <button
+                onClick={handleUpdateCustomer}
+                className="flex-1 px-4 py-2 bg-[#ee2b2b] hover:bg-[#d62626] text-white rounded-lg transition-colors flex items-center justify-center gap-2"
+              >
+                <Save className="h-4 w-4" />
+                Kaydet
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

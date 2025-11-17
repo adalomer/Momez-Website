@@ -14,6 +14,7 @@ interface OrderItem {
   size: string
   quantity: number
   price: number
+  image_url?: string
 }
 
 interface Order {
@@ -155,17 +156,33 @@ export default function OrdersPage() {
                   <div>
                     <h4 className="font-bold mb-3">Ürünler</h4>
                     <div className="space-y-3">
-                      {order.items.map((item) => (
-                        <div key={item.id} className="flex gap-3 text-sm">
-                          <div className="flex-1">
-                            <p className="font-medium">{item.product_name}</p>
-                            <p className="text-slate-600 dark:text-slate-400">
-                              Beden: {item.size} - Adet: {item.quantity}
-                            </p>
+                      {order.items.map((item) => {
+                        const itemTotal = item.price * item.quantity
+                        return (
+                          <div key={item.id} className="flex gap-3 text-sm">
+                            {/* Ürün Resmi */}
+                            {item.image_url && (
+                              <div className="relative w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-700">
+                                <Image
+                                  src={item.image_url}
+                                  alt={item.product_name}
+                                  fill
+                                  className="object-cover"
+                                />
+                              </div>
+                            )}
+                            <div className="flex-1">
+                              <p className="font-medium">{item.product_name}</p>
+                              <p className="text-slate-600 dark:text-slate-400">
+                                Beden: {item.size} - Adet: {item.quantity}
+                              </p>
+                              <p className="text-slate-600 dark:text-slate-400">
+                                {item.quantity} x ₺{item.price.toFixed(2)} = ₺{itemTotal.toFixed(2)}
+                              </p>
+                            </div>
                           </div>
-                          <p className="font-bold">₺{(item.price * item.quantity).toFixed(2)}</p>
-                        </div>
-                      ))}
+                        )
+                      })}
                     </div>
                     <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700 space-y-1 text-sm">
                       <div className="flex justify-between text-slate-600 dark:text-slate-400">

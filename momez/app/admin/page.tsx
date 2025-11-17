@@ -23,7 +23,7 @@ interface Order {
   order_number: string
   customer_name: string
   customer_email: string
-  total_amount: number
+  total: number
   status: string
   created_at: string
 }
@@ -186,7 +186,7 @@ export default function AdminDashboard() {
                         <p className="text-sm text-slate-600 dark:text-slate-400">{order.customer_name}</p>
                       </div>
                       <p className="font-bold text-slate-900 dark:text-white">
-                        ₺{Number(order.total_amount).toFixed(2)}
+                        ₺{Number(order.total).toFixed(2)}
                       </p>
                     </div>
                   )

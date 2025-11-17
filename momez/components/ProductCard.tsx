@@ -152,14 +152,14 @@ export default function ProductCard({ product, user }: ProductCardProps) {
           <div className="flex items-center gap-2">
             <button
               onClick={handleAddToFavorites}
-              className="flex-1 p-2 border border-gray-300 hover:border-[#ee2b2b] rounded-lg transition"
+              className="group/fav flex-1 p-2.5 border-2 border-slate-300 hover:border-primary-500 hover:bg-primary-50 rounded-lg transition-all"
               title="Favorilere Ekle"
             >
-              <Heart className="w-5 h-5 mx-auto" />
+              <Heart className="w-5 h-5 mx-auto text-slate-600 transition-all group-hover/fav:fill-primary-500 group-hover/fav:text-primary-500 group-hover/fav:scale-110" />
             </button>
             <button
               onClick={handleAddToCart}
-              className="flex-1 p-2 bg-[#ee2b2b] text-white rounded-lg hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="flex-1 p-2 bg-primary text-white rounded-lg hover:bg-primary-600 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               disabled={!product.in_stock}
               title="Sepete Ekle"
             >

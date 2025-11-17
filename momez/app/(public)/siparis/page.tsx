@@ -201,13 +201,13 @@ export default function CheckoutPage() {
             {/* Teslimat Adresi */}
             <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold flex items-center gap-2">
+                <h2 className="text-xl font-bold text-red-500 flex items-center gap-2">
                   <MapPin className="w-5 h-5" />
                   Teslimat Adresi
                 </h2>
                 <button
                   onClick={() => setShowAddressForm(!showAddressForm)}
-                  className="text-sm text-primary hover:underline flex items-center gap-1"
+                  className="text-sm text-red-500 hover:text-red-600 font-semibold flex items-center gap-1 hover:scale-105 transition"
                 >
                   <Plus className="w-4 h-4" />
                   Yeni Adres Ekle
@@ -224,10 +224,10 @@ export default function CheckoutPage() {
                   {addresses.map((address) => (
                     <label
                       key={address.id}
-                      className={`block p-4 border-2 rounded-lg cursor-pointer transition ${
+                      className={`block p-4 border-2 rounded-lg cursor-pointer transition shadow-sm ${
                         selectedAddress === address.id
-                          ? 'border-primary bg-primary/5'
-                          : 'border-slate-200 dark:border-slate-700 hover:border-primary/50'
+                          ? 'border-red-500 bg-red-50 dark:bg-red-900/10 shadow-md'
+                          : 'border-slate-300 dark:border-slate-600 hover:border-red-300 hover:shadow-md'
                       }`}
                     >
                       <input
@@ -241,15 +241,15 @@ export default function CheckoutPage() {
                       <div className="flex items-start justify-between">
                         <div>
                           <div className="flex items-center gap-2 mb-1">
-                            <p className="font-bold">{address.title}</p>
+                            <p className="font-bold text-slate-900 dark:text-white">{address.title}</p>
                             {address.is_default && (
-                              <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded">
+                              <span className="text-xs bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-2 py-0.5 rounded font-medium">
                                 Varsayılan
                               </span>
                             )}
                           </div>
-                          <p className="text-sm font-medium">{address.full_name}</p>
-                          <p className="text-sm text-slate-600 dark:text-slate-400">{address.phone}</p>
+                          <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">{address.full_name}</p>
+                          <p className="text-sm text-slate-700 dark:text-slate-300 font-medium">{address.phone}</p>
                           <p className="text-sm text-slate-600 dark:text-slate-400 mt-2">
                             {address.address_line}, {address.district}, {address.city}
                             {address.postal_code && ` - ${address.postal_code}`}
@@ -267,48 +267,48 @@ export default function CheckoutPage() {
               {/* Yeni Adres Formu */}
               {showAddressForm && (
                 <div className="border-t border-slate-200 dark:border-slate-700 pt-4 space-y-4">
-                  <h3 className="font-bold">Yeni Adres Ekle</h3>
+                  <h3 className="font-bold text-red-500 text-lg">Yeni Adres Ekle</h3>
                   <div className="grid grid-cols-2 gap-4">
                     <input
                       type="text"
                       placeholder="Adres Başlığı (Ev, İş vb.) *"
                       value={newAddress.title}
                       onChange={(e) => setNewAddress({ ...newAddress, title: e.target.value })}
-                      className="col-span-2 px-4 py-2 border rounded-lg"
+                      className="col-span-2 px-4 py-3 border-2 border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20 outline-none transition"
                     />
                     <input
                       type="text"
                       placeholder="Ad Soyad *"
                       value={newAddress.full_name}
                       onChange={(e) => setNewAddress({ ...newAddress, full_name: e.target.value })}
-                      className="px-4 py-2 border rounded-lg"
+                      className="px-4 py-3 border-2 border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20 outline-none transition"
                     />
                     <input
                       type="tel"
                       placeholder="Telefon *"
                       value={newAddress.phone}
                       onChange={(e) => setNewAddress({ ...newAddress, phone: e.target.value })}
-                      className="px-4 py-2 border rounded-lg"
+                      className="px-4 py-3 border-2 border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20 outline-none transition"
                     />
                     <input
                       type="text"
                       placeholder="İl *"
                       value={newAddress.city}
                       onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })}
-                      className="px-4 py-2 border rounded-lg"
+                      className="px-4 py-3 border-2 border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20 outline-none transition"
                     />
                     <input
                       type="text"
                       placeholder="İlçe *"
                       value={newAddress.district}
                       onChange={(e) => setNewAddress({ ...newAddress, district: e.target.value })}
-                      className="px-4 py-2 border rounded-lg"
+                      className="px-4 py-3 border-2 border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20 outline-none transition"
                     />
                     <textarea
                       placeholder="Adres *"
                       value={newAddress.address_line}
                       onChange={(e) => setNewAddress({ ...newAddress, address_line: e.target.value })}
-                      className="col-span-2 px-4 py-2 border rounded-lg"
+                      className="col-span-2 px-4 py-3 border-2 border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20 outline-none transition resize-none"
                       rows={3}
                     />
                     <input
@@ -316,28 +316,28 @@ export default function CheckoutPage() {
                       placeholder="Posta Kodu"
                       value={newAddress.postal_code}
                       onChange={(e) => setNewAddress({ ...newAddress, postal_code: e.target.value })}
-                      className="px-4 py-2 border rounded-lg"
+                      className="px-4 py-3 border-2 border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20 outline-none transition"
                     />
-                    <label className="flex items-center gap-2 col-span-2">
+                    <label className="flex items-center gap-2 col-span-2 cursor-pointer">
                       <input
                         type="checkbox"
                         checked={newAddress.is_default}
                         onChange={(e) => setNewAddress({ ...newAddress, is_default: e.target.checked })}
-                        className="w-4 h-4"
+                        className="w-5 h-5 rounded border-2 border-slate-300 dark:border-slate-600 text-red-500 focus:ring-2 focus:ring-red-500/20"
                       />
-                      <span className="text-sm">Varsayılan adres olarak kaydet</span>
+                      <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Varsayılan adres olarak kaydet</span>
                     </label>
                   </div>
                   <div className="flex gap-3">
                     <button
                       onClick={() => setShowAddressForm(false)}
-                      className="flex-1 px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-100 transition"
+                      className="flex-1 px-4 py-3 border-2 border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 font-medium rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition"
                     >
                       İptal
                     </button>
                     <button
                       onClick={handleAddAddress}
-                      className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition"
+                      className="flex-1 px-4 py-3 bg-red-500 text-white font-bold rounded-lg hover:bg-red-600 transition shadow-lg"
                     >
                       Adresi Kaydet
                     </button>
@@ -348,12 +348,12 @@ export default function CheckoutPage() {
 
             {/* Ödeme Yöntemi */}
             <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700">
-              <h2 className="text-xl font-bold mb-4">Ödeme Yöntemi</h2>
+              <h2 className="text-xl font-bold text-red-500 mb-4">Ödeme Yöntemi</h2>
               <div className="space-y-3">
-                <label className={`block p-4 border-2 rounded-lg cursor-pointer transition ${
+                <label className={`block p-4 border-2 rounded-lg cursor-pointer transition shadow-sm ${
                   paymentMethod === 'cash_on_delivery'
-                    ? 'border-primary bg-primary/5'
-                    : 'border-slate-200 dark:border-slate-700 hover:border-primary/50'
+                    ? 'border-red-500 bg-red-50 dark:bg-red-900/10 shadow-md'
+                    : 'border-slate-300 dark:border-slate-600 hover:border-red-300 hover:shadow-md'
                 }`}>
                   <input
                     type="radio"
@@ -367,7 +367,7 @@ export default function CheckoutPage() {
                     <div className="flex items-center gap-3">
                       <Banknote className="w-6 h-6" />
                       <div>
-                        <p className="font-bold">Kapıda Ödeme</p>
+                        <p className="font-bold text-slate-900 dark:text-white">Kapıda Ödeme</p>
                         <p className="text-sm text-slate-600 dark:text-slate-400">Nakit veya Kredi Kartı</p>
                       </div>
                     </div>
@@ -377,10 +377,10 @@ export default function CheckoutPage() {
                   </div>
                 </label>
 
-                <label className={`block p-4 border-2 rounded-lg cursor-pointer transition ${
+                <label className={`block p-4 border-2 rounded-lg cursor-pointer transition shadow-sm ${
                   paymentMethod === 'card'
-                    ? 'border-primary bg-primary/5'
-                    : 'border-slate-200 dark:border-slate-700 hover:border-primary/50'
+                    ? 'border-red-500 bg-red-50 dark:bg-red-900/10 shadow-md'
+                    : 'border-slate-300 dark:border-slate-600 hover:border-red-300 hover:shadow-md'
                 }`}>
                   <input
                     type="radio"
@@ -394,7 +394,7 @@ export default function CheckoutPage() {
                     <div className="flex items-center gap-3">
                       <CreditCard className="w-6 h-6" />
                       <div>
-                        <p className="font-bold">Kredi/Banka Kartı</p>
+                        <p className="font-bold text-slate-900 dark:text-white">Kredi/Banka Kartı</p>
                         <p className="text-sm text-slate-600 dark:text-slate-400">Online Ödeme (Yakında)</p>
                       </div>
                     </div>
@@ -408,12 +408,12 @@ export default function CheckoutPage() {
 
             {/* Sipariş Notu */}
             <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700">
-              <h2 className="text-xl font-bold mb-4">Sipariş Notu (Opsiyonel)</h2>
+              <h2 className="text-xl font-bold text-red-500 mb-4">Sipariş Notu (Opsiyonel)</h2>
               <textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Sipariş ile ilgili not ekleyin..."
-                className="w-full px-4 py-2 border rounded-lg"
+                className="w-full px-4 py-3 border-2 border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20 outline-none transition resize-none"
                 rows={4}
               />
             </div>
@@ -422,7 +422,7 @@ export default function CheckoutPage() {
           {/* Sağ Taraf - Sipariş Özeti */}
           <div className="lg:col-span-1">
             <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 sticky top-4">
-              <h2 className="text-xl font-bold mb-6">Sipariş Özeti</h2>
+              <h2 className="text-xl font-bold text-red-500 mb-6">Sipariş Özeti</h2>
               
               {/* Ürünler */}
               <div className="space-y-3 mb-6 max-h-60 overflow-y-auto">

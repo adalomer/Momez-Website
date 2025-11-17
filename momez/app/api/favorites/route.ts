@@ -28,21 +28,23 @@ export async function GET(request: NextRequest) {
         f.id,
         f.user_id,
         f.product_id,
-        f.added_at,
+        f.created_at,
         p.name,
         p.slug,
         p.price,
         p.discount_price,
         p.is_active,
-        pi.image_url
+        (
+          SELECT image_url 
+          FROM product_images 
+          WHERE product_id COLLATE utf8mb4_unicode_ci = f.product_id COLLATE utf8mb4_unicode_ci 
+          ORDER BY display_order ASC 
+          LIMIT 1
+        ) as image_url
       FROM favorites f
       INNER JOIN products p ON f.product_id COLLATE utf8mb4_unicode_ci = p.id COLLATE utf8mb4_unicode_ci
-      LEFT JOIN (
-        SELECT product_id, image_url, ROW_NUMBER() OVER (PARTITION BY product_id ORDER BY display_order) as rn
-        FROM product_images
-      ) pi ON f.product_id COLLATE utf8mb4_unicode_ci = pi.product_id COLLATE utf8mb4_unicode_ci AND pi.rn = 1
       WHERE f.user_id = ?
-      ORDER BY f.added_at DESC
+      ORDER BY f.created_at DESC
     `
     
     const favorites = await db.query(favoritesQuery, [user.id])

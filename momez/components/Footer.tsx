@@ -9,7 +9,7 @@ export default function Footer() {
   return (
     <footer className="bg-white dark:bg-background-dark border-t border-slate-200/80 dark:border-slate-800/80 mt-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Company Info */}
           <div className="col-span-1">
             <div className="flex items-center gap-2 mb-4">
@@ -28,7 +28,7 @@ export default function Footer() {
                 href="https://instagram.com/momez"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center h-10 w-10 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-primary hover:text-white transition-colors"
+                className="flex items-center justify-center h-10 w-10 rounded-full bg-gradient-to-br from-purple-600 via-pink-500 to-orange-500 text-white hover:scale-110 transition-transform shadow-lg"
                 aria-label="Instagram"
               >
                 <Instagram className="h-5 w-5" />
@@ -37,7 +37,7 @@ export default function Footer() {
                 href="https://facebook.com/momez"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center h-10 w-10 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-primary hover:text-white transition-colors"
+                className="flex items-center justify-center h-10 w-10 rounded-full bg-blue-600 text-white hover:scale-110 transition-transform shadow-lg"
                 aria-label="Facebook"
               >
                 <Facebook className="h-5 w-5" />
@@ -77,32 +77,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Help Links */}
-          <div>
-            <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">Yardım</h3>
-            <ul className="space-y-2">
-              <li>
-                <Link href="/siparis-takip" className="text-sm text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
-                  Sipariş Takip
-                </Link>
-              </li>
-              <li>
-                <Link href="/kargo-ve-odeme" className="text-sm text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
-                  Kargo ve Ödeme
-                </Link>
-              </li>
-              <li>
-                <Link href="/iade-ve-degisim" className="text-sm text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
-                  İade ve Değişim
-                </Link>
-              </li>
-              <li>
-                <Link href="/sikca-sorulan-sorular" className="text-sm text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
-                  Sıkça Sorulan Sorular
-                </Link>
-              </li>
-            </ul>
-          </div>
+
 
           {/* About Links */}
           <div>

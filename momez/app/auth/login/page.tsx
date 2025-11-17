@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useState, Suspense } from 'react'
 import { authAPI } from '@/lib/api'
 import toast, { Toaster } from 'react-hot-toast'
+import AuthTransition from '@/components/AuthTransition'
 
 function LoginForm() {
   const router = useRouter()
@@ -49,26 +50,27 @@ function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 bg-gray-50">
-      <Toaster position="top-center" />
-      
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 mb-6">
-            <div className="w-10 h-10 text-[#ee2b2b]">
-              <svg fill="currentColor" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-                <path d="M44 4H30.6666V17.3334H17.3334V30.6666H4V44H44V4Z"></path>
-              </svg>
-            </div>
-            <span className="text-2xl font-bold text-[#ee2b2b]">momez</span>
-          </Link>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Hoş Geldiniz
-          </h1>
-          <p className="text-gray-600">
-            Hesabınıza giriş yapın
-          </p>
-        </div>
+    <AuthTransition type="login">
+      <div className="min-h-screen flex items-center justify-center py-12 px-4 bg-gray-50">
+        <Toaster position="top-center" />
+        
+        <div className="w-full max-w-md">
+          <div className="text-center mb-8">
+            <Link href="/" className="inline-flex items-center gap-2 mb-6">
+              <div className="w-10 h-10 text-[#ee2b2b]">
+                <svg fill="currentColor" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M44 4H30.6666V17.3334H17.3334V30.6666H4V44H44V4Z"></path>
+                </svg>
+              </div>
+              <span className="text-2xl font-bold text-[#ee2b2b]">momez</span>
+            </Link>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              Hoş Geldiniz
+            </h1>
+            <p className="text-gray-600">
+              Hesabınıza giriş yapın
+            </p>
+          </div>
 
         <div className="bg-white rounded-xl p-8 shadow-lg">
           <form className="space-y-6" onSubmit={handleSubmit}>
@@ -136,8 +138,9 @@ function LoginForm() {
             <p>Şifre: admin123</p>
           </div>
         </div>
+        </div>
       </div>
-    </div>
+    </AuthTransition>
   )
 }
 

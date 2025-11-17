@@ -74,21 +74,26 @@ export default function FavoritesPage() {
   }
 
   return (
-    <div className="min-h-screen py-8">
+    <div className="min-h-screen py-12">
       <Toaster position="top-center" />
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-8">
-          Favorilerim
-        </h1>
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-2">
+            Favorilerim
+          </h1>
+          <p className="text-lg text-slate-700 dark:text-slate-300 font-medium">
+            Beğendiğiniz ürünler burada
+          </p>
+        </div>
 
         {favorites.length === 0 ? (
-          <div className="text-center py-16 bg-white dark:bg-slate-800 rounded-xl">
-            <p className="text-slate-600 dark:text-slate-400 text-lg mb-4">
+          <div className="text-center py-16 bg-white dark:bg-slate-800 rounded-2xl border-2 border-slate-200 dark:border-slate-700 shadow-lg">
+            <p className="text-slate-900 dark:text-white text-xl font-bold mb-4">
               Henüz favori ürününüz yok
             </p>
             <Link
               href="/"
-              className="inline-block px-6 py-3 bg-primary hover:bg-primary/90 text-white font-bold rounded-lg transition-colors"
+              className="inline-block px-8 py-4 bg-gradient-to-r from-primary to-primary-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all"
             >
               Ürünleri Keşfet
             </Link>
@@ -96,7 +101,7 @@ export default function FavoritesPage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {favorites.map((item) => (
-              <div key={item.id} className="group bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+              <div key={item.id} className="group bg-white dark:bg-slate-800 rounded-2xl border-2 border-slate-200 dark:border-slate-700 overflow-hidden shadow-lg hover:shadow-xl transition-all">
                 <Link href={`/urun/${item.product_slug}`} className="block relative aspect-square bg-slate-100 dark:bg-slate-700">
                   <Image
                     src={item.image_url}
@@ -113,21 +118,21 @@ export default function FavoritesPage() {
                 
                 <div className="p-4 space-y-3">
                   <Link href={`/urun/${item.product_slug}`}>
-                    <h3 className="font-semibold text-slate-900 dark:text-white group-hover:text-primary transition line-clamp-2">
+                    <h3 className="font-bold text-slate-900 dark:text-white group-hover:text-primary transition line-clamp-2">
                       {item.product_name}
                     </h3>
                   </Link>
                   
-                  <p className="text-lg font-bold text-primary">
+                  <p className="text-xl font-bold text-primary">
                     ₺{Number(item.price).toFixed(2)}
                   </p>
                   
                   <div className="flex gap-2">
                     <button
                       onClick={() => removeFavorite(item.product_id)}
-                      className="flex-1 px-4 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition flex items-center justify-center gap-2"
+                      className="group/remove flex-1 px-4 py-3 border-2 border-red-300 dark:border-red-600 text-red-700 dark:text-red-400 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/30 transition-all flex items-center justify-center gap-2 font-bold"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="w-4 h-4 group-hover/remove:scale-110 transition-transform" />
                       Çıkar
                     </button>
                   </div>

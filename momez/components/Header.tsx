@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { ShoppingCart, Heart, User, Search, Menu, X, LogOut } from 'lucide-react'
 import { useState, useEffect } from 'react'
+import toast from 'react-hot-toast'
 
 interface UserData {
   id: number
@@ -40,12 +41,23 @@ export default function Header() {
 
   const handleLogout = async () => {
     try {
+      // Logout animasyonu için toast göster
+      toast.loading('Çıkış yapılıyor...', { id: 'logout' })
+      
       await fetch('/api/auth/logout', { method: 'POST' })
+      
+      toast.success('Başarıyla çıkış yapıldı', { id: 'logout' })
+      
       setUser(null)
-      router.push('/')
-      router.refresh()
+      
+      // Kısa bir gecikme ile sayfayı yenile (animasyon için)
+      setTimeout(() => {
+        router.push('/')
+        router.refresh()
+      }, 500)
     } catch (error) {
       console.error('Logout error:', error)
+      toast.error('Çıkış yapılırken hata oluştu', { id: 'logout' })
     }
   }
 
@@ -58,29 +70,31 @@ export default function Header() {
   ]
 
   return (
-    <header className="sticky top-0 z-50 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm">
+    <header className="sticky top-0 z-50 glass border-b border-border-light dark:border-border-dark shadow-soft">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 text-primary group-hover:scale-110 transition-transform">
+          <Link href="/" className="flex items-center gap-2">
+            <div className="w-10 h-10 text-red-500">
               <svg fill="currentColor" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
                 <path d="M44 4H30.6666V17.3334H17.3334V30.6666H4V44H44V4Z"></path>
               </svg>
             </div>
-            <span className="text-2xl font-bold text-primary">momez</span>
+            <span className="text-2xl font-bold hidden sm:block text-red-500">
+              momez
+            </span>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-6">
+          <nav className="hidden lg:flex items-center gap-1">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`text-sm font-medium transition-colors ${
+                className={`px-4 py-2 text-sm font-bold rounded-xl transition-all duration-300 ${
                   pathname === link.href
-                    ? 'text-primary'
-                    : 'text-slate-700 dark:text-slate-300 hover:text-primary'
+                    ? 'bg-red-500 text-white shadow-lg scale-105'
+                    : 'text-red-500 hover:bg-red-500 hover:text-white hover:scale-105 hover:shadow-md'
                 }`}
               >
                 {link.label}
@@ -89,75 +103,68 @@ export default function Header() {
           </nav>
 
           {/* Right Side Icons */}
-          <div className="flex items-center gap-2">
-            <button
-              className="flex items-center justify-center rounded-full h-10 w-10 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-              aria-label="Arama"
-            >
-              <Search className="h-5 w-5 text-slate-600 dark:text-slate-400" />
-            </button>
-            
-            <Link
-              href="/favoriler"
-              className="flex items-center justify-center rounded-full h-10 w-10 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-              aria-label="Favoriler"
-            >
-              <Heart className="h-5 w-5 text-slate-600 dark:text-slate-400" />
-            </Link>
-            
+          <div className="flex items-center gap-3">
             <Link
               href="/sepet"
-              className="relative flex items-center justify-center rounded-full h-10 w-10 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              className="relative flex items-center justify-center rounded-xl h-11 w-11 text-red-500 hover:bg-red-500 hover:text-white transition-all duration-300 hover:scale-110"
               aria-label="Sepet"
             >
-              <ShoppingCart className="h-5 w-5 text-slate-600 dark:text-slate-400" />
-              <span className="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
+              <ShoppingCart className="h-5 w-5 transition-all duration-300" />
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold shadow-soft animate-pulse">
                 2
               </span>
             </Link>
             
+            <Link
+              href="/favoriler"
+              className="flex items-center justify-center rounded-xl h-11 w-11 text-red-500 hover:bg-red-500 hover:text-white transition-all duration-300 hover:scale-110 group"
+              aria-label="Favoriler"
+            >
+              <Heart className="h-5 w-5 transition-all duration-300 group-hover:fill-current" />
+            </Link>
+            
             {/* User Menu */}
             {loading ? (
-              <div className="flex items-center justify-center rounded-full h-10 w-10">
-                <div className="animate-spin rounded-full h-5 w-5 border-2 border-primary border-t-transparent"></div>
+              <div className="flex items-center justify-center rounded-xl h-11 w-11">
+                <div className="animate-spin rounded-full h-5 w-5 border-2 border-primary-400 border-t-transparent"></div>
               </div>
             ) : user ? (
               <div className="relative group">
-                <button className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-                  <div className="flex items-center justify-center rounded-full h-8 w-8 bg-primary/10 text-primary font-semibold text-sm">
+                <button className="flex items-center gap-3 px-4 py-2 rounded-xl hover:bg-accent-lighter transition-all hover:scale-105">
+                  <div className="flex items-center justify-center rounded-full h-10 w-10 bg-red-500 text-white font-bold text-base shadow-soft">
                     {user.full_name?.charAt(0).toUpperCase() || 'U'}
                   </div>
-                  <span className="hidden md:block text-sm font-medium text-slate-700 dark:text-slate-300">
+                  <span className="hidden md:block text-base font-bold text-red-500">
                     {user.full_name}
                   </span>
                 </button>
                 
                 {/* Dropdown Menu */}
-                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                <div className="absolute right-0 mt-2 w-48 glass rounded-xl shadow-soft-lg border border-border-light dark:border-border-dark opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 animate-scaleIn">
                   <div className="p-2">
                     {user.role === 'admin' && (
                       <Link
                         href="/admin"
-                        className="block px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded"
+                        className="block px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all font-medium"
                       >
                         Admin Panel
                       </Link>
                     )}
                     <Link
                       href="/profil"
-                      className="block px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded"
+                      className="block px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all font-medium"
                     >
                       Profilim
                     </Link>
                     <Link
                       href="/profil/siparisler"
-                      className="block px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded"
+                      className="block px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all font-medium"
                     >
                       Siparişlerim
                     </Link>
                     <button
                       onClick={handleLogout}
-                      className="w-full text-left px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded flex items-center gap-2"
+                      className="w-full text-left px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg flex items-center gap-2 transition-all font-medium"
                     >
                       <LogOut className="h-4 w-4" />
                       Çıkış Yap
@@ -168,23 +175,23 @@ export default function Header() {
             ) : (
               <Link
                 href="/auth/login"
-                className="flex items-center justify-center rounded-full h-10 w-10 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                className="flex items-center justify-center rounded-xl h-11 w-11 hover:bg-accent-lighter hover:text-primary-600 transition-all hover:scale-105"
                 aria-label="Giriş Yap"
               >
-                <User className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+                <User className="h-5 w-5" />
               </Link>
             )}
 
             {/* Mobile Menu Button */}
             <button
-              className="lg:hidden flex items-center justify-center rounded-full h-10 w-10 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors ml-2"
+              className="lg:hidden flex items-center justify-center rounded-xl h-11 w-11 hover:bg-accent-lighter hover:text-primary-600 transition-all hover:scale-105 ml-2"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label="Menü"
             >
               {mobileMenuOpen ? (
-                <X className="h-5 w-5 text-slate-600" />
+                <X className="h-5 w-5" />
               ) : (
-                <Menu className="h-5 w-5 text-slate-600" />
+                <Menu className="h-5 w-5" />
               )}
             </button>
           </div>
@@ -192,17 +199,17 @@ export default function Header() {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <nav className="lg:hidden py-4 border-t border-slate-200 dark:border-slate-800">
+          <nav className="lg:hidden py-4 border-t border-border-light dark:border-border-dark animate-slideIn">
             <div className="flex flex-col gap-2">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                  className={`px-4 py-3 text-sm font-medium rounded-xl transition-all ${
                     pathname === link.href
-                      ? 'bg-primary/10 text-primary'
-                      : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                      ? 'bg-red-500 text-white'
+                      : 'text-red-500 hover:bg-red-500 hover:text-white'
                   }`}
                 >
                   {link.label}

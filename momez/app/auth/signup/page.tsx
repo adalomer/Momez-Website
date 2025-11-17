@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { authAPI } from '@/lib/api'
 import toast, { Toaster } from 'react-hot-toast'
+import AuthTransition from '@/components/AuthTransition'
 
 export default function SignupPage() {
   const router = useRouter()
@@ -56,8 +57,9 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 bg-gray-50">
-      <Toaster position="top-center" />
+    <AuthTransition type="login">
+      <div className="min-h-screen flex items-center justify-center py-12 px-4 bg-gray-50">
+        <Toaster position="top-center" />
       
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
@@ -190,6 +192,7 @@ export default function SignupPage() {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </AuthTransition>
   )
 }

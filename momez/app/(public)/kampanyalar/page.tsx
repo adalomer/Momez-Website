@@ -52,95 +52,73 @@ export default function CampaignsPage() {
   ]
 
   return (
-    <div className="min-h-screen py-8">
+    <div className="min-h-screen py-12">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
-            Aktif Kampanyalar
+        <div className="mb-12 text-center">
+          <div className="inline-flex items-center gap-2 bg-white border-2 border-primary text-primary px-6 py-3 rounded-full font-bold text-base mb-4 shadow-lg">
+            <Tag className="h-5 w-5" />
+            <span>AKTİF KAMPANYALAR</span>
+          </div>
+          <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-3">
+            Özel Fırsatlar
           </h1>
-          <p className="text-slate-600 dark:text-slate-400">
-            Fırsatları kaçırmayın! Tüm kampanyalarımız burada.
+          <p className="text-lg text-slate-800 dark:text-slate-200 max-w-2xl mx-auto font-medium">
+            Kazanılı alabileceğiniz harika kampanyalar. Fırsatları kaçırmayın!
           </p>
         </div>
 
         {/* Campaigns Grid */}
-        <div className="space-y-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {campaigns.map((campaign) => (
-            <div key={campaign.id} className="bg-white dark:bg-slate-800 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 shadow-lg hover:shadow-xl transition-shadow">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
-                {/* Image */}
-                <div className="relative h-64 lg:h-auto">
-                  <Image
-                    src={campaign.image}
-                    alt={campaign.title}
-                    fill
-                    className="object-cover"
-                  />
-                  <div className="absolute top-4 left-4">
-                    <div className="bg-primary text-white px-6 py-3 rounded-full font-bold text-2xl shadow-lg">
-                      %{campaign.discount}
-                    </div>
+            <div key={campaign.id} className="bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all hover:-translate-y-2 border-2 border-slate-200 dark:border-slate-700">
+              <div className="relative h-56">
+                <Image
+                  src={campaign.image}
+                  alt={campaign.title}
+                  fill
+                  className="object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+                <div className="absolute top-4 right-4">
+                  <div className="bg-white text-primary-600 px-5 py-2 rounded-full font-bold text-xl shadow-soft-lg">
+                    %{campaign.discount}
                   </div>
                 </div>
-
-                {/* Content */}
-                <div className="p-8 flex flex-col justify-center">
-                  <div className="inline-flex items-center gap-2 text-primary font-semibold text-sm mb-3">
-                    <Tag className="h-4 w-4" />
-                    <span>KAMPANYA</span>
-                  </div>
-                  
-                  <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">
+                <div className="absolute bottom-4 left-4 right-4">
+                  <h2 className="text-2xl font-bold text-white mb-1">
                     {campaign.title}
                   </h2>
-                  
-                  <p className="text-lg text-slate-600 dark:text-slate-400 mb-6">
-                    {campaign.description}
-                  </p>
-
-                  <div className="flex items-center gap-4 text-sm text-slate-600 dark:text-slate-400 mb-6">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4" />
-                      <span>{new Date(campaign.startDate).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long' })}</span>
-                    </div>
-                    <span>-</span>
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4" />
-                      <span>{new Date(campaign.endDate).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
-                    </div>
-                  </div>
-
-                  <Link
-                    href={`/kategori/erkek?kampanya=${campaign.id}`}
-                    className="inline-flex items-center justify-center px-8 py-4 bg-primary hover:bg-primary/90 text-white font-bold rounded-lg transition-colors"
-                  >
-                    Kampanya Ürünlerini İncele
-                  </Link>
                 </div>
+              </div>
+
+              {/* Content */}
+              <div className="p-6">
+                <p className="text-slate-800 dark:text-slate-200 mb-6 text-base leading-relaxed font-medium">
+                  {campaign.description}
+                </p>
+
+                <div className="flex flex-wrap items-center gap-3 text-sm text-slate-700 dark:text-slate-300 mb-6">
+                  <div className="flex items-center gap-2 bg-accent-lighter px-3 py-2 rounded-lg">
+                    <Calendar className="h-4 w-4 text-primary-500" />
+                    <span className="font-medium">{new Date(campaign.startDate).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long' })}</span>
+                  </div>
+                  <span className="font-bold">-</span>
+                  <div className="flex items-center gap-2 bg-accent-lighter px-3 py-2 rounded-lg">
+                    <Calendar className="h-4 w-4 text-primary-500" />
+                    <span className="font-medium">{new Date(campaign.endDate).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                  </div>
+                </div>
+
+                <Link
+                  href={`/kategori/erkek?kampanya=${campaign.id}`}
+                  className="btn-primary inline-flex items-center justify-center w-full px-6 py-3 rounded-xl font-bold shadow-soft hover:shadow-lg transition-all"
+                >
+                  Kampanya Ürünlerini İncele
+                </Link>
               </div>
             </div>
           ))}
-        </div>
-
-        {/* Info Box */}
-        <div className="mt-12 p-6 bg-gradient-to-r from-primary/10 to-red-100 dark:from-primary/20 dark:to-red-900/20 rounded-xl border border-primary/20">
-          <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
-            Kampanyalardan Haberdar Olun!
-          </h3>
-          <p className="text-slate-700 dark:text-slate-300 mb-4">
-            Yeni kampanyalarımızdan ve özel fırsatlardan ilk siz haberdar olun. E-posta bültenimize abone olun.
-          </p>
-          <div className="flex gap-2">
-            <input
-              type="email"
-              placeholder="E-posta adresiniz"
-              className="flex-1 px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-            <button className="px-6 py-3 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors">
-              Abone Ol
-            </button>
-          </div>
         </div>
       </div>
     </div>

@@ -43,7 +43,20 @@ export async function GET(request: NextRequest) {
     // Her sipariş için kalemleri getir
     const ordersWithItems = await Promise.all(
       orders.map(async (order: any) => {
-        const items = await db.findMany('order_items', { order_id: order.id })
+        // Sipariş kalemlerini resimle birlikte getir
+        const itemsQuery = `
+          SELECT 
+            oi.*,
+            pi.image_url
+          FROM order_items oi
+          LEFT JOIN (
+            SELECT product_id, image_url, ROW_NUMBER() OVER (PARTITION BY product_id ORDER BY display_order) as rn
+            FROM product_images
+          ) pi ON oi.product_id COLLATE utf8mb4_unicode_ci = pi.product_id COLLATE utf8mb4_unicode_ci AND pi.rn = 1
+          WHERE oi.order_id = ?
+        `
+        const items = await db.query(itemsQuery, [order.id])
+        
         return {
           ...order,
           subtotal: parseFloat(order.subtotal),

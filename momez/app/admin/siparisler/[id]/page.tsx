@@ -148,7 +148,7 @@ export default function OrderDetailPage() {
           <select
             value={order.status}
             onChange={(e) => updateOrderStatus(e.target.value)}
-            className="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+            className="w-full px-4 py-3 border-2 border-slate-400 dark:border-slate-500 rounded-xl bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-bold hover:border-primary focus:border-primary focus:ring-2 focus:ring-primary-200 transition-all"
           >
             <option value="pending">Beklemede</option>
             <option value="confirmed">Onaylandı</option>

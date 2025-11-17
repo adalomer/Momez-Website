@@ -190,7 +190,7 @@ export default function AdminOrdersPage() {
                         <select
                           value={order.status}
                           onChange={(e) => updateOrderStatus(order.id, e.target.value)}
-                          className="text-sm border border-slate-300 dark:border-slate-600 rounded px-2 py-1 bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
+                          className="text-sm border-2 border-slate-400 dark:border-slate-500 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-white font-medium hover:border-primary focus:border-primary focus:ring-2 focus:ring-primary-200 transition-all"
                         >
                           <option value="pending">Beklemede</option>
                           <option value="confirmed">Onaylandı</option>

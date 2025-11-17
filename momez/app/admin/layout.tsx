@@ -1,4 +1,5 @@
 import AdminSidebar from '@/components/admin/AdminSidebar'
+import PageTransition from '@/components/PageTransition'
 
 export default function AdminLayout({
   children,
@@ -9,7 +10,9 @@ export default function AdminLayout({
     <div className="flex min-h-screen bg-slate-50 dark:bg-slate-900">
       <AdminSidebar />
       <main className="flex-1 p-6 lg:p-10">
-        {children}
+        <PageTransition>
+          {children}
+        </PageTransition>
       </main>
     </div>
   )

@@ -26,10 +26,12 @@ export default function AdminProductsPage() {
   const [showEditModal, setShowEditModal] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [uploadingImage, setUploadingImage] = useState(false)
+  const [categories, setCategories] = useState<Array<{ id: string; name: string }>>([])
   
   const [editForm, setEditForm] = useState({
     name: '',
     description: '',
+    category_id: '',
     price: '',
     discount_price: '',
     images: [] as string[],
@@ -38,7 +40,20 @@ export default function AdminProductsPage() {
 
   useEffect(() => {
     fetchProducts()
+    fetchCategories()
   }, [])
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch('/api/categories')
+      const data = await response.json()
+      if (data.success) {
+        setCategories(data.data || [])
+      }
+    } catch (error) {
+      console.error('Categories load error:', error)
+    }
+  }
 
   const fetchProducts = async () => {
     try {
@@ -71,6 +86,7 @@ export default function AdminProductsPage() {
     setEditForm({
       name: product.name,
       description: product.description || '',
+      category_id: (product as any).category_id || '',
       price: product.price.toString(),
       discount_price: product.discount_price?.toString() || '',
       images: product.images?.sort((a, b) => a.display_order - b.display_order).map(img => img.image_url) || [],
@@ -136,6 +152,7 @@ export default function AdminProductsPage() {
         body: JSON.stringify({
           name: editForm.name,
           description: editForm.description,
+          category_id: editForm.category_id,
           price: parseFloat(editForm.price),
           discount_price: editForm.discount_price ? parseFloat(editForm.discount_price) : null,
           images: editForm.images,
@@ -359,6 +376,26 @@ export default function AdminProductsPage() {
                 className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
                 required
               />
+            </div>
+
+            {/* Kategori */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                Kategori *
+              </label>
+              <select
+                value={editForm.category_id}
+                onChange={(e) => setEditForm(prev => ({ ...prev, category_id: e.target.value }))}
+                className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
+                required
+              >
+                <option value="">Kategori Seçin</option>
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

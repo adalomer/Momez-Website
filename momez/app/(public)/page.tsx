@@ -155,7 +155,7 @@ export default function HomePage() {
         {/* Kategoriler */}
         <section className="mb-16">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl font-bold">Kategoriler</h2>
+            <h2 className="text-2xl font-bold text-red-500">Kategoriler</h2>
             <Link href="/kategoriler" className="text-[#ee2b2b] hover:underline">
               Tümünü Gör
             </Link>
@@ -166,36 +166,40 @@ export default function HomePage() {
               Henüz kategori eklenmemiş
             </div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-              {categories.map((category) => (
-                <Link
-                  key={category.id}
-                  href={`/kategori/${category.slug}`}
-                  className="group"
-                >
-                  <div className="aspect-square rounded-lg overflow-hidden bg-gray-100 mb-2">
-                    {category.image_url ? (
-                      <Image
-                        src={category.image_url}
-                        alt={category.name}
-                        width={200}
-                        height={200}
-                        className="w-full h-full object-cover group-hover:scale-110 transition"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-gray-400">
-                        {category.name}
+            <div className="relative">
+              <div className="overflow-x-auto overflow-y-hidden" style={{scrollbarWidth: 'thin', scrollbarColor: '#ef4444 #f3f4f6'}}>
+                <div className="flex gap-4 pb-4">
+                  {categories.map((category) => (
+                    <Link
+                      key={category.id}
+                      href={`/kategori/${category.slug}`}
+                      className="group flex-shrink-0 w-[140px] md:w-[160px]"
+                    >
+                      <div className="aspect-square rounded-lg overflow-hidden bg-gray-100 mb-2 shadow-md">
+                        {category.image_url ? (
+                          <Image
+                            src={category.image_url}
+                            alt={category.name}
+                            width={200}
+                            height={200}
+                            className="w-full h-full object-cover group-hover:scale-110 transition"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-gray-400">
+                            {category.name}
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-                  <p className="text-center font-medium group-hover:text-[#ee2b2b] transition">
-                    {category.name}
-                  </p>
-                  <p className="text-center text-sm text-gray-500">
-                    {category.product_count || 0} ürün
-                  </p>
-                </Link>
-              ))}
+                      <p className="text-center font-medium group-hover:text-[#ee2b2b] transition text-sm">
+                        {category.name}
+                      </p>
+                      <p className="text-center text-xs text-gray-500">
+                        {category.product_count || 0} ürün
+                      </p>
+                    </Link>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
         </section>
@@ -204,8 +208,8 @@ export default function HomePage() {
         <section>
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h2 className="text-2xl font-bold mb-2">Öne Çıkan Ürünler</h2>
-              <p className="text-gray-600">En çok satılan ve beğenilen ürünler</p>
+              <h2 className="text-2xl font-bold mb-2 text-red-500">Öne Çıkan Ürünler</h2>
+              <p className="text-red-500">En çok satılan ve beğenilen ürünler</p>
             </div>
             <Link href="/kategori/tum-urunler" className="text-[#ee2b2b] hover:underline">
               Tümünü Gör

@@ -46,7 +46,6 @@ services:
     networks:
       - momez-network
     volumes:
-      - ./public:/app/public
       - uploads:/app/uploads
 
   # phpMyAdmin (Opsiyonel - Database yönetimi için)

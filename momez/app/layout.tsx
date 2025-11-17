@@ -1,12 +1,6 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import { Toaster } from 'react-hot-toast'
 import "./globals.css";
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "momez - Premium Ayakkabı Mağazası",
@@ -21,7 +15,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="tr" className="light">
-      <body className={`${inter.variable} font-display antialiased bg-white dark:bg-[#111111]`}>
+      <body className="font-sans antialiased bg-white dark:bg-[#111111]">
         {children}
         <Toaster position="top-right" />
       </body>

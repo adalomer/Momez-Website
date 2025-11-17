@@ -11,30 +11,48 @@ export default {
     extend: {
       colors: {
         primary: {
-          DEFAULT: "#ee2b2b",
+          DEFAULT: "#ef4444",
           50: "#fef2f2",
           100: "#fee2e2",
           200: "#fecaca",
           300: "#fca5a5",
           400: "#f87171",
-          500: "#ee2b2b",
+          500: "#ef4444",
           600: "#dc2626",
           700: "#b91c1c",
           800: "#991b1b",
           900: "#7f1d1d",
         },
+        accent: {
+          DEFAULT: "#fecaca",
+          light: "#fee2e2",
+          lighter: "#fef2f2",
+        },
         background: {
+          light: "#fafafa",
+          dark: "#0f0f0f",
+        },
+        surface: {
           light: "#ffffff",
-          dark: "#111111",
+          dark: "#1a1a1a",
+        },
+        border: {
+          light: "#f3f4f6",
+          dark: "#2d2d2d",
         },
       },
       fontFamily: {
         display: ["var(--font-inter)", "Inter", "sans-serif"],
       },
       borderRadius: {
-        DEFAULT: "0.25rem",
-        lg: "0.5rem",
-        xl: "0.75rem",
+        DEFAULT: "0.5rem",
+        lg: "0.75rem",
+        xl: "1rem",
+        "2xl": "1.5rem",
+      },
+      boxShadow: {
+        'soft': '0 2px 15px -3px rgba(239, 68, 68, 0.1), 0 2px 6px -4px rgba(239, 68, 68, 0.1)',
+        'soft-lg': '0 10px 40px -10px rgba(239, 68, 68, 0.15)',
       },
     },
   },

@@ -181,46 +181,39 @@ export default function AddressesPage() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Sidebar */}
           <div className="lg:col-span-1">
-            <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-4">
-              <div className="space-y-1">
+            <div className="bg-white dark:bg-slate-800 rounded-xl border-2 border-slate-200 dark:border-slate-700 p-4 shadow-lg">
+              <div className="space-y-2">
                 <Link
                   href="/profil"
-                  className="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-900 dark:text-white hover:bg-red-100 hover:text-primary-600 transition-all font-medium"
                 >
                   <User className="h-5 w-5" />
                   Profil Bilgileri
                 </Link>
                 <Link
                   href="/profil/siparisler"
-                  className="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-900 dark:text-white hover:bg-red-100 hover:text-primary-600 transition-all font-medium"
                 >
                   <Package className="h-5 w-5" />
                   Siparişlerim
                 </Link>
                 <Link
                   href="/favoriler"
-                  className="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-900 dark:text-white hover:bg-red-100 hover:text-primary-600 transition-all font-medium"
                 >
                   <Heart className="h-5 w-5" />
                   Favorilerim
                 </Link>
                 <Link
                   href="/profil/adresler"
-                  className="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/10 text-primary font-medium"
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-primary to-primary-600 text-white font-bold shadow-lg"
                 >
                   <MapPin className="h-5 w-5" />
                   Adreslerim
                 </Link>
-                <Link
-                  href="/profil/ayarlar"
-                  className="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
-                >
-                  <Settings className="h-5 w-5" />
-                  Ayarlar
-                </Link>
                 <button
                   onClick={handleLogout}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-700 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 transition-all font-medium"
                 >
                   <LogOut className="h-5 w-5" />
                   Çıkış Yap
@@ -231,14 +224,14 @@ export default function AddressesPage() {
 
           {/* Content */}
           <div className="lg:col-span-3">
-            <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+            <div className="bg-white dark:bg-slate-800 rounded-xl border-2 border-slate-200 dark:border-slate-700 shadow-lg p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+                <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
                   Adreslerim
                 </h2>
                 <button
                   onClick={() => setShowModal(true)}
-                  className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg transition-colors"
+                  className="btn-primary flex items-center gap-2 px-6 py-3 rounded-xl font-bold shadow-soft hover:shadow-lg transition-all"
                 >
                   <Plus className="h-5 w-5" />
                   Yeni Adres
@@ -247,11 +240,11 @@ export default function AddressesPage() {
 
               {addresses.length === 0 ? (
                 <div className="text-center py-12">
-                  <MapPin className="h-16 w-16 text-slate-300 dark:text-slate-600 mx-auto mb-4" />
-                  <p className="text-slate-600 dark:text-slate-400 mb-4">Henüz adres eklenmemiş</p>
+                  <MapPin className="h-16 w-16 text-primary-300 mx-auto mb-4" />
+                  <p className="text-slate-700 dark:text-slate-300 text-lg mb-4">Henüz adres eklenmemiş</p>
                   <button
                     onClick={() => setShowModal(true)}
-                    className="px-6 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg transition-colors"
+                    className="btn-primary px-8 py-3 rounded-xl font-bold shadow-soft"
                   >
                     İlk Adresini Ekle
                   </button>
@@ -261,23 +254,23 @@ export default function AddressesPage() {
                   {addresses.map((address) => (
                     <div
                       key={address.id}
-                      className="p-4 border border-slate-200 dark:border-slate-700 rounded-lg relative"
+                      className="p-5 bg-slate-50 dark:bg-slate-900 rounded-xl border-2 border-slate-200 dark:border-slate-700 relative hover:shadow-lg hover:border-primary-300 transition-all"
                     >
                       {address.is_default && (
-                        <span className="absolute top-2 right-2 px-2 py-1 bg-primary text-white text-xs rounded">
+                        <span className="absolute top-3 right-3 px-3 py-1 bg-gradient-to-r from-primary to-primary-600 text-white text-xs font-bold rounded-full shadow-soft">
                           Varsayılan
                         </span>
                       )}
                       
-                      <h3 className="font-bold text-slate-900 dark:text-white mb-2">
+                      <h3 className="font-bold text-slate-900 dark:text-white mb-3 text-lg">
                         {address.title}
                       </h3>
                       
-                      <p className="text-sm text-slate-700 dark:text-slate-300 mb-1">
+                      <p className="text-sm text-slate-800 dark:text-slate-200 mb-1 font-medium">
                         {address.full_name}
                       </p>
                       
-                      <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">
+                      <p className="text-sm text-slate-700 dark:text-slate-300 mb-2">
                         {address.phone}
                       </p>
                       
@@ -292,7 +285,7 @@ export default function AddressesPage() {
                       <div className="flex gap-2 mt-4">
                         <button
                           onClick={() => handleDelete(address.id, address.title)}
-                          className="flex items-center gap-1 text-sm text-red-600 dark:text-red-400 hover:underline"
+                          className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 font-medium px-3 py-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
                         >
                           <Trash2 className="h-4 w-4" />
                           Sil
@@ -309,24 +302,24 @@ export default function AddressesPage() {
 
       {/* Add Address Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-slate-800 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="glass rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-soft-lg">
             <div className="p-6 border-b border-slate-200 dark:border-slate-700">
-              <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
+              <h2 className="text-2xl font-bold gradient-text">
                 Yeni Adres Ekle
               </h2>
             </div>
             
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
+                <label className="block text-sm font-bold text-slate-800 dark:text-white mb-2">
                   Adres Başlığı *
                 </label>
                 <input
                   type="text"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className={`w-full px-4 py-3 rounded-lg border ${formErrors.title ? 'border-red-500' : 'border-slate-300 dark:border-slate-700'} bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
+                  className={`w-full px-4 py-3 rounded-xl border-2 ${formErrors.title ? 'border-red-500' : 'border-slate-300 dark:border-slate-700'} bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all`}
                   placeholder="Ev, İş, vb."
                 />
                 {formErrors.title && (
@@ -336,97 +329,97 @@ export default function AddressesPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
+                  <label className="block text-sm font-bold text-slate-800 dark:text-white mb-2">
                     Ad Soyad *
                   </label>
                   <input
                     type="text"
                     value={formData.full_name}
                     onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-                    className={`w-full px-4 py-3 rounded-lg border ${formErrors.full_name ? 'border-red-500' : 'border-slate-300 dark:border-slate-700'} bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
+                    className={`w-full px-4 py-3 rounded-xl border-2 ${formErrors.full_name ? 'border-red-500' : 'border-slate-300 dark:border-slate-700'} bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all`}
                   />
                   {formErrors.full_name && (
-                    <p className="text-red-500 text-sm mt-1">{formErrors.full_name}</p>
+                    <p className="text-red-500 text-sm mt-1 font-medium">{formErrors.full_name}</p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
+                  <label className="block text-sm font-bold text-slate-800 dark:text-white mb-2">
                     Telefon *
                   </label>
                   <input
                     type="tel"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className={`w-full px-4 py-3 rounded-lg border ${formErrors.phone ? 'border-red-500' : 'border-slate-300 dark:border-slate-700'} bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
+                    className={`w-full px-4 py-3 rounded-xl border-2 ${formErrors.phone ? 'border-red-500' : 'border-slate-300 dark:border-slate-700'} bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all`}
                     placeholder="+90 555 123 4567"
                   />
                   {formErrors.phone && (
-                    <p className="text-red-500 text-sm mt-1">{formErrors.phone}</p>
+                    <p className="text-red-500 text-sm mt-1 font-medium">{formErrors.phone}</p>
                   )}
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
+                <label className="block text-sm font-bold text-slate-800 dark:text-white mb-2">
                   Adres *
                 </label>
                 <textarea
                   value={formData.address}
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                  className={`w-full px-4 py-3 rounded-lg border ${formErrors.address ? 'border-red-500' : 'border-slate-300 dark:border-slate-700'} bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
+                  className={`w-full px-4 py-3 rounded-xl border-2 ${formErrors.address ? 'border-red-500' : 'border-slate-300 dark:border-slate-700'} bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all`}
                   rows={3}
                   placeholder="Mahalle, Cadde, No, Daire"
                 />
                 {formErrors.address && (
-                  <p className="text-red-500 text-sm mt-1">{formErrors.address}</p>
+                  <p className="text-red-500 text-sm mt-1 font-medium">{formErrors.address}</p>
                 )}
               </div>
 
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
+                  <label className="block text-sm font-bold text-slate-800 dark:text-white mb-2">
                     İlçe *
                   </label>
                   <input
                     type="text"
                     value={formData.district}
                     onChange={(e) => setFormData({ ...formData, district: e.target.value })}
-                    className={`w-full px-4 py-3 rounded-lg border ${formErrors.district ? 'border-red-500' : 'border-slate-300 dark:border-slate-700'} bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
+                    className={`w-full px-4 py-3 rounded-xl border-2 ${formErrors.district ? 'border-red-500' : 'border-slate-300 dark:border-slate-700'} bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all`}
                   />
                   {formErrors.district && (
-                    <p className="text-red-500 text-sm mt-1">{formErrors.district}</p>
+                    <p className="text-red-500 text-sm mt-1 font-medium">{formErrors.district}</p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
+                  <label className="block text-sm font-bold text-slate-800 dark:text-white mb-2">
                     Şehir *
                   </label>
                   <input
                     type="text"
                     value={formData.city}
                     onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                    className={`w-full px-4 py-3 rounded-lg border ${formErrors.city ? 'border-red-500' : 'border-slate-300 dark:border-slate-700'} bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
+                    className={`w-full px-4 py-3 rounded-xl border-2 ${formErrors.city ? 'border-red-500' : 'border-slate-300 dark:border-slate-700'} bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all`}
                   />
                   {formErrors.city && (
-                    <p className="text-red-500 text-sm mt-1">{formErrors.city}</p>
+                    <p className="text-red-500 text-sm mt-1 font-medium">{formErrors.city}</p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
+                  <label className="block text-sm font-bold text-slate-800 dark:text-white mb-2">
                     Posta Kodu *
                   </label>
                   <input
                     type="text"
                     value={formData.postal_code}
                     onChange={(e) => setFormData({ ...formData, postal_code: e.target.value })}
-                    className={`w-full px-4 py-3 rounded-lg border ${formErrors.postal_code ? 'border-red-500' : 'border-slate-300 dark:border-slate-700'} bg-white dark:bg-slate-900 text-slate-900 dark:text-white`}
+                    className={`w-full px-4 py-3 rounded-xl border-2 ${formErrors.postal_code ? 'border-red-500' : 'border-slate-300 dark:border-slate-700'} bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all`}
                     placeholder="34000"
                   />
                   {formErrors.postal_code && (
-                    <p className="text-red-500 text-sm mt-1">{formErrors.postal_code}</p>
+                    <p className="text-red-500 text-sm mt-1 font-medium">{formErrors.postal_code}</p>
                   )}
                 </div>
               </div>
@@ -438,13 +431,13 @@ export default function AddressesPage() {
                     setShowModal(false)
                     setFormErrors({})
                   }}
-                  className="px-6 py-3 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                  className="px-6 py-3 border-2 border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 font-medium transition-all"
                 >
                   İptal
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-3 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors"
+                  className="btn-primary px-8 py-3 rounded-xl font-bold shadow-soft hover:shadow-lg transition-all"
                 >
                   Adresi Kaydet
                 </button>
