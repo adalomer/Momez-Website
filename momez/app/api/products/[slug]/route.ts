@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db/mysql'
+import { db, query } from '@/lib/db/mysql'
 
 // GET /api/products/[slug] - Ürün detayı
 export async function GET(
@@ -63,18 +63,53 @@ export async function PUT(
   try {
     const { slug } = await params
     const body = await request.json()
+    const { images, stock, ...productData } = body
     
-    const updated = await db.update(
-      'products',
-      body,
-      { slug }
-    )
-    
-    if (updated === 0) {
+    // Ürünü bul
+    const product = await db.findOne('products', { slug })
+    if (!product) {
       return NextResponse.json(
         { success: false, error: 'Ürün bulunamadı' },
         { status: 404 }
       )
+    }
+    
+    const productId = (product as any).id
+    
+    // Ürün bilgilerini güncelle
+    if (Object.keys(productData).length > 0) {
+      await db.update('products', productData, { slug })
+    }
+    
+    // Görselleri güncelle
+    if (images && Array.isArray(images)) {
+      // Mevcut görselleri sil
+      await query('DELETE FROM product_images WHERE product_id = ?', [productId])
+      
+      // Yeni görselleri ekle
+      for (let i = 0; i < images.length; i++) {
+        await db.insert('product_images', {
+          product_id: productId,
+          image_url: images[i],
+          display_order: i,
+          is_primary: i === 0
+        })
+      }
+    }
+    
+    // Stokları güncelle
+    if (stock && Array.isArray(stock)) {
+      // Mevcut stokları sil
+      await query('DELETE FROM product_stock WHERE product_id = ?', [productId])
+      
+      // Yeni stokları ekle
+      for (const s of stock) {
+        await db.insert('product_stock', {
+          product_id: productId,
+          size: s.size,
+          quantity: s.quantity
+        })
+      }
     }
     
     return NextResponse.json({

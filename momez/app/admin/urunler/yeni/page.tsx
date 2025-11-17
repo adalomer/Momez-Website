@@ -132,9 +132,9 @@ export default function AdminProductFormPage() {
       return
     }
     
-    const sizesData = selectedSizes.map(size => ({
+    const stockData = selectedSizes.map(size => ({
       size,
-      stock: sizeStocks[size] || 0
+      quantity: sizeStocks[size] || 0
     }))
     
     setLoading(true)
@@ -151,7 +151,7 @@ export default function AdminProductFormPage() {
         price: parseFloat(formData.price),
         category_id: formData.category_id,
         images,
-        sizes: sizesData,
+        stock: stockData,
         sku: formData.sku || null,
         is_active: formData.is_active,
         is_featured: formData.is_featured,

@@ -28,10 +28,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
       
       if (result.success) {
         setProduct(result.data)
-        // İlk bedeni otomatik seç
-        if (result.data.stock && result.data.stock.length > 0) {
-          setSelectedSize(result.data.stock[0].size)
-        }
+        // Otomatik seçim kaldırıldı - Kullanıcı beden seçmeli
       } else {
         toast.error('Ürün bulunamadı')
         router.push('/')
@@ -192,27 +189,41 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
             {/* Beden Seçimi */}
             <div className="mb-6">
               <label className="block text-sm font-medium mb-3">Beden Seç</label>
-              <div className="grid grid-cols-5 gap-2">
-                {product.stock && product.stock.length > 0 ? (
-                  product.stock.map((s: any) => (
-                    <button
-                      key={s.size}
-                      onClick={() => setSelectedSize(s.size)}
-                      disabled={s.quantity === 0}
-                      className={`py-3 rounded-lg border-2 font-medium transition ${
-                        selectedSize === s.size
-                          ? 'border-[#ee2b2b] bg-[#ee2b2b] text-white'
-                          : s.quantity > 0
-                          ? 'border-gray-300 hover:border-[#ee2b2b]'
-                          : 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed'
-                      }`}
-                    >
-                      {s.size}
-                    </button>
-                  ))
-                ) : (
-                  <p className="col-span-5 text-gray-500">Stok bilgisi yok</p>
-                )}
+              <div className="grid grid-cols-6 gap-2">
+                {Array.from({ length: 11 }, (_, i) => 36 + i).map((size) => {
+                  const sizeStr = size.toString()
+                  const stockItem = product.stock?.find((s: any) => s.size === sizeStr)
+                  const quantity = stockItem?.quantity || 0
+                  const hasStock = quantity > 0
+
+                  return (
+                    <div key={size} className="flex flex-col">
+                      <button
+                        onClick={() => hasStock && setSelectedSize(sizeStr)}
+                        disabled={!hasStock}
+                        className={`py-3 rounded-lg border-2 font-medium transition relative ${
+                          selectedSize === sizeStr
+                            ? 'border-[#ee2b2b] bg-[#ee2b2b] text-white'
+                            : hasStock
+                            ? 'border-gray-300 hover:border-[#ee2b2b]'
+                            : 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed'
+                        }`}
+                      >
+                        <span className={!hasStock ? 'line-through' : ''}>{size}</span>
+                      </button>
+                      {hasStock && (
+                        <span className="text-xs text-center mt-1 text-green-600 font-medium">
+                          {quantity} adet
+                        </span>
+                      )}
+                      {!hasStock && (
+                        <span className="text-xs text-center mt-1 text-gray-400">
+                          Yok
+                        </span>
+                      )}
+                    </div>
+                  )
+                })}
               </div>
               {selectedSize && (
                 <p className="text-sm text-gray-600 mt-2">

@@ -34,7 +34,7 @@ function LoginForm() {
         // Role göre yönlendirme
         const targetUrl = result.data.user.role === 'admin' 
           ? '/admin' 
-          : (redirect !== '/' ? redirect : '/profil')
+          : (redirect !== '/' ? redirect : '/')
         
         // Hemen yönlendir
         window.location.href = targetUrl

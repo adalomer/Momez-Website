@@ -138,7 +138,7 @@ export const cartAPI = {
   },
 
   // Sepete ekle
-  async add(product_id: number, size: string, quantity: number) {
+  async add(product_id: string, size: string, quantity: number) {
     const res = await fetch(`${API_URL}/api/cart`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -165,7 +165,7 @@ export const favoritesAPI = {
   },
 
   // Favorilere ekle
-  async add(product_id: number) {
+  async add(product_id: string) {
     const res = await fetch(`${API_URL}/api/favorites`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -175,7 +175,7 @@ export const favoritesAPI = {
   },
 
   // Favorilerden çıkar
-  async remove(product_id: number) {
+  async remove(product_id: string) {
     const res = await fetch(`${API_URL}/api/favorites?product_id=${product_id}`, {
       method: 'DELETE'
     })
