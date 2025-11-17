@@ -26,7 +26,9 @@ export async function POST(request: NextRequest) {
     // Cookie'ye token kaydet
     const response = NextResponse.json({
       success: true,
-      user: result.user,
+      data: {
+        user: result.user
+      },
       message: 'Giriş başarılı'
     })
 

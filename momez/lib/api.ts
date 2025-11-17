@@ -108,6 +108,24 @@ export const categoriesAPI = {
       body: JSON.stringify(data)
     })
     return res.json()
+  },
+
+  // Kategori güncelle (Admin)
+  async update(id: number, data: any) {
+    const res = await fetch(`${API_URL}/api/categories/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    })
+    return res.json()
+  },
+
+  // Kategori sil (Admin)
+  async delete(id: number) {
+    const res = await fetch(`${API_URL}/api/categories/${id}`, {
+      method: 'DELETE'
+    })
+    return res.json()
   }
 }
 
@@ -173,6 +191,12 @@ export const ordersAPI = {
     return res.json()
   },
 
+  // Tüm siparişleri getir (alias)
+  async getAll() {
+    const res = await fetch(`${API_URL}/api/orders`)
+    return res.json()
+  },
+
   // Sipariş oluştur
   async create(address_id: number, payment_method: string, items: any[]) {
     const res = await fetch(`${API_URL}/api/orders`, {
@@ -194,6 +218,43 @@ export const uploadAPI = {
     const res = await fetch(`${API_URL}/api/upload`, {
       method: 'POST',
       body: formData
+    })
+    return res.json()
+  }
+}
+
+// Addresses API
+export const addressesAPI = {
+  // Adresleri getir
+  async getAll() {
+    const res = await fetch(`${API_URL}/api/addresses`)
+    return res.json()
+  },
+
+  // Adres ekle
+  async create(data: any) {
+    const res = await fetch(`${API_URL}/api/addresses`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    })
+    return res.json()
+  },
+
+  // Adres güncelle
+  async update(id: number, data: any) {
+    const res = await fetch(`${API_URL}/api/addresses/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    })
+    return res.json()
+  },
+
+  // Adres sil
+  async delete(id: number) {
+    const res = await fetch(`${API_URL}/api/addresses/${id}`, {
+      method: 'DELETE'
     })
     return res.json()
   }

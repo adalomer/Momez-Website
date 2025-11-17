@@ -1,51 +1,143 @@
 'use client'
 
-import { useState } from 'react'
-import Image from 'next/image'
-import { Plus, Edit, Trash2, Eye } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Plus, Edit, Trash2 } from 'lucide-react'
+import toast, { Toaster } from 'react-hot-toast'
+import { categoriesAPI } from '@/lib/api'
 
-// Admin kategori yönetimi sayfası - Demo
+interface Category {
+  id: number
+  name: string
+  slug: string
+  description?: string
+  product_count: number
+}
 
 export default function AdminCategoriesPage() {
-  // Demo kategoriler
-  const categories = [
-    {
-      id: 1,
-      name: 'Erkek Ayakkabı',
-      slug: 'erkek',
-      image: 'https://images.unsplash.com/photo-1449505278894-297fdb3edbc1?w=200&h=200&fit=crop',
-      productCount: 45,
-      active: true,
-    },
-    {
-      id: 2,
-      name: 'Kadın Ayakkabı',
-      slug: 'kadin',
-      image: 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=200&h=200&fit=crop',
-      productCount: 38,
-      active: true,
-    },
-    {
-      id: 3,
-      name: 'Çocuk Ayakkabı',
-      slug: 'cocuk',
-      image: 'https://images.unsplash.com/photo-1514989940723-e8e51635b782?w=200&h=200&fit=crop',
-      productCount: 22,
-      active: true,
-    },
-    {
-      id: 4,
-      name: 'Spor Ayakkabı',
-      slug: 'spor',
-      image: 'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=200&h=200&fit=crop',
-      productCount: 56,
-      active: true,
-    },
-  ]
+  const [categories, setCategories] = useState<Category[]>([])
+  const [loading, setLoading] = useState(true)
+  const [showModal, setShowModal] = useState(false)
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null)
+  const [formData, setFormData] = useState({
+    name: '',
+    slug: '',
+    description: ''
+  })
+
+  useEffect(() => {
+    loadCategories()
+  }, [])
+
+  const loadCategories = async () => {
+    try {
+      const result = await categoriesAPI.getAll()
+      if (result.success) {
+        setCategories(result.data || [])
+      }
+    } catch (error) {
+      console.error('Categories load error:', error)
+      toast.error('Kategoriler yüklenemedi')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    try {
+      if (editingCategory) {
+        const result = await categoriesAPI.update(editingCategory.id, formData)
+        if (result.success) {
+          toast.success('Kategori güncellendi')
+          loadCategories()
+          closeModal()
+        } else {
+          toast.error(result.message || 'Güncellenemedi')
+        }
+      } else {
+        const result = await categoriesAPI.create(formData)
+        if (result.success) {
+          toast.success('Kategori eklendi')
+          loadCategories()
+          closeModal()
+        } else {
+          toast.error(result.message || 'Eklenemedi')
+        }
+      }
+    } catch (error) {
+      toast.error('Bir hata oluştu')
+    }
+  }
+
+  const handleDelete = async (id: number, name: string) => {
+    if (!confirm('Bu kategoriyi silmek istediğinize emin misiniz?\n\n' + name)) return
+    
+    try {
+      const result = await categoriesAPI.delete(id)
+      if (result.success) {
+        toast.success('Kategori silindi')
+        loadCategories()
+      } else {
+        toast.error(result.message || 'Silinemedi')
+      }
+    } catch (error) {
+      toast.error('Bir hata oluştu')
+    }
+  }
+
+  const openModal = (category?: Category) => {
+    if (category) {
+      setEditingCategory(category)
+      setFormData({
+        name: category.name,
+        slug: category.slug,
+        description: category.description || ''
+      })
+    } else {
+      setEditingCategory(null)
+      setFormData({ name: '', slug: '', description: '' })
+    }
+    setShowModal(true)
+  }
+
+  const closeModal = () => {
+    setShowModal(false)
+    setEditingCategory(null)
+    setFormData({ name: '', slug: '', description: '' })
+  }
+
+  const generateSlug = (name: string) => {
+    const turkishMap: Record<string, string> = {
+      'ç': 'c', 'ğ': 'g', 'ı': 'i', 'İ': 'i', 'ö': 'o', 'ş': 's', 'ü': 'u',
+      'Ç': 'c', 'Ğ': 'g', 'Ö': 'o', 'Ş': 's', 'Ü': 'u'
+    }
+    
+    return name
+      .split('')
+      .map(char => turkishMap[char] || char)
+      .join('')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+  }
+
+  const handleNameChange = (name: string) => {
+    setFormData({ ...formData, name, slug: generateSlug(name) })
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      <Toaster position="top-center" />
+      
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
@@ -56,71 +148,141 @@ export default function AdminCategoriesPage() {
           </p>
         </div>
         <button 
+          onClick={() => openModal()}
           className="px-4 py-2 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors flex items-center gap-2"
-          onClick={() => alert('Yeni kategori ekle (Demo)')}
         >
           <Plus className="h-5 w-5" />
           Yeni Kategori
         </button>
       </div>
 
-      {/* Categories Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {categories.map((category) => (
-          <div key={category.id} className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
-            <div className="relative h-48 bg-slate-200 dark:bg-slate-700">
-              <Image
-                src={category.image}
-                alt={category.name}
-                fill
-                className="object-cover"
-              />
-            </div>
-            <div className="p-4">
-              <div className="flex items-start justify-between mb-3">
-                <div>
-                  <h3 className="font-bold text-slate-900 dark:text-white text-lg mb-1">
-                    {category.name}
-                  </h3>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">
-                    {category.productCount} ürün
-                  </p>
-                </div>
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                  category.active
-                    ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400'
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-400'
-                }`}>
-                  {category.active ? 'Aktif' : 'Pasif'}
-                </span>
-              </div>
-              
-              <div className="flex items-center gap-2">
-                <button 
-                  className="flex-1 px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors flex items-center justify-center gap-2"
-                  onClick={() => alert('Kategori görüntüle (Demo)')}
-                >
-                  <Eye className="h-4 w-4" />
-                  Görüntüle
-                </button>
-                <button 
-                  className="flex-1 px-3 py-2 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors flex items-center justify-center gap-2"
-                  onClick={() => alert('Kategori düzenle (Demo)')}
-                >
-                  <Edit className="h-4 w-4" />
-                  Düzenle
-                </button>
-                <button 
-                  className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                  onClick={() => alert('Kategori sil (Demo)')}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
-          </div>
-        ))}
+      <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
+        <table className="w-full">
+          <thead className="border-b border-slate-200 dark:border-slate-700">
+            <tr>
+              <th className="text-left px-6 py-4 text-sm font-semibold text-slate-900 dark:text-white">
+                Kategori Adı
+              </th>
+              <th className="text-left px-6 py-4 text-sm font-semibold text-slate-900 dark:text-white">
+                Slug
+              </th>
+              <th className="text-left px-6 py-4 text-sm font-semibold text-slate-900 dark:text-white">
+                Ürün Sayısı
+              </th>
+              <th className="text-right px-6 py-4 text-sm font-semibold text-slate-900 dark:text-white">
+                İşlemler
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {categories.map((category) => (
+              <tr key={category.id} className="border-b border-slate-200 dark:border-slate-700 last:border-0">
+                <td className="px-6 py-4">
+                  <p className="font-medium text-slate-900 dark:text-white">{category.name}</p>
+                  {category.description && (
+                    <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">{category.description}</p>
+                  )}
+                </td>
+                <td className="px-6 py-4 text-slate-600 dark:text-slate-400">
+                  /{category.slug}
+                </td>
+                <td className="px-6 py-4 text-slate-600 dark:text-slate-400">
+                  {category.product_count || 0} ürün
+                </td>
+                <td className="px-6 py-4">
+                  <div className="flex items-center justify-end gap-2">
+                    <button
+                      onClick={() => openModal(category)}
+                      className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition"
+                    >
+                      <Edit className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(category.id, category.name)}
+                      className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+            {categories.length === 0 && (
+              <tr>
+                <td colSpan={4} className="px-6 py-12 text-center text-slate-600 dark:text-slate-400">
+                  Henüz kategori eklenmemiş
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
+
+      {showModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-slate-800 rounded-xl max-w-md w-full p-6">
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4">
+              {editingCategory ? 'Kategori Düzenle' : 'Yeni Kategori'}
+            </h2>
+            
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
+                  Kategori Adı
+                </label>
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => handleNameChange(e.target.value)}
+                  className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
+                  Slug
+                </label>
+                <input
+                  type="text"
+                  value={formData.slug}
+                  onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                  className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
+                  Açıklama (Opsiyonel)
+                </label>
+                <textarea
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                  rows={3}
+                />
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={closeModal}
+                  className="flex-1 px-4 py-2 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition"
+                >
+                  İptal
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 px-4 py-2 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition"
+                >
+                  {editingCategory ? 'Güncelle' : 'Ekle'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
