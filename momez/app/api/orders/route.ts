@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { db, transaction } from '@/lib/db/mysql'
+import { db } from '@/lib/db/mysql'
 import { getUserFromToken } from '@/lib/auth'
+import { v4 as uuidv4 } from 'uuid'
 
-// GET /api/orders - Siparişleri listele
+// GET /api/orders - Kullanıcının siparişlerini getir
 export async function GET(request: NextRequest) {
   try {
     const token = request.cookies.get('auth_token')?.value
@@ -22,25 +23,38 @@ export async function GET(request: NextRequest) {
       )
     }
     
-    // Kullanıcının siparişleri
-    const orders = await db.findMany('orders', 
-      { user_id: user.id },
-      { orderBy: 'created_at DESC' }
-    )
+    // Siparişleri getir
+    const ordersQuery = `
+      SELECT 
+        o.*,
+        a.title as address_title,
+        a.full_name,
+        a.phone,
+        a.city,
+        a.district
+      FROM orders o
+      LEFT JOIN user_addresses a ON o.address_id COLLATE utf8mb4_unicode_ci = a.id COLLATE utf8mb4_unicode_ci
+      WHERE o.user_id = ?
+      ORDER BY o.created_at DESC
+    `
     
-    // Her sipariş için ürün detayları
+    const orders = await db.query(ordersQuery, [user.id])
+    
+    // Her sipariş için kalemleri getir
     const ordersWithItems = await Promise.all(
       orders.map(async (order: any) => {
         const items = await db.findMany('order_items', { order_id: order.id })
-        
-        const itemsWithProducts = await Promise.all(
-          items.map(async (item: any) => {
-            const product = await db.findOne('products', { id: item.product_id })
-            return { ...item, product }
-          })
-        )
-        
-        return { ...order, items: itemsWithProducts }
+        return {
+          ...order,
+          subtotal: parseFloat(order.subtotal),
+          shipping_cost: parseFloat(order.shipping_cost),
+          total: parseFloat(order.total),
+          items: items.map((item: any) => ({
+            ...item,
+            price: parseFloat(item.price),
+            quantity: parseInt(item.quantity)
+          }))
+        }
       })
     )
     
@@ -77,93 +91,137 @@ export async function POST(request: NextRequest) {
       )
     }
     
-    const { address_id, payment_method, items } = await request.json()
+    const { address_id, payment_method, notes } = await request.json()
     
-    if (!address_id || !items || items.length === 0) {
+    if (!address_id || !payment_method) {
       return NextResponse.json(
-        { success: false, error: 'Adres ve ürünler gerekli' },
+        { success: false, error: 'Adres ve ödeme yöntemi gerekli' },
         { status: 400 }
       )
     }
     
-    // Transaction içinde sipariş oluştur
-    const result = await transaction(async (conn) => {
-      // Toplam tutarı hesapla
-      let totalAmount = 0
-      for (const item of items) {
-        const product = await db.findOne('products', { id: item.product_id })
-        if (!product) {
-          throw new Error(`Ürün bulunamadı: ${item.product_id}`)
-        }
-        totalAmount += (product as any).price * item.quantity
+    // Sepetteki ürünleri al
+    const cartQuery = `
+      SELECT 
+        ci.id,
+        ci.product_id,
+        ci.size,
+        ci.quantity,
+        p.name as product_name,
+        p.price,
+        p.discount_price,
+        ps.quantity as stock
+      FROM cart_items ci
+      INNER JOIN products p ON ci.product_id COLLATE utf8mb4_unicode_ci = p.id COLLATE utf8mb4_unicode_ci
+      LEFT JOIN product_stock ps ON ci.product_id COLLATE utf8mb4_unicode_ci = ps.product_id COLLATE utf8mb4_unicode_ci AND ci.size = ps.size
+      WHERE ci.user_id = ?
+    `
+    
+    const cartItems = await db.query(cartQuery, [user.id])
+    
+    if (cartItems.length === 0) {
+      return NextResponse.json(
+        { success: false, error: 'Sepetiniz boş' },
+        { status: 400 }
+      )
+    }
+    
+    // Stok kontrolü
+    for (const item of cartItems) {
+      if (item.stock < item.quantity) {
+        return NextResponse.json(
+          { success: false, error: `${item.product_name} için yeterli stok yok` },
+          { status: 400 }
+        )
       }
+    }
+    
+    // Toplam hesapla
+    const subtotal = cartItems.reduce((sum: number, item: any) => {
+      const price = item.discount_price || item.price
+      return sum + (price * item.quantity)
+    }, 0)
+    
+    const shipping_cost = subtotal >= 500 ? 0 : 50
+    const total = subtotal + shipping_cost
+    
+    // Sipariş numarası oluştur (OR-20241117-XXXX formatında)
+    const today = new Date()
+    const dateStr = today.toISOString().slice(0, 10).replace(/-/g, '')
+    const randomNum = Math.floor(1000 + Math.random() * 9000)
+    const order_number = `OR-${dateStr}-${randomNum}`
+    
+    // Sipariş oluştur
+    const orderId = uuidv4()
+    await db.query(
+      `INSERT INTO orders 
+        (id, user_id, order_number, address_id, payment_method, subtotal, shipping_cost, total, status, notes) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)`,
+      [orderId, user.id, order_number, address_id, payment_method, parseFloat(subtotal.toFixed(2)), parseFloat(shipping_cost.toFixed(2)), parseFloat(total.toFixed(2)), notes || null]
+    )
+    
+    // Sipariş detaylarını ekle ve stoktan düş
+    for (const item of cartItems) {
+      const itemId = uuidv4()
+      const price = item.discount_price || item.price
       
-      // Sipariş numarası oluştur
-      const orderNumber = `ORD-${Date.now()}`
-      
-      // Sipariş oluştur
-      const order = await db.insert<any>('orders', {
-        user_id: user.id,
-        order_number: orderNumber,
-        address_id,
-        total: totalAmount,
-        subtotal: totalAmount,
-        status: 'pending',
-        payment_method: payment_method || 'credit_card',
-        payment_status: 'pending',
-        created_at: new Date()
-      })
-      
-      if (!order) {
-        throw new Error('Sipariş oluşturulamadı')
-      }
-      
-      // Sipariş ürünlerini ekle
-      for (const item of items) {
-        const product = await db.findOne('products', { id: item.product_id })
-        
-        await db.insert('order_items', {
-          order_id: order.id,
-          product_id: item.product_id,
-          size: item.size,
-          quantity: item.quantity,
-          price: (product as any).price
-        })
-        
-        // Stoktan düş
-        const stock = await db.findOne('product_stock', {
-          product_id: item.product_id,
-          size: item.size
-        })
-        
-        if (stock) {
-          await db.update(
-            'product_stock',
-            { quantity: (stock as any).quantity - item.quantity },
-            { 
-              product_id: item.product_id,
-              size: item.size
-            }
-          )
-        }
-      }
-      
-      // Sepeti temizle
-      await conn.execute(
-        'DELETE FROM cart_items WHERE user_id = ?',
-        [user.id]
+      // Sipariş kalemine ekle
+      await db.query(
+        `INSERT INTO order_items 
+          (id, order_id, product_id, product_name, size, quantity, price) 
+         VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [itemId, orderId, item.product_id, item.product_name, item.size, item.quantity, price]
       )
       
-      return order
-    })
+      // Stoktan düş
+      await db.query(
+        'UPDATE product_stock SET quantity = quantity - ? WHERE product_id = ? AND size = ?',
+        [item.quantity, item.product_id, item.size]
+      )
+    }
+    
+    // Sepeti temizle
+    await db.delete('cart_items', { user_id: user.id })
+    
+    // Siparişi getir (adres bilgisiyle birlikte)
+    const orderQuery = `
+      SELECT 
+        o.*,
+        a.title as address_title,
+        a.full_name,
+        a.phone,
+        a.city,
+        a.district,
+        a.address_line,
+        a.postal_code
+      FROM orders o
+      LEFT JOIN user_addresses a ON o.address_id COLLATE utf8mb4_unicode_ci = a.id COLLATE utf8mb4_unicode_ci
+      WHERE o.id = ?
+    `
+    
+    const orders = await db.query(orderQuery, [orderId])
+    const order = orders[0]
+    
+    // Sipariş kalemlerini getir
+    const items = await db.findMany('order_items', { order_id: orderId })
     
     return NextResponse.json({
       success: true,
-      data: result,
-      message: 'Sipariş oluşturuldu'
+      data: {
+        ...order,
+        subtotal: parseFloat(order.subtotal),
+        shipping_cost: parseFloat(order.shipping_cost),
+        total: parseFloat(order.total),
+        items: items.map((item: any) => ({
+          ...item,
+          price: parseFloat(item.price),
+          quantity: parseInt(item.quantity)
+        }))
+      },
+      message: 'Sipariş başarıyla oluşturuldu'
     })
   } catch (error) {
-    console.error('Create Order Error:', error)
+    console.error('Order POST Error:', error)
     return NextResponse.json(
       { success: false, error: 'Sipariş oluşturulurken hata oluştu' },
       { status: 500 }

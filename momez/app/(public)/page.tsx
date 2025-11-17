@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { productsAPI, categoriesAPI } from '@/lib/api'
 import toast, { Toaster } from 'react-hot-toast'
+import ProductCard from '@/components/ProductCard'
 
 interface UserData {
   id: string
@@ -226,70 +227,7 @@ export default function HomePage() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {products.map((product) => (
-                <div key={product.id} className="group">
-                  <Link href={`/urun/${product.slug}`}>
-                    <div className="aspect-square rounded-lg overflow-hidden bg-gray-100 mb-3 relative">
-                      {product.images && product.images[0] ? (
-                        <Image
-                          src={product.images[0].image_url}
-                          alt={product.name}
-                          fill
-                          className="object-cover group-hover:scale-110 transition"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-gray-400">
-                          Görsel Yok
-                        </div>
-                      )}
-                      {!product.in_stock && (
-                        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                          <span className="text-white font-semibold">Stokta Yok</span>
-                        </div>
-                      )}
-                    </div>
-                  </Link>
-                  
-                  <div className="space-y-2">
-                    <Link href={`/urun/${product.slug}`}>
-                      <h3 className="font-semibold group-hover:text-[#ee2b2b] transition line-clamp-2">
-                        {product.name}
-                      </h3>
-                    </Link>
-                    
-                    <div className="flex items-center justify-between">
-                      <p className="text-lg font-bold text-[#ee2b2b]">
-                        ₺{Number(product.price).toFixed(2)}
-                      </p>
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => toast.error('Favorilere eklemek için giriş yapın', {
-                            duration: 2000,
-                            icon: '🔒'
-                          })}
-                          className="p-2 hover:bg-gray-100 rounded-full transition"
-                        >
-                          <Heart className="w-5 h-5" />
-                        </button>
-                        <button
-                          onClick={() => {
-                            if (!product.in_stock) {
-                              toast.error('Bu ürün stokta yok')
-                            } else {
-                              toast.error('Sepete eklemek için giriş yapın', {
-                                duration: 2000,
-                                icon: '🔒'
-                              })
-                            }
-                          }}
-                          className="p-2 bg-[#ee2b2b] text-white rounded-full hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                          disabled={!product.in_stock}
-                        >
-                          <ShoppingCart className="w-5 h-5" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <ProductCard key={product.id} product={product} user={user} />
               ))}
             </div>
           )}

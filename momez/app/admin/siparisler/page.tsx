@@ -5,13 +5,13 @@ import { Search } from 'lucide-react'
 import toast, { Toaster } from 'react-hot-toast'
 
 interface Order {
-  id: number
+  id: string
   order_number: string
   customer_name: string
   customer_email: string
-  total_amount: number
+  total: number
   status: string
-  payment_status: string
+  payment_method: string
   item_count: number
   created_at: string
 }
@@ -42,7 +42,7 @@ export default function AdminOrdersPage() {
     }
   }
 
-  const updateOrderStatus = async (orderId: number, newStatus: string) => {
+  const updateOrderStatus = async (orderId: string, newStatus: string) => {
     try {
       const response = await fetch('/api/admin/orders', {
         method: 'PATCH',
@@ -65,15 +65,17 @@ export default function AdminOrdersPage() {
 
   const statusColors = {
     pending: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400',
-    processing: 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400',
-    shipped: 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400',
+    confirmed: 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400',
+    preparing: 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400',
+    shipped: 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-400',
     delivered: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400',
     cancelled: 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400',
   }
 
   const statusLabels: Record<string, string> = {
     pending: 'Beklemede',
-    processing: 'Hazırlanıyor',
+    confirmed: 'Onaylandı',
+    preparing: 'Hazırlanıyor',
     shipped: 'Kargoda',
     delivered: 'Teslim Edildi',
     cancelled: 'İptal',
@@ -174,7 +176,7 @@ export default function AdminOrdersPage() {
                       {order.item_count} ürün
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap font-medium text-slate-900 dark:text-white">
-                      ₺{order.total_amount.toLocaleString('tr-TR')}
+                      ₺{order.total?.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
@@ -184,17 +186,26 @@ export default function AdminOrdersPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <select
-                        value={order.status}
-                        onChange={(e) => updateOrderStatus(order.id, e.target.value)}
-                        className="text-sm border border-slate-300 dark:border-slate-600 rounded px-2 py-1 bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
-                      >
-                        <option value="pending">Beklemede</option>
-                        <option value="processing">Hazırlanıyor</option>
-                        <option value="shipped">Kargoda</option>
-                        <option value="delivered">Teslim Edildi</option>
-                        <option value="cancelled">İptal</option>
-                      </select>
+                      <div className="flex items-center gap-2">
+                        <select
+                          value={order.status}
+                          onChange={(e) => updateOrderStatus(order.id, e.target.value)}
+                          className="text-sm border border-slate-300 dark:border-slate-600 rounded px-2 py-1 bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
+                        >
+                          <option value="pending">Beklemede</option>
+                          <option value="confirmed">Onaylandı</option>
+                          <option value="preparing">Hazırlanıyor</option>
+                          <option value="shipped">Kargoda</option>
+                          <option value="delivered">Teslim Edildi</option>
+                          <option value="cancelled">İptal</option>
+                        </select>
+                        <a
+                          href={`/admin/siparisler/${order.id}`}
+                          className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+                        >
+                          Detay
+                        </a>
+                      </div>
                     </td>
                   </tr>
                 ))}

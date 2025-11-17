@@ -148,7 +148,7 @@ export const cartAPI = {
   },
 
   // Sepetten çıkar
-  async remove(itemId: number) {
+  async remove(itemId: string) {
     const res = await fetch(`${API_URL}/api/cart?id=${itemId}`, {
       method: 'DELETE'
     })

@@ -22,29 +22,49 @@ export async function GET(request: NextRequest) {
       )
     }
     
-    // Sepet ürünlerini getir
-    const cartItems = await db.findMany('cart_items', { user_id: user.id })
+    // Sepet ürünlerini getir (JOIN ile)
+    const query = `
+      SELECT 
+        ci.id,
+        ci.product_id,
+        ci.size,
+        ci.quantity,
+        p.name as product_name,
+        p.slug as product_slug,
+        p.price,
+        p.discount_price,
+        ps.quantity as stock,
+        pi.image_url
+      FROM cart_items ci
+      INNER JOIN products p ON ci.product_id COLLATE utf8mb4_unicode_ci = p.id COLLATE utf8mb4_unicode_ci
+      LEFT JOIN product_stock ps ON ci.product_id COLLATE utf8mb4_unicode_ci = ps.product_id COLLATE utf8mb4_unicode_ci AND ci.size = ps.size
+      LEFT JOIN (
+        SELECT product_id, image_url, 
+               ROW_NUMBER() OVER (PARTITION BY product_id ORDER BY display_order) as rn
+        FROM product_images
+      ) pi ON ci.product_id COLLATE utf8mb4_unicode_ci = pi.product_id COLLATE utf8mb4_unicode_ci AND pi.rn = 1
+      WHERE ci.user_id = ?
+      ORDER BY ci.created_at DESC
+    `
     
-    // Her ürün için detay bilgisi ekle
-    const itemsWithDetails = await Promise.all(
-      cartItems.map(async (item: any) => {
-        const product = await db.findOne('products', { id: item.product_id })
-        const images = await db.findMany('product_images', 
-          { product_id: item.product_id },
-          { orderBy: 'display_order ASC', limit: 1 }
-        )
-        
-        return {
-          ...item,
-          product,
-          image: images[0] || null
-        }
-      })
-    )
+    const cartItems = await db.query(query, [user.id])
+    
+    // Fiyat hesapla (indirimli varsa onu kullan)
+    const formattedItems = cartItems.map((item: any) => ({
+      id: item.id,
+      product_id: item.product_id,
+      product_name: item.product_name,
+      product_slug: item.product_slug,
+      size: item.size,
+      quantity: item.quantity,
+      price: item.discount_price || item.price,
+      image_url: item.image_url || '/placeholder.jpg',
+      stock: item.stock || 0
+    }))
     
     return NextResponse.json({
       success: true,
-      data: itemsWithDetails
+      data: formattedItems
     })
   } catch (error) {
     console.error('Cart GET Error:', error)
@@ -119,8 +139,7 @@ export async function POST(request: NextRequest) {
         user_id: user.id,
         product_id,
         size,
-        quantity,
-        added_at: new Date()
+        quantity
       })
     }
     
@@ -167,10 +186,16 @@ export async function DELETE(request: NextRequest) {
       )
     }
     
-    await db.delete('cart_items', {
-      id: parseInt(itemId),
-      user_id: user.id
-    })
+    // Önce bu item gerçekten bu kullanıcıya ait mi kontrol et
+    const item = await db.findOne('cart_items', { id: itemId })
+    if (!item || (item as any).user_id !== user.id) {
+      return NextResponse.json(
+        { success: false, error: 'Ürün bulunamadı' },
+        { status: 404 }
+      )
+    }
+    
+    await db.delete('cart_items', { id: itemId })
     
     return NextResponse.json({
       success: true,

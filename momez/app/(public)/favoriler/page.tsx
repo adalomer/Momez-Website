@@ -10,7 +10,7 @@ import { favoritesAPI, authAPI, cartAPI } from '@/lib/api'
 
 interface FavoriteItem {
   id: number
-  product_id: number
+  product_id: string
   product_name: string
   product_slug: string
   price: number
@@ -47,11 +47,11 @@ export default function FavoritesPage() {
     }
   }
 
-  const removeFavorite = async (itemId: number) => {
+  const removeFavorite = async (productId: string) => {
     try {
-      const result = await favoritesAPI.remove(itemId)
+      const result = await favoritesAPI.remove(productId)
       if (result.success) {
-        setFavorites(items => items.filter(i => i.id !== itemId))
+        setFavorites(items => items.filter(i => i.product_id !== productId))
         toast.success('Favorilerden çıkarıldı')
       } else {
         toast.error('Çıkarılamadı')
@@ -124,7 +124,7 @@ export default function FavoritesPage() {
                   
                   <div className="flex gap-2">
                     <button
-                      onClick={() => removeFavorite(item.id)}
+                      onClick={() => removeFavorite(item.product_id)}
                       className="flex-1 px-4 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition flex items-center justify-center gap-2"
                     >
                       <Trash2 className="w-4 h-4" />

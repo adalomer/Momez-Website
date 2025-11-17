@@ -9,8 +9,8 @@ import toast, { Toaster } from 'react-hot-toast'
 import { cartAPI, authAPI } from '@/lib/api'
 
 interface CartItem {
-  id: number
-  product_id: number
+  id: string
+  product_id: string
   product_name: string
   product_slug: string
   size: string
@@ -54,7 +54,7 @@ export default function CartPage() {
     }
   }
 
-  const updateQuantity = async (itemId: number, newQuantity: number) => {
+  const updateQuantity = async (itemId: string, newQuantity: number) => {
     if (newQuantity < 1) return
     
     const item = cartItems.find(i => i.id === itemId)
@@ -84,7 +84,7 @@ export default function CartPage() {
     }
   }
 
-  const removeItem = async (itemId: number) => {
+  const removeItem = async (itemId: string) => {
     try {
       const result = await cartAPI.remove(itemId)
       if (result.success) {

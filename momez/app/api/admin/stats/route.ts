@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
     ])
 
     // Son siparişler (son 10)
-    const recentOrders = await query(`
+    const recentOrdersRaw = await query(`
       SELECT 
         o.id,
         o.order_number,
@@ -49,10 +49,15 @@ export async function GET(request: NextRequest) {
         u.full_name as customer_name,
         u.email as customer_email
       FROM orders o
-      JOIN users u ON o.user_id = u.id
+      JOIN users u ON o.user_id COLLATE utf8mb4_unicode_ci = u.id COLLATE utf8mb4_unicode_ci
       ORDER BY o.created_at DESC
       LIMIT 10
     `)
+    
+    const recentOrders = recentOrdersRaw.map((order: any) => ({
+      ...order,
+      total: parseFloat(order.total)
+    }))
 
     // Düşük stoklu ürünler (stok < 10)
     const lowStockProducts = await query(`
@@ -62,7 +67,7 @@ export async function GET(request: NextRequest) {
         ps.size,
         ps.quantity as stock
       FROM product_stock ps
-      JOIN products p ON ps.product_id = p.id
+      JOIN products p ON ps.product_id COLLATE utf8mb4_unicode_ci = p.id COLLATE utf8mb4_unicode_ci
       WHERE ps.quantity < 10 AND ps.quantity > 0 AND p.is_active = 1
       ORDER BY ps.quantity ASC
       LIMIT 10
@@ -73,7 +78,7 @@ export async function GET(request: NextRequest) {
       data: {
         stats: {
           totalOrders: totalOrders[0]?.count || 0,
-          totalRevenue: totalRevenue[0]?.total || 0,
+          totalRevenue: parseFloat(totalRevenue[0]?.total || '0'),
           totalProducts: totalProducts[0]?.count || 0,
           totalCustomers: totalCustomers[0]?.count || 0
         },

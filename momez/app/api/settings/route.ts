@@ -7,15 +7,9 @@ export async function GET(request: NextRequest) {
   try {
     const settings = await query('SELECT * FROM settings')
     
-    // Key-value objesi oluştur
-    const settingsObj: Record<string, string> = {}
-    settings.forEach((s: any) => {
-      settingsObj[s.key] = s.value
-    })
-
     return NextResponse.json({
       success: true,
-      data: settingsObj
+      data: settings
     })
   } catch (error) {
     console.error('Settings GET Error:', error)

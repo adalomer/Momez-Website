@@ -1,0 +1,304 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import { useParams, useRouter } from 'next/navigation'
+import { ArrowLeft, Package, MapPin, CreditCard, Clock } from 'lucide-react'
+import toast, { Toaster } from 'react-hot-toast'
+
+interface OrderItem {
+  id: string
+  product_id: string
+  product_name: string
+  size: string
+  quantity: number
+  price: number
+}
+
+interface Order {
+  id: string
+  order_number: string
+  user_id: string
+  customer_name: string
+  customer_email: string
+  address_title: string
+  full_name: string
+  phone: string
+  city: string
+  district: string
+  address_line: string
+  postal_code: string
+  payment_method: string
+  subtotal: number
+  shipping_cost: number
+  total: number
+  status: string
+  notes: string
+  created_at: string
+  items: OrderItem[]
+}
+
+export default function OrderDetailPage() {
+  const params = useParams()
+  const router = useRouter()
+  const [order, setOrder] = useState<Order | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetchOrder()
+  }, [params.id])
+
+  const fetchOrder = async () => {
+    try {
+      const response = await fetch(`/api/admin/orders/${params.id}`)
+      const data = await response.json()
+      
+      if (data.success) {
+        setOrder(data.data)
+      } else {
+        toast.error('Sipariş yüklenirken hata oluştu')
+      }
+    } catch (error) {
+      toast.error('Bağlantı hatası')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const updateOrderStatus = async (newStatus: string) => {
+    try {
+      const response = await fetch('/api/admin/orders', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ order_id: order?.id, status: newStatus })
+      })
+      
+      const data = await response.json()
+      
+      if (data.success) {
+        toast.success('Sipariş durumu güncellendi')
+        fetchOrder()
+      } else {
+        toast.error(data.error || 'Güncelleme başarısız')
+      }
+    } catch (error) {
+      toast.error('Güncelleme hatası')
+    }
+  }
+
+  const statusColors = {
+    pending: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400',
+    confirmed: 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400',
+    preparing: 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400',
+    shipped: 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-400',
+    delivered: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400',
+    cancelled: 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400',
+  }
+
+  const statusLabels: Record<string, string> = {
+    pending: 'Beklemede',
+    confirmed: 'Onaylandı',
+    preparing: 'Hazırlanıyor',
+    shipped: 'Kargoda',
+    delivered: 'Teslim Edildi',
+    cancelled: 'İptal',
+  }
+
+  const paymentLabels: Record<string, string> = {
+    cash_on_delivery: 'Kapıda Ödeme',
+    card: 'Kredi Kartı',
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="text-slate-600 dark:text-slate-400">Yükleniyor...</div>
+      </div>
+    )
+  }
+
+  if (!order) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="text-slate-600 dark:text-slate-400">Sipariş bulunamadı</div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-6">
+      <Toaster position="top-right" />
+      
+      {/* Header */}
+      <div className="flex items-center gap-4">
+        <button
+          onClick={() => router.push('/admin/siparisler')}
+          className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </button>
+        <div className="flex-1">
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+            Sipariş Detayı
+          </h1>
+          <p className="text-slate-600 dark:text-slate-400 mt-1">
+            {order.order_number}
+          </p>
+        </div>
+        <div>
+          <select
+            value={order.status}
+            onChange={(e) => updateOrderStatus(e.target.value)}
+            className="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+          >
+            <option value="pending">Beklemede</option>
+            <option value="confirmed">Onaylandı</option>
+            <option value="preparing">Hazırlanıyor</option>
+            <option value="shipped">Kargoda</option>
+            <option value="delivered">Teslim Edildi</option>
+            <option value="cancelled">İptal</option>
+          </select>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Ana İçerik */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Ürünler */}
+          <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <Package className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
+                Sipariş Ürünleri
+              </h2>
+            </div>
+            
+            <div className="space-y-3">
+              {order.items?.map((item) => (
+                <div key={item.id} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-900/50 rounded-lg">
+                  <div className="flex-1">
+                    <h3 className="font-medium text-slate-900 dark:text-white">
+                      {item.product_name}
+                    </h3>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">
+                      Beden: {item.size} • Adet: {item.quantity}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-medium text-slate-900 dark:text-white">
+                      ₺{(item.price * item.quantity).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                      ₺{item.price.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} / adet
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Toplam */}
+            <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700 space-y-2">
+              <div className="flex justify-between text-slate-600 dark:text-slate-400">
+                <span>Ara Toplam</span>
+                <span>₺{order.subtotal?.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+              </div>
+              <div className="flex justify-between text-slate-600 dark:text-slate-400">
+                <span>Kargo</span>
+                <span>₺{order.shipping_cost?.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+              </div>
+              <div className="flex justify-between text-lg font-bold text-slate-900 dark:text-white pt-2 border-t border-slate-200 dark:border-slate-700">
+                <span>Toplam</span>
+                <span>₺{order.total?.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Teslimat Adresi */}
+          <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <MapPin className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
+                Teslimat Adresi
+              </h2>
+            </div>
+            
+            <div className="space-y-2 text-slate-700 dark:text-slate-300">
+              <p className="font-medium text-slate-900 dark:text-white">
+                {order.full_name}
+              </p>
+              <p>{order.phone}</p>
+              <p>{order.address_line}</p>
+              <p>{order.district} / {order.city}</p>
+              {order.postal_code && <p>Posta Kodu: {order.postal_code}</p>}
+            </div>
+          </div>
+        </div>
+
+        {/* Yan Bilgiler */}
+        <div className="space-y-6">
+          {/* Sipariş Bilgileri */}
+          <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+            <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
+              Sipariş Bilgileri
+            </h2>
+            
+            <div className="space-y-3">
+              <div>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Durum</p>
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium mt-1 ${
+                  statusColors[order.status as keyof typeof statusColors] || statusColors.pending
+                }`}>
+                  {statusLabels[order.status] || order.status}
+                </span>
+              </div>
+              
+              <div>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Sipariş Tarihi</p>
+                <p className="text-slate-900 dark:text-white">
+                  {new Date(order.created_at).toLocaleString('tr-TR')}
+                </p>
+              </div>
+              
+              <div>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Ödeme Yöntemi</p>
+                <div className="flex items-center gap-2 mt-1">
+                  <CreditCard className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+                  <span className="text-slate-900 dark:text-white">
+                    {paymentLabels[order.payment_method] || order.payment_method}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Müşteri Bilgileri */}
+          <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+            <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
+              Müşteri Bilgileri
+            </h2>
+            
+            <div className="space-y-2">
+              <p className="font-medium text-slate-900 dark:text-white">
+                {order.customer_name}
+              </p>
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                {order.customer_email}
+              </p>
+            </div>
+          </div>
+
+          {/* Notlar */}
+          {order.notes && (
+            <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
+                Sipariş Notu
+              </h2>
+              <p className="text-slate-700 dark:text-slate-300">
+                {order.notes}
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}

@@ -22,28 +22,34 @@ export async function GET(request: NextRequest) {
       )
     }
     
-    const favorites = await db.findMany('favorites', { user_id: user.id })
+    // Favorileri JOIN ile getir
+    const favoritesQuery = `
+      SELECT 
+        f.id,
+        f.user_id,
+        f.product_id,
+        f.added_at,
+        p.name,
+        p.slug,
+        p.price,
+        p.discount_price,
+        p.is_active,
+        pi.image_url
+      FROM favorites f
+      INNER JOIN products p ON f.product_id COLLATE utf8mb4_unicode_ci = p.id COLLATE utf8mb4_unicode_ci
+      LEFT JOIN (
+        SELECT product_id, image_url, ROW_NUMBER() OVER (PARTITION BY product_id ORDER BY display_order) as rn
+        FROM product_images
+      ) pi ON f.product_id COLLATE utf8mb4_unicode_ci = pi.product_id COLLATE utf8mb4_unicode_ci AND pi.rn = 1
+      WHERE f.user_id = ?
+      ORDER BY f.added_at DESC
+    `
     
-    // Her ürün için detay bilgisi
-    const favoritesWithDetails = await Promise.all(
-      favorites.map(async (fav: any) => {
-        const product = await db.findOne('products', { id: fav.product_id })
-        const images = await db.findMany('product_images',
-          { product_id: fav.product_id },
-          { orderBy: 'display_order ASC', limit: 1 }
-        )
-        
-        return {
-          ...fav,
-          product,
-          image: images[0] || null
-        }
-      })
-    )
+    const favorites = await db.query(favoritesQuery, [user.id])
     
     return NextResponse.json({
       success: true,
-      data: favoritesWithDetails
+      data: favorites
     })
   } catch (error) {
     console.error('Favorites GET Error:', error)
@@ -91,8 +97,7 @@ export async function POST(request: NextRequest) {
     
     await db.insert('favorites', {
       user_id: user.id,
-      product_id,
-      added_at: new Date()
+      product_id
     })
     
     return NextResponse.json({
@@ -140,7 +145,7 @@ export async function DELETE(request: NextRequest) {
     
     await db.delete('favorites', {
       user_id: user.id,
-      product_id: parseInt(productId)
+      product_id: productId
     })
     
     return NextResponse.json({

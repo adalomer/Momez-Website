@@ -25,20 +25,40 @@ export async function GET(request: NextRequest) {
     // Tüm siparişleri kullanıcı bilgisi ile getir
     const orders = await query(`
       SELECT 
-        o.*,
+        o.id,
+        o.user_id,
+        o.order_number,
+        o.address_id,
+        o.payment_method,
+        o.subtotal,
+        o.shipping_cost,
+        o.total,
+        o.status,
+        o.notes,
+        o.created_at,
+        o.updated_at,
         u.full_name as customer_name,
         u.email as customer_email,
         COUNT(oi.id) as item_count
       FROM orders o
-      LEFT JOIN users u ON o.user_id = u.id
-      LEFT JOIN order_items oi ON o.id = oi.order_id
-      GROUP BY o.id
+      LEFT JOIN users u ON o.user_id COLLATE utf8mb4_unicode_ci = u.id COLLATE utf8mb4_unicode_ci
+      LEFT JOIN order_items oi ON o.id COLLATE utf8mb4_unicode_ci = oi.order_id COLLATE utf8mb4_unicode_ci
+      GROUP BY o.id, o.user_id, o.order_number, o.address_id, o.payment_method, o.subtotal, o.shipping_cost, o.total, o.status, o.notes, o.created_at, o.updated_at, u.full_name, u.email
       ORDER BY o.created_at DESC
     `)
 
+    // Numeric alanları parse et
+    const formattedOrders = orders.map((order: any) => ({
+      ...order,
+      subtotal: parseFloat(order.subtotal),
+      shipping_cost: parseFloat(order.shipping_cost),
+      total: parseFloat(order.total),
+      item_count: parseInt(order.item_count)
+    }))
+
     return NextResponse.json({
       success: true,
-      data: orders
+      data: formattedOrders
     })
   } catch (error) {
     console.error('Admin Orders Error:', error)

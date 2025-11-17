@@ -62,6 +62,11 @@ export async function transaction<T>(
 
 // CRUD helper fonksiyonları
 export const db = {
+  // RAW QUERY
+  async query<T = any>(sql: string, params?: any[]): Promise<T[]> {
+    return query<T>(sql, params)
+  },
+  
   // SELECT
   async findMany<T = any>(
     table: string,

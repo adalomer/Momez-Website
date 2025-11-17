@@ -183,6 +183,7 @@ export default function AdminCategoriesPage() {
     <div className="space-y-6">
       <Toaster position="top-right" />
       
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
@@ -201,6 +202,7 @@ export default function AdminCategoriesPage() {
         </button>
       </div>
 
+      {/* Categories Grid */}
       {loading ? (
         <div className="text-center py-12">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -259,6 +261,7 @@ export default function AdminCategoriesPage() {
         </div>
       )}
 
+      {/* Add Modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-slate-800 rounded-xl max-w-md w-full p-6">
@@ -340,6 +343,7 @@ export default function AdminCategoriesPage() {
         </div>
       )}
 
+      {/* Edit Modal */}
       {showEditModal && selectedCategory && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-slate-800 rounded-xl max-w-md w-full p-6">
