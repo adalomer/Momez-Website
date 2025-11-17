@@ -11,7 +11,8 @@ import {
   Tag,
   TrendingUp,
   Menu,
-  X
+  X,
+  Users
 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -23,6 +24,7 @@ export default function AdminSidebar() {
     { href: '/admin', icon: LayoutDashboard, label: 'Dashboard' },
     { href: '/admin/urunler', icon: Package, label: 'Ürünler' },
     { href: '/admin/siparisler', icon: ShoppingCart, label: 'Siparişler' },
+    { href: '/admin/musteriler', icon: Users, label: 'Müşteriler' },
     { href: '/admin/kategoriler', icon: Tag, label: 'Kategoriler' },
     { href: '/admin/kampanyalar', icon: TrendingUp, label: 'Kampanyalar' },
     { href: '/admin/ayarlar', icon: Settings, label: 'Ayarlar' },
@@ -82,11 +84,32 @@ export default function AdminSidebar() {
             })}
           </nav>
 
-          {/* Logout */}
-          <button className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 transition-colors mt-auto">
-            <LogOut className="h-5 w-5" />
-            <span className="text-sm font-medium">Çıkış Yap</span>
-          </button>
+          {/* Bottom Actions */}
+          <div className="space-y-2 mt-auto">
+            <Link
+              href="/"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            >
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+              </svg>
+              <span className="text-sm font-medium">Ana Sayfa</span>
+            </Link>
+            <button
+              onClick={async () => {
+                try {
+                  await fetch('/api/auth/logout', { method: 'POST' })
+                  window.location.href = '/'
+                } catch (error) {
+                  alert('Çıkış yapılamadı')
+                }
+              }}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+            >
+              <LogOut className="h-5 w-5" />
+              <span className="text-sm font-medium">Çıkış Yap</span>
+            </button>
+          </div>
         </div>
       </aside>
 

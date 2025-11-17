@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db/mysql'
+import { query } from '@/lib/db/mysql'
 
 // GET /api/categories - Tüm kategorileri listele
 export async function GET(request: NextRequest) {
@@ -7,27 +7,26 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const parentId = searchParams.get('parent_id')
     
-    let where: Record<string, any> = { is_active: true }
+    let sql = 'SELECT * FROM categories WHERE is_active = 1'
+    const params: any[] = []
     
     if (parentId) {
-      where.parent_id = parseInt(parentId)
-    } else if (parentId === null) {
-      // Ana kategoriler
-      where.parent_id = null
+      sql += ' AND parent_id = ?'
+      params.push(parentId)
     }
     
-    const categories = await db.findMany('categories', where, {
-      orderBy: 'display_order ASC, name ASC'
-    })
+    sql += ' ORDER BY display_order ASC, name ASC'
+    
+    const categories = await query(sql, params)
     
     // Her kategori için ürün sayısı
     const categoriesWithCount = await Promise.all(
       categories.map(async (cat: any) => {
-        const count = await db.count('products', {
-          category_id: cat.id,
-          is_active: true
-        })
-        return { ...cat, product_count: count }
+        const countResult = await query(
+          'SELECT COUNT(*) as count FROM products WHERE category_id = ? AND is_active = 1',
+          [cat.id]
+        )
+        return { ...cat, product_count: countResult[0]?.count || 0 }
       })
     )
     
@@ -50,6 +49,13 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { name, parent_id, image_url } = body
     
+    if (!name || name.trim() === '') {
+      return NextResponse.json(
+        { success: false, error: 'Kategori adı gerekli' },
+        { status: 400 }
+      )
+    }
+    
     // Slug oluştur
     const slug = name
       .toLowerCase()
@@ -62,25 +68,42 @@ export async function POST(request: NextRequest) {
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-|-$/g, '')
     
-    const category = await db.insert('categories', {
-      name,
-      slug,
-      parent_id: parent_id || null,
-      image_url: image_url || null,
-      is_active: true,
-      display_order: 0,
-      created_at: new Date()
-    })
+    // UUID oluştur
+    const crypto = require('crypto')
+    const id = crypto.randomUUID()
+    
+    // Direct SQL insert (UUID için)
+    const { query } = await import('@/lib/db/mysql')
+    await query(
+      `INSERT INTO categories (id, name, slug, parent_id, image_url, is_active, display_order, created_at) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, NOW())`,
+      [id, name, slug, parent_id || null, image_url || null, true, 0]
+    )
+    
+    // Eklenen kategoriyi getir
+    const newCategory = await query(
+      'SELECT * FROM categories WHERE id = ?',
+      [id]
+    )
     
     return NextResponse.json({
       success: true,
-      data: category,
+      data: newCategory[0],
       message: 'Kategori eklendi'
     })
-  } catch (error) {
+  } catch (error: any) {
     console.error('Create Category Error:', error)
+    
+    // Slug duplicate hatası
+    if (error.code === 'ER_DUP_ENTRY') {
+      return NextResponse.json(
+        { success: false, error: 'Bu isimde bir kategori zaten var' },
+        { status: 400 }
+      )
+    }
+    
     return NextResponse.json(
-      { success: false, error: 'Kategori eklenirken hata oluştu' },
+      { success: false, error: 'Kategori eklenirken hata oluştu: ' + error.message },
       { status: 500 }
     )
   }

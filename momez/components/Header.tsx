@@ -1,13 +1,53 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { ShoppingCart, Heart, User, Search, Menu, X } from 'lucide-react'
-import { useState } from 'react'
+import { usePathname, useRouter } from 'next/navigation'
+import { ShoppingCart, Heart, User, Search, Menu, X, LogOut } from 'lucide-react'
+import { useState, useEffect } from 'react'
+
+interface UserData {
+  id: number
+  email: string
+  full_name: string
+  role: string
+}
 
 export default function Header() {
   const pathname = usePathname()
+  const router = useRouter()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [user, setUser] = useState<UserData | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetchUser()
+  }, [])
+
+  const fetchUser = async () => {
+    try {
+      const response = await fetch('/api/auth/me')
+      const data = await response.json()
+      
+      if (data.success && data.data?.user) {
+        setUser(data.data.user)
+      }
+    } catch (error) {
+      console.error('User load error:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' })
+      setUser(null)
+      router.push('/')
+      router.refresh()
+    } catch (error) {
+      console.error('Logout error:', error)
+    }
+  }
 
   const navLinks = [
     { href: '/', label: 'Ana Sayfa' },
@@ -76,13 +116,64 @@ export default function Header() {
               </span>
             </Link>
             
-            <Link
-              href="/profil"
-              className="flex items-center justify-center rounded-full h-10 w-10 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-              aria-label="Hesabım"
-            >
-              <User className="h-5 w-5 text-slate-600 dark:text-slate-400" />
-            </Link>
+            {/* User Menu */}
+            {loading ? (
+              <div className="flex items-center justify-center rounded-full h-10 w-10">
+                <div className="animate-spin rounded-full h-5 w-5 border-2 border-primary border-t-transparent"></div>
+              </div>
+            ) : user ? (
+              <div className="relative group">
+                <button className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                  <div className="flex items-center justify-center rounded-full h-8 w-8 bg-primary/10 text-primary font-semibold text-sm">
+                    {user.full_name?.charAt(0).toUpperCase() || 'U'}
+                  </div>
+                  <span className="hidden md:block text-sm font-medium text-slate-700 dark:text-slate-300">
+                    {user.full_name}
+                  </span>
+                </button>
+                
+                {/* Dropdown Menu */}
+                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                  <div className="p-2">
+                    {user.role === 'admin' && (
+                      <Link
+                        href="/admin"
+                        className="block px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded"
+                      >
+                        Admin Panel
+                      </Link>
+                    )}
+                    <Link
+                      href="/profil"
+                      className="block px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded"
+                    >
+                      Profilim
+                    </Link>
+                    <Link
+                      href="/profil/siparisler"
+                      className="block px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded"
+                    >
+                      Siparişlerim
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded flex items-center gap-2"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      Çıkış Yap
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <Link
+                href="/auth/login"
+                className="flex items-center justify-center rounded-full h-10 w-10 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                aria-label="Giriş Yap"
+              >
+                <User className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+              </Link>
+            )}
 
             {/* Mobile Menu Button */}
             <button

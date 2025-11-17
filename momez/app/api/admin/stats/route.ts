@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
       // Toplam sipariş sayısı
       query('SELECT COUNT(*) as count FROM orders'),
       // Toplam gelir
-      query('SELECT SUM(total_amount) as total FROM orders WHERE status != "cancelled"'),
+      query('SELECT SUM(total) as total FROM orders WHERE status != "cancelled"'),
       // Toplam ürün sayısı
       query('SELECT COUNT(*) as count FROM products WHERE is_active = 1'),
       // Toplam müşteri sayısı
@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
       SELECT 
         o.id,
         o.order_number,
-        o.total_amount,
+        o.total,
         o.status,
         o.created_at,
         u.full_name as customer_name,
@@ -60,11 +60,11 @@ export async function GET(request: NextRequest) {
         p.id,
         p.name,
         ps.size,
-        ps.stock
-      FROM product_sizes ps
+        ps.quantity as stock
+      FROM product_stock ps
       JOIN products p ON ps.product_id = p.id
-      WHERE ps.stock < 10 AND ps.stock > 0
-      ORDER BY ps.stock ASC
+      WHERE ps.quantity < 10 AND ps.quantity > 0 AND p.is_active = 1
+      ORDER BY ps.quantity ASC
       LIMIT 10
     `)
 

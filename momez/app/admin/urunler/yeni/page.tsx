@@ -4,12 +4,12 @@ import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { ArrowLeft, Save, Upload, X } from 'lucide-react'
 import Link from 'next/link'
-import toast from 'react-hot-toast'
+import toast, { Toaster } from 'react-hot-toast'
 import { categoriesAPI, productsAPI, uploadAPI } from '@/lib/api'
 import { useRouter } from 'next/navigation'
 
 interface Category {
-  id: number
+  id: string
   name: string
   slug: string
 }
@@ -80,8 +80,8 @@ export default function AdminProductFormPage() {
     try {
       const uploadPromises = Array.from(files).map(async (file) => {
         const result = await uploadAPI.uploadImage(file)
-        if (result.success && result.data) {
-          return result.data.url
+        if (result.success && result.url) {
+          return result.url
         }
         return null
       })
@@ -93,15 +93,29 @@ export default function AdminProductFormPage() {
         setImages(prev => [...prev, ...validUrls])
         toast.success(validUrls.length + ' görsel yüklendi')
       }
+      
+      // Input'u temizle
+      e.target.value = ''
     } catch (error) {
+      console.error('Image upload error:', error)
       toast.error('Görsel yüklenirken hata oluştu')
     } finally {
       setUploadingImage(false)
     }
   }
   
+  const removeImage = (index: number) => {
+    setImages(prev => prev.filter((_, i) => i !== index))
+    toast.success('Görsel kaldırıldı')
+  }
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    console.log('Form submit başladı')
+    console.log('FormData:', formData)
+    console.log('Images:', images)
+    console.log('Selected Sizes:', selectedSizes)
     
     if (!formData.name || !formData.description || !formData.category_id || !formData.price) {
       toast.error('Lütfen zorunlu alanları doldurun')
@@ -126,6 +140,7 @@ export default function AdminProductFormPage() {
     setLoading(true)
     
     try {
+      console.log('API çağrısı yapılıyor...')
       const result = await productsAPI.create({
         name: formData.name,
         slug: formData.name.toLowerCase()
@@ -134,7 +149,7 @@ export default function AdminProductFormPage() {
           .replace(/-+/g, '-'),
         description: formData.description,
         price: parseFloat(formData.price),
-        category_id: parseInt(formData.category_id),
+        category_id: formData.category_id,
         images,
         sizes: sizesData,
         sku: formData.sku || null,
@@ -143,6 +158,8 @@ export default function AdminProductFormPage() {
         is_new: formData.is_new,
         tags: formData.tags ? formData.tags.split(',').map(t => t.trim()).filter(t => t) : []
       })
+      
+      console.log('API yanıtı:', result)
       
       if (result.success) {
         toast.success('Ürün başarıyla eklendi!')
@@ -153,7 +170,8 @@ export default function AdminProductFormPage() {
         toast.error(result.error || 'Ürün eklenirken hata oluştu')
       }
     } catch (error) {
-      toast.error('Bir hata oluştu')
+      console.error('Submit error:', error)
+      toast.error('Bir hata oluştu: ' + (error instanceof Error ? error.message : 'Bilinmeyen hata'))
     } finally {
       setLoading(false)
     }
@@ -161,6 +179,8 @@ export default function AdminProductFormPage() {
 
   return (
     <div className="space-y-6">
+      <Toaster position="top-right" />
+      
       <div className="flex items-center gap-4">
         <Link 
           href="/admin/urunler"
@@ -327,10 +347,10 @@ export default function AdminProductFormPage() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {images.map((img, idx) => (
                   <div key={idx} className="relative aspect-square rounded-lg overflow-hidden bg-slate-200 dark:bg-slate-700 group">
-                    <Image src={img} alt={'Ürün ' + (idx + 1)} fill className="object-cover" />
+                    <img src={img} alt={'Ürün ' + (idx + 1)} className="w-full h-full object-cover" />
                     <button
                       type="button"
-                      onClick={() => setImages(images.filter((_, i) => i !== idx))}
+                      onClick={() => removeImage(idx)}
                       className="absolute top-2 right-2 p-1.5 bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                     >
                       <X className="h-4 w-4" />

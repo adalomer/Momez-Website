@@ -26,7 +26,7 @@ export async function PUT(
 
     const { id } = await params
     const body = await request.json()
-    const { name, slug, description } = body
+    const { name, slug, description, image_url } = body
 
     if (!name || !slug) {
       return NextResponse.json(
@@ -50,8 +50,8 @@ export async function PUT(
 
     // Kategoriyi güncelle
     await query(
-      'UPDATE categories SET name = ?, slug = ?, description = ? WHERE id = ?',
-      [name, slug, description || null, id]
+      'UPDATE categories SET name = ?, slug = ?, description = ?, image_url = ? WHERE id = ?',
+      [name, slug, description || null, image_url || null, id]
     )
 
     return NextResponse.json({

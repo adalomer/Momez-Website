@@ -6,7 +6,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'
 const JWT_EXPIRES_IN = '7d'
 
 export interface User {
-  id: number
+  id: string  // UUID
   email: string
   full_name: string
   role: 'admin' | 'customer'
@@ -15,7 +15,7 @@ export interface User {
 }
 
 export interface JWTPayload {
-  userId: number
+  userId: string  // UUID
   email: string
   role: string
 }

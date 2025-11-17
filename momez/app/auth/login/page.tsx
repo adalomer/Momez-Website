@@ -36,10 +36,8 @@ function LoginForm() {
           ? '/admin' 
           : (redirect !== '/' ? redirect : '/profil')
         
-        setTimeout(() => {
-          router.push(targetUrl)
-          router.refresh()
-        }, 1000)
+        // Hemen yönlendir
+        window.location.href = targetUrl
       } else {
         toast.error(result.error || 'Giriş başarısız')
       }

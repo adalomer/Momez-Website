@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     const filename = `${timestamp}_${originalName}`
     
     // Upload klasörü oluştur
-    const uploadDir = join(process.cwd(), 'public', 'uploads')
+    const uploadDir = join(process.cwd(), 'uploads')
     if (!existsSync(uploadDir)) {
       await mkdir(uploadDir, { recursive: true })
     }
@@ -50,6 +50,8 @@ export async function POST(request: NextRequest) {
     // Dosyayı kaydet
     const filepath = join(uploadDir, filename)
     await writeFile(filepath, buffer)
+    
+    console.log('File uploaded:', filepath)
     
     // URL oluştur
     const url = `/uploads/${filename}`

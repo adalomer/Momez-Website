@@ -94,7 +94,7 @@ export const productsAPI = {
 // Categories API
 export const categoriesAPI = {
   // Kategori listesi
-  async getAll(parentId?: number) {
+  async getAll(parentId?: string) {
     const query = parentId ? `?parent_id=${parentId}` : ''
     const res = await fetch(`${API_URL}/api/categories${query}`)
     return res.json()
@@ -111,7 +111,7 @@ export const categoriesAPI = {
   },
 
   // Kategori güncelle (Admin)
-  async update(id: number, data: any) {
+  async update(id: string, data: any) {
     const res = await fetch(`${API_URL}/api/categories/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -121,7 +121,7 @@ export const categoriesAPI = {
   },
 
   // Kategori sil (Admin)
-  async delete(id: number) {
+  async delete(id: string) {
     const res = await fetch(`${API_URL}/api/categories/${id}`, {
       method: 'DELETE'
     })

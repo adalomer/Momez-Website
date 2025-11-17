@@ -138,7 +138,7 @@ export default function AdminDashboard() {
           <p className="text-sm text-slate-600 dark:text-slate-400">Toplam Ürün</p>
         </div>
 
-        <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm">
+        <Link href="/admin/musteriler" className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between mb-4">
             <div className="bg-orange-500 p-3 rounded-lg shadow-sm">
               <Users className="h-6 w-6 text-white" />
@@ -148,7 +148,7 @@ export default function AdminDashboard() {
             {stats?.totalCustomers || 0}
           </h3>
           <p className="text-sm text-slate-600 dark:text-slate-400">Toplam Müşteri</p>
-        </div>
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

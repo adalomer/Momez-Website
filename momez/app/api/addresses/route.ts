@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
 
     const result: any = await query(
       `INSERT INTO addresses 
-      (user_id, title, full_name, phone, address, city, district, postal_code, is_default) 
+      (user_id, title, full_name, phone, address_line1, city, district, postal_code, is_default) 
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [user.id, title, full_name, phone, address, city, district || null, postal_code || null, is_default ? 1 : 0]
     )
