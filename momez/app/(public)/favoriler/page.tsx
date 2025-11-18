@@ -11,11 +11,12 @@ import { favoritesAPI, authAPI, cartAPI } from '@/lib/api'
 interface FavoriteItem {
   id: number
   product_id: string
-  product_name: string
-  product_slug: string
+  name: string
+  slug: string
   price: number
+  discount_price?: number
+  stock: number
   image_url: string
-  in_stock: boolean
 }
 
 export default function FavoritesPage() {
@@ -102,14 +103,14 @@ export default function FavoritesPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {favorites.map((item) => (
               <div key={item.id} className="group bg-white dark:bg-slate-800 rounded-2xl border-2 border-slate-200 dark:border-slate-700 overflow-hidden shadow-lg hover:shadow-xl transition-all">
-                <Link href={`/urun/${item.product_slug}`} className="block relative aspect-square bg-slate-100 dark:bg-slate-700">
+                <Link href={`/urun/${item.slug}`} className="block relative aspect-square bg-slate-100 dark:bg-slate-700">
                   <Image
                     src={item.image_url}
-                    alt={item.product_name}
+                    alt={item.name}
                     fill
                     className="object-cover group-hover:scale-110 transition"
                   />
-                  {!item.in_stock && (
+                  {item.stock === 0 && (
                     <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                       <span className="text-white font-semibold">Stokta Yok</span>
                     </div>
@@ -117,15 +118,28 @@ export default function FavoritesPage() {
                 </Link>
                 
                 <div className="p-4 space-y-3">
-                  <Link href={`/urun/${item.product_slug}`}>
+                  <Link href={`/urun/${item.slug}`}>
                     <h3 className="font-bold text-slate-900 dark:text-white group-hover:text-primary transition line-clamp-2">
-                      {item.product_name}
+                      {item.name}
                     </h3>
                   </Link>
                   
-                  <p className="text-xl font-bold text-primary">
-                    ₺{Number(item.price).toFixed(2)}
-                  </p>
+                  <div className="flex items-center gap-2">
+                    {item.discount_price ? (
+                      <>
+                        <p className="text-xl font-bold text-primary">
+                          ₺{Number(item.discount_price).toFixed(2)}
+                        </p>
+                        <p className="text-sm text-slate-500 line-through">
+                          ₺{Number(item.price).toFixed(2)}
+                        </p>
+                      </>
+                    ) : (
+                      <p className="text-xl font-bold text-primary">
+                        ₺{Number(item.price).toFixed(2)}
+                      </p>
+                    )}
+                  </div>
                   
                   <div className="flex gap-2">
                     <button

@@ -77,22 +77,23 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
       const result = await favoritesAPI.add(product.id)
       
       if (result.success) {
-        toast.success('Favorilere eklendi')
+        toast.success('Favorilere eklendi', { id: 'favorite-add' })
       } else {
         if (result.error?.includes('Giriş')) {
           toast.error('Favorilere eklemek için giriş yapmalısınız', {
             duration: 3000,
-            icon: '🔒'
+            icon: '🔒',
+            id: 'favorite-error'
           })
           setTimeout(() => {
             router.push(`/auth/login?redirect=/urun/${product.slug}`)
           }, 1500)
         } else {
-          toast.error(result.error)
+          toast.error(result.error, { id: 'favorite-error' })
         }
       }
     } catch (error) {
-      toast.error('Favorilere eklenirken hata oluştu')
+      toast.error('Favorilere eklenirken hata oluştu', { id: 'favorite-error' })
     }
   }
 
@@ -258,7 +259,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
               <button
                 onClick={handleAddToCart}
                 disabled={!product.in_stock || !selectedSize}
-                className="w-full px-6 py-4 bg-[#ee2b2b] hover:bg-red-700 text-white font-bold rounded-lg flex items-center justify-center gap-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-6 py-4 border-2 border-red-500 bg-white text-red-500 hover:bg-red-500 hover:text-white font-bold rounded-xl shadow-lg hover:shadow-xl flex items-center justify-center gap-2 transition-all transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
                 <ShoppingCart className="w-5 h-5" />
                 Sepete Ekle

@@ -10,7 +10,7 @@ export default function PublicLayout({
   return (
     <div className="bg-gradient-to-br from-background-light via-white to-accent-lighter dark:from-background-dark dark:via-gray-900 dark:to-gray-800 min-h-screen">
       <Header />
-      <main className="min-h-screen">
+      <main className="min-h-screen relative">
         <PageTransition>
           {children}
         </PageTransition>

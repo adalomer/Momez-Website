@@ -19,9 +19,11 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [user, setUser] = useState<UserData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [cartCount, setCartCount] = useState(0)
 
   useEffect(() => {
     fetchUser()
+    fetchCartCount()
   }, [])
 
   const fetchUser = async () => {
@@ -36,6 +38,21 @@ export default function Header() {
       console.error('User load error:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const fetchCartCount = async () => {
+    try {
+      const response = await fetch('/api/cart')
+      const data = await response.json()
+      
+      if (data.success && data.data) {
+        const total = data.data.reduce((sum: number, item: any) => sum + item.quantity, 0)
+        setCartCount(total)
+      }
+    } catch (error) {
+      // Giriş yapılmamışsa sepet 0
+      setCartCount(0)
     }
   }
 
@@ -110,9 +127,11 @@ export default function Header() {
               aria-label="Sepet"
             >
               <ShoppingCart className="h-5 w-5 transition-all duration-300" />
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold shadow-soft animate-pulse">
-                2
-              </span>
+              {cartCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold shadow-soft">
+                  {cartCount}
+                </span>
+              )}
             </Link>
             
             <Link
@@ -130,17 +149,20 @@ export default function Header() {
               </div>
             ) : user ? (
               <div className="relative group">
-                <button className="flex items-center gap-3 px-4 py-2 rounded-xl hover:bg-accent-lighter transition-all hover:scale-105">
+                <Link 
+                  href="/profil"
+                  className="flex items-center gap-3 px-4 py-2 rounded-xl hover:bg-accent-lighter transition-all hover:scale-105"
+                >
                   <div className="flex items-center justify-center rounded-full h-10 w-10 bg-red-500 text-white font-bold text-base shadow-soft">
                     {user.full_name?.charAt(0).toUpperCase() || 'U'}
                   </div>
                   <span className="hidden md:block text-base font-bold text-red-500">
                     {user.full_name}
                   </span>
-                </button>
+                </Link>
                 
                 {/* Dropdown Menu */}
-                <div className="absolute right-0 mt-2 w-48 glass rounded-xl shadow-soft-lg border border-border-light dark:border-border-dark opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 animate-scaleIn">
+                <div className="absolute right-0 mt-2 w-48 glass rounded-xl shadow-soft-lg border border-border-light dark:border-border-dark opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 animate-scaleIn z-50">
                   <div className="p-2">
                     {user.role === 'admin' && (
                       <Link

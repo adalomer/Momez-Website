@@ -37,12 +37,17 @@ export async function GET(request: NextRequest) {
         (
           SELECT image_url 
           FROM product_images 
-          WHERE product_id COLLATE utf8mb4_unicode_ci = f.product_id COLLATE utf8mb4_unicode_ci 
+          WHERE product_id = f.product_id
           ORDER BY display_order ASC 
           LIMIT 1
-        ) as image_url
+        ) as image_url,
+        COALESCE((
+          SELECT SUM(quantity)
+          FROM product_stock
+          WHERE product_id = f.product_id
+        ), 0) as stock
       FROM favorites f
-      INNER JOIN products p ON f.product_id COLLATE utf8mb4_unicode_ci = p.id COLLATE utf8mb4_unicode_ci
+      INNER JOIN products p ON f.product_id = p.id
       WHERE f.user_id = ?
       ORDER BY f.created_at DESC
     `
