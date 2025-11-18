@@ -63,6 +63,29 @@ export default function AdminOrdersPage() {
     }
   }
 
+  const deleteOrder = async (orderId: string, orderNumber: string) => {
+    if (!confirm(`${orderNumber} numaralı siparişi silmek istediğinize emin misiniz? Bu işlem geri alınamaz.`)) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/admin/orders/${orderId}`, {
+        method: 'DELETE'
+      })
+      
+      const data = await response.json()
+      
+      if (data.success) {
+        toast.success('Sipariş silindi')
+        fetchOrders()
+      } else {
+        toast.error(data.error || 'Silme başarısız')
+      }
+    } catch (error) {
+      toast.error('Silme hatası')
+    }
+  }
+
   const statusColors = {
     pending: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400',
     confirmed: 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400',
@@ -190,7 +213,7 @@ export default function AdminOrdersPage() {
                         <select
                           value={order.status}
                           onChange={(e) => updateOrderStatus(order.id, e.target.value)}
-                          className="text-sm border-2 border-slate-400 dark:border-slate-500 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-white font-medium hover:border-primary focus:border-primary focus:ring-2 focus:ring-primary-200 transition-all"
+                          className="text-sm border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 cursor-pointer transition-all"
                         >
                           <option value="pending">Beklemede</option>
                           <option value="confirmed">Onaylandı</option>
@@ -199,12 +222,15 @@ export default function AdminOrdersPage() {
                           <option value="delivered">Teslim Edildi</option>
                           <option value="cancelled">İptal</option>
                         </select>
-                        <a
-                          href={`/admin/siparisler/${order.id}`}
-                          className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+                        <button
+                          onClick={() => deleteOrder(order.id, order.order_number)}
+                          className="p-2 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                          title="Siparişi Sil"
                         >
-                          Detay
-                        </a>
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
                       </div>
                     </td>
                   </tr>

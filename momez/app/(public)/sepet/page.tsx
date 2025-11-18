@@ -25,10 +25,33 @@ export default function CartPage() {
   const [cartItems, setCartItems] = useState<CartItem[]>([])
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState<any>(null)
+  const [shippingSettings, setShippingSettings] = useState({ freeLimit: 500, fee: 50 })
 
   useEffect(() => {
     checkAuthAndLoadCart()
+    loadShippingSettings()
   }, [])
+
+  const loadShippingSettings = async () => {
+    try {
+      const response = await fetch('/api/settings')
+      const data = await response.json()
+      if (data.success && data.data) {
+        // Array'i object'e çevir
+        const settingsObj = data.data.reduce((acc: any, item: any) => {
+          acc[item.key] = item.value
+          return acc
+        }, {})
+        
+        const freeLimit = parseFloat(settingsObj.free_shipping_limit || 500)
+        const fee = parseFloat(settingsObj.standard_shipping_fee || 50)
+        setShippingSettings({ freeLimit, fee })
+        console.log('Kargo ayarları yüklendi:', { freeLimit, fee })
+      }
+    } catch (error) {
+      console.error('Settings load error:', error)
+    }
+  }
 
   const checkAuthAndLoadCart = async () => {
     try {
@@ -99,8 +122,9 @@ export default function CartPage() {
   }
 
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
-  const shipping = subtotal >= 500 ? 0 : 50
+  const shipping = subtotal >= shippingSettings.freeLimit ? 0 : shippingSettings.fee
   const total = subtotal + shipping
+  const remainingForFreeShipping = shippingSettings.freeLimit - subtotal
 
   if (loading) {
     return (
@@ -216,12 +240,12 @@ export default function CartPage() {
                   </div>
                   {shipping === 0 && (
                     <p className="text-xs text-green-600 dark:text-green-400">
-                      ✓ 500 TL ve üzeri alışverişlerde kargo ücretsiz
+                      ✓ {shippingSettings.freeLimit} TL ve üzeri alışverişlerde kargo ücretsiz
                     </p>
                   )}
-                  {subtotal < 500 && shipping > 0 && (
+                  {remainingForFreeShipping > 0 && shipping > 0 && (
                     <p className="text-xs text-slate-500">
-                      {(500 - subtotal).toFixed(2)} TL daha alışveriş yapın, kargo ücretsiz olsun
+                      {remainingForFreeShipping.toFixed(2)} TL daha alışveriş yapın, kargo ücretsiz olsun
                     </p>
                   )}
                   <div className="border-t border-slate-200 dark:border-slate-700 pt-3 flex justify-between text-lg font-bold text-slate-900 dark:text-white">

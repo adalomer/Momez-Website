@@ -85,3 +85,47 @@ export async function GET(
     )
   }
 }
+
+// DELETE /api/admin/orders/[id] - Siparişi sil
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params
+    const token = request.cookies.get('auth_token')?.value
+    
+    if (!token) {
+      return NextResponse.json(
+        { success: false, error: 'Yetkisiz erişim' },
+        { status: 401 }
+      )
+    }
+    
+    const user = await getUserFromToken(token)
+    
+    if (!user || user.role !== 'admin') {
+      return NextResponse.json(
+        { success: false, error: 'Yetkisiz erişim' },
+        { status: 401 }
+      )
+    }
+
+    // Önce sipariş kalemlerini sil
+    await query('DELETE FROM order_items WHERE order_id = ?', [id])
+    
+    // Siparişi sil
+    await query('DELETE FROM orders WHERE id = ?', [id])
+
+    return NextResponse.json({
+      success: true,
+      message: 'Sipariş silindi'
+    })
+  } catch (error) {
+    console.error('Delete Order Error:', error)
+    return NextResponse.json(
+      { success: false, error: 'Sipariş silinirken hata oluştu' },
+      { status: 500 }
+    )
+  }
+}

@@ -41,6 +41,7 @@ export default function CheckoutPage() {
   const [notes, setNotes] = useState('')
   const [showAddressForm, setShowAddressForm] = useState(false)
   const [user, setUser] = useState<any>(null)
+  const [shippingSettings, setShippingSettings] = useState({ freeLimit: 500, fee: 50 })
 
   // Yeni adres formu
   const [newAddress, setNewAddress] = useState({
@@ -56,7 +57,29 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     checkAuthAndLoadData()
+    loadShippingSettings()
   }, [])
+
+  const loadShippingSettings = async () => {
+    try {
+      const response = await fetch('/api/settings')
+      const data = await response.json()
+      if (data.success && data.data) {
+        // Array'i object'e çevir
+        const settingsObj = data.data.reduce((acc: any, item: any) => {
+          acc[item.key] = item.value
+          return acc
+        }, {})
+        
+        const freeLimit = parseFloat(settingsObj.free_shipping_limit || 500)
+        const fee = parseFloat(settingsObj.standard_shipping_fee || 50)
+        setShippingSettings({ freeLimit, fee })
+        console.log('Kargo ayarları yüklendi:', { freeLimit, fee })
+      }
+    } catch (error) {
+      console.error('Settings load error:', error)
+    }
+  }
 
   const checkAuthAndLoadData = async () => {
     try {
@@ -172,7 +195,7 @@ export default function CheckoutPage() {
   }
 
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
-  const shipping = subtotal >= 500 ? 0 : 50
+  const shipping = subtotal >= shippingSettings.freeLimit ? 0 : shippingSettings.fee
   const total = subtotal + shipping
 
   if (loading) {
@@ -461,7 +484,12 @@ export default function CheckoutPage() {
                 </div>
                 {shipping === 0 && (
                   <p className="text-xs text-green-600 dark:text-green-400">
-                    ✓ Kargo bedava!
+                    ✓ {shippingSettings.freeLimit} TL ve üzeri - Kargo ücretsiz!
+                  </p>
+                )}
+                {subtotal < shippingSettings.freeLimit && shipping > 0 && (
+                  <p className="text-xs text-slate-500">
+                    {(shippingSettings.freeLimit - subtotal).toFixed(2)} TL daha ekleyin, kargo ücretsiz olsun
                   </p>
                 )}
                 <div className="border-t border-slate-200 dark:border-slate-700 pt-3 flex justify-between text-lg font-bold">
@@ -474,9 +502,24 @@ export default function CheckoutPage() {
               <button
                 onClick={handleSubmitOrder}
                 disabled={submitting || !selectedAddress}
-                className="w-full mt-6 px-6 py-3 bg-primary hover:bg-primary/90 text-white font-bold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full mt-6 px-8 py-4 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white text-lg font-bold rounded-xl transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 shadow-lg hover:shadow-xl"
               >
-                {submitting ? 'İşleniyor...' : 'Siparişi Tamamla'}
+                {submitting ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    İşleniyor...
+                  </span>
+                ) : (
+                  <span className="flex items-center justify-center gap-2">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Siparişi Tamamla
+                  </span>
+                )}
               </button>
 
               <p className="text-xs text-center text-slate-500 mt-4">
