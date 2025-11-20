@@ -93,27 +93,27 @@ export default function CustomersPage() {
       <Toaster position="top-right" />
       
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Müşteriler</h1>
-        <p className="text-gray-600 mt-2">Kayıtlı müşterileri görüntüleyin</p>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Müşteriler</h1>
+        <p className="text-gray-600 dark:text-gray-400 mt-2">Kayıtlı müşterileri görüntüleyin</p>
       </div>
 
-      <div className="bg-white rounded-lg shadow">
-        <div className="p-6 border-b border-gray-200">
+      <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg shadow border border-slate-200 dark:border-slate-700">
+        <div className="p-6 border-b border-gray-200 dark:border-slate-700">
           <input
             type="text"
             placeholder="Müşteri ara..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full max-w-md px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ee2b2b]"
+            className="w-full max-w-md px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#ee2b2b]"
           />
         </div>
 
         {loading ? (
-          <div className="p-12 text-center text-gray-500">
+          <div className="p-12 text-center text-gray-500 dark:text-gray-400">
             Yükleniyor...
           </div>
         ) : filteredCustomers.length === 0 ? (
-          <div className="p-12 text-center text-gray-500">
+          <div className="p-12 text-center text-gray-500 dark:text-gray-400">
             {searchTerm ? 'Müşteri bulunamadı' : 'Henüz kayıtlı müşteri yok'}
           </div>
         ) : (
@@ -144,31 +144,31 @@ export default function CustomersPage() {
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-red-50/30 divide-y divide-gray-200">
+              <tbody className="bg-red-50/30 dark:bg-slate-800/80 divide-y divide-gray-200 dark:divide-slate-700">
                 {filteredCustomers.map((customer) => (
                   <tr key={customer.id} className="hover:bg-red-100/50 dark:hover:bg-red-900/20 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
                       #{customer.id.slice(0, 8)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                       {customer.full_name || '-'}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
                       {customer.email}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
                       {customer.phone || '-'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
                         customer.role === 'admin' 
-                          ? 'bg-purple-100 text-purple-800' 
-                          : 'bg-green-100 text-green-800'
+                          ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400' 
+                          : 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
                       }`}>
                         {customer.role === 'admin' ? 'Admin' : 'Müşteri'}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
                       {new Date(customer.created_at).toLocaleDateString('tr-TR')}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
@@ -187,8 +187,8 @@ export default function CustomersPage() {
           </div>
         )}
 
-        <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
-          <p className="text-sm text-gray-600">
+        <div className="px-6 py-4 border-t border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50">
+          <p className="text-sm text-gray-600 dark:text-gray-400">
             Toplam {filteredCustomers.length} müşteri
           </p>
         </div>
@@ -197,55 +197,55 @@ export default function CustomersPage() {
       {/* Edit Modal */}
       {editingCustomer && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl max-w-md w-full p-6">
+          <div className="bg-white dark:bg-slate-800 rounded-xl max-w-md w-full p-6 border border-slate-200 dark:border-slate-700">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-900">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                 Müşteri Düzenle
               </h2>
               <button
                 onClick={() => setEditingCustomer(null)}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                className="p-2 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
               >
-                <X className="h-5 w-5" />
+                <X className="h-5 w-5 text-gray-600 dark:text-gray-400" />
               </button>
             </div>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Ad Soyad *
                 </label>
                 <input
                   type="text"
                   value={editForm.full_name}
                   onChange={(e) => setEditForm(prev => ({ ...prev, full_name: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ee2b2b]"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#ee2b2b]"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   E-posta *
                 </label>
                 <input
                   type="email"
                   value={editForm.email}
                   onChange={(e) => setEditForm(prev => ({ ...prev, email: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ee2b2b]"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#ee2b2b]"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Telefon
                 </label>
                 <input
                   type="tel"
                   value={editForm.phone}
                   onChange={(e) => setEditForm(prev => ({ ...prev, phone: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ee2b2b]"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#ee2b2b]"
                   placeholder="5XX XXX XX XX"
                 />
               </div>
@@ -254,7 +254,7 @@ export default function CustomersPage() {
             <div className="flex gap-3 mt-6">
               <button
                 onClick={() => setEditingCustomer(null)}
-                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex-1 px-4 py-2 border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
               >
                 İptal
               </button>

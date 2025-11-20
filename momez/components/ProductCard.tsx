@@ -127,7 +127,7 @@ export default function ProductCard({ product, user }: ProductCardProps) {
         
         <div className="space-y-2">
           <Link href={`/urun/${product.slug}`}>
-            <h3 className="font-semibold group-hover:text-[#ee2b2b] transition line-clamp-2">
+            <h3 className="font-semibold text-slate-900 dark:text-white group-hover:text-[#ee2b2b] transition line-clamp-2">
               {product.name}
             </h3>
           </Link>

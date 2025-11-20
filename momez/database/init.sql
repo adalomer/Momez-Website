@@ -220,7 +220,7 @@ CREATE TABLE IF NOT EXISTS campaigns (
     title VARCHAR(255) NOT NULL,
     slug VARCHAR(255) NOT NULL UNIQUE,
     description TEXT,
-    image_url VARCHAR(500),
+    image_url LONGTEXT,
     discount_type ENUM('percentage', 'fixed') DEFAULT 'percentage',
     discount_value DECIMAL(10, 2) NOT NULL,
     start_date TIMESTAMP NOT NULL,

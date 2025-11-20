@@ -245,14 +245,28 @@ export default function AdminCampaignsPage() {
 
               <div>
                 <label className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
-                  Görsel URL
+                  Kampanya Görseli
                 </label>
                 <input
-                  type="url"
-                  value={formData.image_url}
-                  onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                  className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                  type="file"
+                  accept="image/*"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0]
+                    if (file) {
+                      const reader = new FileReader()
+                      reader.onloadend = () => {
+                        setFormData({ ...formData, image_url: reader.result as string })
+                      }
+                      reader.readAsDataURL(file)
+                    }
+                  }}
+                  className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100"
                 />
+                {formData.image_url && (
+                  <div className="mt-2">
+                    <Image src={formData.image_url} alt="Preview" width={200} height={100} className="rounded-lg" />
+                  </div>
+                )}
               </div>
 
               <div className="grid grid-cols-2 gap-4">
