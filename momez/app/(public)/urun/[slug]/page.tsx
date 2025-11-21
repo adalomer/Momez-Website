@@ -24,13 +24,13 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
     try {
       setLoading(true)
       const resolvedParams = await params
-      const result = await productsAPI.getBySlug(resolvedParams.slug)
+      const result = await productsAPI.getBySlug(resolvedParams.slug) as { success: boolean; data?: any; error?: string }
       
-      if (result.success) {
+      if (result.success && result.data) {
         setProduct(result.data)
         // Otomatik seçim kaldırıldı - Kullanıcı beden seçmeli
       } else {
-        toast.error('Ürün bulunamadı')
+        toast.error(result.error || 'Ürün bulunamadı')
         router.push('/')
       }
     } catch (error) {
@@ -49,7 +49,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
     }
 
     try {
-      const result = await cartAPI.add(product.id, selectedSize, quantity)
+      const result = await cartAPI.add(product.id, selectedSize, quantity) as { success: boolean; error?: string }
       
       if (result.success) {
         toast.success('Ürün sepete eklendi')
@@ -64,7 +64,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
             router.push(`/auth/login?redirect=/urun/${product.slug}`)
           }, 1500)
         } else {
-          toast.error(result.error)
+          toast.error(result.error || 'Sepete eklenemedi')
         }
       }
     } catch (error) {
@@ -74,7 +74,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
 
   const handleAddToFavorites = async () => {
     try {
-      const result = await favoritesAPI.add(product.id)
+      const result = await favoritesAPI.add(product.id) as { success: boolean; error?: string }
       
       if (result.success) {
         toast.success('Favorilere eklendi', { id: 'favorite-add' })
@@ -89,7 +89,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
             router.push(`/auth/login?redirect=/urun/${product.slug}`)
           }, 1500)
         } else {
-          toast.error(result.error, { id: 'favorite-error' })
+          toast.error(result.error || 'Favorilere eklenemedi', { id: 'favorite-error' })
         }
       }
     } catch (error) {
@@ -116,7 +116,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
   const availableStock = product.stock?.find((s: any) => s.size === selectedSize)?.quantity || 0
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <Toaster position="top-center" />
       
       <div className="container mx-auto px-4 py-8">
@@ -138,15 +138,39 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
         <div className="grid lg:grid-cols-2 gap-12">
           {/* Görseller */}
           <div>
-            <div className="aspect-square rounded-lg overflow-hidden bg-white mb-4">
+            <div className="aspect-square rounded-lg overflow-hidden bg-white mb-4 relative group">
               {product.images && product.images[selectedImage] ? (
-                <Image
-                  src={product.images[selectedImage].image_url}
-                  alt={product.name}
-                  width={600}
-                  height={600}
-                  className="w-full h-full object-cover"
-                />
+                <>
+                  <Image
+                    src={product.images[selectedImage].image_url}
+                    alt={product.name}
+                    width={600}
+                    height={600}
+                    className="w-full h-full object-cover"
+                  />
+                  {product.images.length > 1 && (
+                    <>
+                      <button
+                        onClick={() => setSelectedImage((selectedImage - 1 + product.images.length) % product.images.length)}
+                        className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                        aria-label="Önceki resim"
+                      >
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={() => setSelectedImage((selectedImage + 1) % product.images.length)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                        aria-label="Sonraki resim"
+                      >
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </button>
+                    </>
+                  )}
+                </>
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-gray-400">
                   Görsel Yok

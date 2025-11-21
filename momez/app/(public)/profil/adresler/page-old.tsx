@@ -42,15 +42,15 @@ export default function AddressesPage() {
 
   const loadAddresses = async () => {
     try {
-      const userResult = await authAPI.me()
-      if (!userResult.success) {
+      const userResult = await authAPI.me() as { success: boolean; data?: any; error?: string }
+      if (!userResult || !userResult.success) {
         router.push('/auth/login?redirect=/profil/adresler')
         return
       }
 
-      const result = await addressesAPI.getAll()
-      if (result.success) {
-        setAddresses(result.data || [])
+      const result = await addressesAPI.getAll() as { success: boolean; data?: any[]; error?: string }
+      if (result.success && result.data) {
+        setAddresses(result.data)
       }
     } catch (error) {
       console.error('Addresses load error:', error)
@@ -77,22 +77,22 @@ export default function AddressesPage() {
     
     try {
       if (editingAddress) {
-        const result = await addressesAPI.update(editingAddress.id, formData)
+        const result = await addressesAPI.update(editingAddress.id, formData) as { success: boolean; message?: string; error?: string }
         if (result.success) {
           toast.success('Adres güncellendi')
           loadAddresses()
           closeModal()
         } else {
-          toast.error(result.message || 'Güncellenemedi')
+          toast.error(result.message || result.error || 'Güncellenemedi')
         }
       } else {
-        const result = await addressesAPI.create(formData)
+        const result = await addressesAPI.create(formData) as { success: boolean; message?: string; error?: string }
         if (result.success) {
           toast.success('Adres eklendi')
           loadAddresses()
           closeModal()
         } else {
-          toast.error(result.message || 'Eklenemedi')
+          toast.error(result.message || result.error || 'Eklenemedi')
         }
       }
     } catch (error) {
@@ -104,12 +104,12 @@ export default function AddressesPage() {
     if (!confirm(`"${title}" adresini silmek istediğinize emin misiniz?`)) return
     
     try {
-      const result = await addressesAPI.delete(id)
+      const result = await addressesAPI.delete(id) as { success: boolean; message?: string; error?: string }
       if (result.success) {
         toast.success('Adres silindi')
         loadAddresses()
       } else {
-        toast.error(result.message || 'Silinemedi')
+        toast.error(result.message || result.error || 'Silinemedi')
       }
     } catch (error) {
       toast.error('Bir hata oluştu')

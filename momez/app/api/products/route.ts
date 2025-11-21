@@ -27,7 +27,12 @@ export async function GET(request: NextRequest) {
       params.push(`%${search}%`, `%${search}%`)
     }
     
-    sql += ` ORDER BY created_at DESC LIMIT ${limit} OFFSET ${offset}`
+    // Güvenli LIMIT ve OFFSET kullanımı
+    // MySQL'de LIMIT ve OFFSET prepared statement'lerde doğrudan kullanılamaz
+    const safeLimit = Math.max(1, Math.min(100, limit)) // Max 100
+    const safeOffset = Math.max(0, offset)
+    
+    sql += ` ORDER BY created_at DESC LIMIT ${safeLimit} OFFSET ${safeOffset}`
     
     const products = await query<any>(sql, params)
     

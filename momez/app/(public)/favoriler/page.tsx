@@ -30,15 +30,15 @@ export default function FavoritesPage() {
 
   const checkAuthAndLoadFavorites = async () => {
     try {
-      const userResult = await authAPI.me()
-      if (!userResult.success) {
+      const userResult = await authAPI.me() as { success: boolean; data?: any; error?: string }
+      if (!userResult || !userResult.success) {
         router.push('/auth/login?redirect=/favoriler')
         return
       }
       
-      const favResult = await favoritesAPI.get()
-      if (favResult.success) {
-        setFavorites(favResult.data || [])
+      const favResult = await favoritesAPI.get() as { success: boolean; data?: FavoriteItem[]; error?: string }
+      if (favResult.success && favResult.data) {
+        setFavorites(favResult.data)
       }
     } catch (error) {
       console.error('Favorites load error:', error)
@@ -50,12 +50,12 @@ export default function FavoritesPage() {
 
   const removeFavorite = async (productId: string) => {
     try {
-      const result = await favoritesAPI.remove(productId)
+      const result = await favoritesAPI.remove(productId) as { success: boolean; error?: string }
       if (result.success) {
         setFavorites(items => items.filter(i => i.product_id !== productId))
         toast.success('Favorilerden çıkarıldı')
       } else {
-        toast.error('Çıkarılamadı')
+        toast.error(result.error || 'Çıkarılamadı')
       }
     } catch (error) {
       toast.error('Bir hata oluştu')

@@ -12,14 +12,8 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL('/auth/login?redirect=/admin', request.url))
     }
     
-    // Token'ı kontrol et (basit kontrol, production'da JWT verify yap)
-    try {
-      // Burada gerçek JWT verify yapılmalı
-      // Şimdilik cookie varlığı yeterli
-      return NextResponse.next()
-    } catch {
-      return NextResponse.redirect(new URL('/auth/login', request.url))
-    }
+    // Token varlığını kontrol et (gerçek doğrulama sayfa seviyesinde yapılacak)
+    return NextResponse.next()
   }
   
   // Profil sayfaları için auth kontrolü
@@ -29,6 +23,9 @@ export async function middleware(request: NextRequest) {
     if (!token) {
       return NextResponse.redirect(new URL('/auth/login?redirect=' + pathname, request.url))
     }
+    
+    // Token varlığını kontrol et (gerçek doğrulama sayfa seviyesinde yapılacak)
+    return NextResponse.next()
   }
   
   return NextResponse.next()

@@ -106,15 +106,16 @@ export default function AdminProductsPage() {
 
     setUploadingImage(true)
     try {
-      const result = await uploadAPI.uploadImage(file)
+      const result = await uploadAPI.uploadImage(file) as { success: boolean; url?: string; error?: string }
       if (result.success && result.url) {
+        const imageUrl = result.url
         setEditForm(prev => ({
           ...prev,
-          images: [...prev.images, result.url]
+          images: [...prev.images, imageUrl]
         }))
         toast.success('Görsel yüklendi')
       } else {
-        toast.error('Görsel yüklenemedi')
+        toast.error(result.error || 'Görsel yüklenemedi')
       }
     } catch (error) {
       console.error('Upload error:', error)

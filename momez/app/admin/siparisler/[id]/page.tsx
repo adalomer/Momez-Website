@@ -221,15 +221,52 @@ export default function OrderDetailPage() {
               </h2>
             </div>
             
-            <div className="space-y-2 text-slate-700 dark:text-slate-300">
-              <p className="font-medium text-slate-900 dark:text-white">
-                {order.full_name}
-              </p>
-              <p>{order.phone}</p>
-              <p>{order.address_line}</p>
-              <p>{order.district} / {order.city}</p>
-              {order.postal_code && <p>Posta Kodu: {order.postal_code}</p>}
-            </div>
+            {order.full_name || order.address_line ? (
+              <div className="space-y-2 text-slate-700 dark:text-slate-300">
+                {order.address_title && (
+                  <p className="text-sm font-semibold text-slate-500 dark:text-slate-400 mb-2">
+                    {order.address_title}
+                  </p>
+                )}
+                {order.full_name && (
+                  <p className="font-medium text-slate-900 dark:text-white">
+                    {order.full_name}
+                  </p>
+                )}
+                {order.phone && <p className="flex items-center gap-2">
+                  <span className="text-slate-500">Tel:</span>
+                  <a href={`tel:${order.phone}`} className="text-blue-600 hover:underline">
+                    {order.phone}
+                  </a>
+                </p>}
+                {order.address_line && (
+                  <p className="mt-2">{order.address_line}</p>
+                )}
+                {(order.district || order.city) && (
+                  <p className="font-medium">
+                    {order.district && `${order.district} / `}{order.city}
+                  </p>
+                )}
+                {order.postal_code && (
+                  <p className="text-sm text-slate-500">Posta Kodu: {order.postal_code}</p>
+                )}
+                {(order.city || order.district) && (
+                  <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
+                    <a
+                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${order.address_line || ''} ${order.district || ''} ${order.city || ''}`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                    >
+                      <MapPin className="w-4 h-4" />
+                      Haritada Göster
+                    </a>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <p className="text-slate-500 dark:text-slate-400 italic">Adres bilgisi bulunamadı</p>
+            )}
           </div>
         </div>
 

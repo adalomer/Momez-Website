@@ -31,9 +31,11 @@ export async function GET(request: NextRequest) {
         a.full_name,
         a.phone,
         a.city,
-        a.district
+        a.district,
+        CONCAT(a.address_line1, IFNULL(CONCAT(' ', a.address_line2), '')) as address_line,
+        a.postal_code
       FROM orders o
-      LEFT JOIN user_addresses a ON o.address_id COLLATE utf8mb4_unicode_ci = a.id COLLATE utf8mb4_unicode_ci
+      LEFT JOIN addresses a ON o.shipping_address_id COLLATE utf8mb4_unicode_ci = a.id COLLATE utf8mb4_unicode_ci
       WHERE o.user_id = ?
       ORDER BY o.created_at DESC
     `
@@ -168,7 +170,7 @@ export async function POST(request: NextRequest) {
     const orderId = uuidv4()
     await db.query(
       `INSERT INTO orders 
-        (id, user_id, order_number, address_id, payment_method, subtotal, shipping_cost, total, status, notes) 
+        (id, user_id, order_number, shipping_address_id, payment_method, subtotal, shipping_cost, total, status, notes) 
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)`,
       [orderId, user.id, order_number, address_id, payment_method, parseFloat(subtotal.toFixed(2)), parseFloat(shipping_cost.toFixed(2)), parseFloat(total.toFixed(2)), notes || null]
     )
@@ -205,10 +207,10 @@ export async function POST(request: NextRequest) {
         a.phone,
         a.city,
         a.district,
-        a.address_line,
+        CONCAT(a.address_line1, IFNULL(CONCAT(' ', a.address_line2), '')) as address_line,
         a.postal_code
       FROM orders o
-      LEFT JOIN user_addresses a ON o.address_id COLLATE utf8mb4_unicode_ci = a.id COLLATE utf8mb4_unicode_ci
+      LEFT JOIN addresses a ON o.shipping_address_id COLLATE utf8mb4_unicode_ci = a.id COLLATE utf8mb4_unicode_ci
       WHERE o.id = ?
     `
     

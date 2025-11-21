@@ -84,8 +84,8 @@ export default function CheckoutPage() {
   const checkAuthAndLoadData = async () => {
     try {
       // Kullanıcı kontrolü
-      const userResult = await authAPI.me()
-      if (!userResult.success) {
+      const userResult = await authAPI.me() as { success: boolean; data?: any; error?: string }
+      if (!userResult || !userResult.success) {
         router.push('/auth/login?redirect=/siparis')
         return
       }
@@ -93,7 +93,7 @@ export default function CheckoutPage() {
       setUser(userResult.data)
       
       // Sepeti yükle
-      const cartResult = await cartAPI.get()
+      const cartResult = await cartAPI.get() as { success: boolean; data?: any[]; error?: string }
       if (cartResult.success && cartResult.data) {
         if (cartResult.data.length === 0) {
           toast.error('Sepetiniz boş')

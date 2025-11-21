@@ -16,8 +16,8 @@ export default function KategorilerPage() {
 
   const loadCategories = async () => {
     try {
-      const result = await categoriesAPI.getAll()
-      if (result.success) {
+      const result = await categoriesAPI.getAll() as { success: boolean; data?: any[]; error?: string }
+      if (result.success && result.data) {
         setCategories(result.data)
       }
     } catch (error) {

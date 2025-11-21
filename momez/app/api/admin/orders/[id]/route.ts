@@ -38,11 +38,11 @@ export async function GET(
         a.phone,
         a.city,
         a.district,
-        a.address_line,
+        CONCAT(a.address_line1, IFNULL(CONCAT(' ', a.address_line2), '')) as address_line,
         a.postal_code
       FROM orders o
       LEFT JOIN users u ON o.user_id COLLATE utf8mb4_unicode_ci = u.id COLLATE utf8mb4_unicode_ci
-      LEFT JOIN user_addresses a ON o.address_id COLLATE utf8mb4_unicode_ci = a.id COLLATE utf8mb4_unicode_ci
+      LEFT JOIN addresses a ON o.shipping_address_id COLLATE utf8mb4_unicode_ci = a.id COLLATE utf8mb4_unicode_ci
       WHERE o.id = ?
     `
     
@@ -63,13 +63,13 @@ export async function GET(
     // Numeric alanları parse et
     const formattedOrder = {
       ...order,
-      subtotal: parseFloat(order.subtotal),
-      shipping_cost: parseFloat(order.shipping_cost),
-      total: parseFloat(order.total),
+      subtotal: parseFloat(order.subtotal || '0') || 0,
+      shipping_cost: parseFloat(order.shipping_cost || '0') || 0,
+      total: parseFloat(order.total || '0') || 0,
       items: items.map((item: any) => ({
         ...item,
-        price: parseFloat(item.price),
-        quantity: parseInt(item.quantity)
+        price: parseFloat(item.price || '0') || 0,
+        quantity: parseInt(item.quantity || '0') || 0
       }))
     }
 

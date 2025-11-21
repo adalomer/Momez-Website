@@ -61,8 +61,8 @@ export default function OrdersPage() {
   const checkAuthAndLoadOrders = async () => {
     try {
       // Kullanıcı kontrolü
-      const userResult = await authAPI.me()
-      if (!userResult.success) {
+      const userResult = await authAPI.me() as { success: boolean; data?: any; error?: string }
+      if (!userResult || !userResult.success) {
         router.push('/auth/login?redirect=/siparislerim')
         return
       }
@@ -145,7 +145,11 @@ export default function OrdersPage() {
                       {statusMap[order.status]?.label || 'Beklemede'}
                     </span>
                     <span className="text-lg font-bold text-primary">
-                      ₺{order.total.toFixed(2)}
+                      ₺{(() => {
+                        const calculatedTotal = (order.items?.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0) || 0) + (Number(order.shipping_cost) || 0)
+                        const orderTotal = Number(order.total) || 0
+                        return (orderTotal > 0 ? orderTotal : calculatedTotal).toFixed(2)
+                      })()}
                     </span>
                   </div>
                 </div>
@@ -187,11 +191,23 @@ export default function OrdersPage() {
                     <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700 space-y-1 text-sm">
                       <div className="flex justify-between text-slate-600 dark:text-slate-400">
                         <span>Ara Toplam</span>
-                        <span>₺{order.subtotal.toFixed(2)}</span>
+                        <span>₺{((Number(order.subtotal) || 0) > 0 
+                          ? (Number(order.subtotal) || 0).toFixed(2)
+                          : (order.items?.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0) || 0).toFixed(2))}
+                        </span>
                       </div>
                       <div className="flex justify-between text-slate-600 dark:text-slate-400">
                         <span>Kargo</span>
-                        <span>{order.shipping_cost === 0 ? 'Ücretsiz' : `₺${order.shipping_cost.toFixed(2)}`}</span>
+                        <span>{(Number(order.shipping_cost) || 0) === 0 ? 'Ücretsiz' : `₺${(Number(order.shipping_cost) || 0).toFixed(2)}`}</span>
+                      </div>
+                      <div className="flex justify-between font-bold text-slate-900 dark:text-white pt-2 border-t border-slate-200 dark:border-slate-700">
+                        <span>Toplam</span>
+                        <span>₺{(() => {
+                          const calculatedTotal = (order.items?.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0) || 0) + (Number(order.shipping_cost) || 0)
+                          const orderTotal = Number(order.total) || 0
+                          return (orderTotal > 0 ? orderTotal : calculatedTotal).toFixed(2)
+                        })()}
+                        </span>
                       </div>
                     </div>
                   </div>

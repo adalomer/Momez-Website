@@ -35,15 +35,15 @@ export default function OrdersPage() {
 
   const loadOrders = async () => {
     try {
-      const userResult = await authAPI.me()
-      if (!userResult.success) {
+      const userResult = await authAPI.me() as { success: boolean; data?: any; error?: string }
+      if (!userResult || !userResult.success) {
         router.push('/auth/login?redirect=/profil/siparisler')
         return
       }
 
-      const result = await ordersAPI.getAll()
-      if (result.success) {
-        setOrders(result.data || [])
+      const result = await ordersAPI.getAll() as { success: boolean; data?: any[]; error?: string }
+      if (result.success && result.data) {
+        setOrders(result.data)
       }
     } catch (error) {
       console.error('Orders load error:', error)
@@ -215,7 +215,7 @@ export default function OrdersPage() {
 
                         <div className="flex items-center justify-between pt-4 border-t border-slate-200 dark:border-slate-700">
                           <p className="text-lg font-bold text-primary">
-                            Toplam: ₺{Number(order.total_amount).toFixed(2)}
+                            Toplam: ₺{(Number(order.total_amount) || 0).toFixed(2)}
                           </p>
                         </div>
                       </div>

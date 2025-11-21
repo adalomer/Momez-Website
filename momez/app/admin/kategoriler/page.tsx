@@ -35,7 +35,7 @@ export default function AdminCategoriesPage() {
     console.log('Loading categories...')
     setLoading(true)
     try {
-      const result = await categoriesAPI.getAll()
+      const result = await categoriesAPI.getAll() as { success: boolean; data?: any[]; error?: string }
       console.log('Categories API result:', result)
       if (result.success && result.data) {
         console.log('Categories loaded:', result.data.length)
@@ -61,12 +61,13 @@ export default function AdminCategoriesPage() {
 
     setUploadingImage(true)
     try {
-      const result = await uploadAPI.uploadImage(file)
+      const result = await uploadAPI.uploadImage(file) as { success: boolean; url?: string; error?: string }
       if (result.success && result.url) {
-        setFormData(prev => ({ ...prev, image_url: result.url }))
+        const imageUrl = result.url
+        setFormData(prev => ({ ...prev, image_url: imageUrl }))
         toast.success('Görsel yüklendi')
       } else {
-        toast.error('Görsel yüklenemedi')
+        toast.error(result.error || 'Görsel yüklenemedi')
       }
     } catch (error) {
       console.error('Upload error:', error)
@@ -99,7 +100,7 @@ export default function AdminCategoriesPage() {
           .replace(/^-|-$/g, ''),
         image_url: formData.image_url || null,
         is_active: true
-      })
+      }) as { success: boolean; error?: string }
 
       if (result.success) {
         toast.success('Kategori eklendi')
@@ -136,7 +137,7 @@ export default function AdminCategoriesPage() {
           .replace(/[^a-z0-9]+/g, '-')
           .replace(/^-|-$/g, ''),
         image_url: formData.image_url || null
-      })
+      }) as { success: boolean; error?: string }
 
       if (result.success) {
         toast.success('Kategori güncellendi')
@@ -158,7 +159,7 @@ export default function AdminCategoriesPage() {
     }
 
     try {
-      const result = await categoriesAPI.delete(id)
+      const result = await categoriesAPI.delete(id) as { success: boolean; error?: string }
       if (result.success) {
         toast.success('Kategori silindi')
         loadCategories()

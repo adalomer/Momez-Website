@@ -38,7 +38,7 @@ export default function SignupPage() {
     setLoading(true)
     
     try {
-      const result = await authAPI.register(email, password, name, phone)
+      const result = await authAPI.register(email, password, name, phone) as { success: boolean; error?: string }
       
       if (result.success) {
         toast.success('Kayıt başarılı! Yönlendiriliyorsunuz...')

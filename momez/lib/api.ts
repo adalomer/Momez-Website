@@ -5,40 +5,74 @@
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || ''
 
+// API hata yönetimi için yardımcı fonksiyon
+async function handleResponse<T>(response: Response): Promise<T> {
+  const data = await response.json()
+  
+  if (!response.ok) {
+    const error = new Error(data.error || 'Bir hata oluştu')
+    ;(error as any).status = response.status
+    ;(error as any).data = data
+    throw error
+  }
+  
+  return data as T
+}
+
 // Auth API
 export const authAPI = {
   // Kayıt ol
   async register(email: string, password: string, name: string, phone?: string) {
-    const res = await fetch(`${API_URL}/api/auth/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password, name, phone })
-    })
-    return res.json()
+    try {
+      const res = await fetch(`${API_URL}/api/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, name, phone })
+      })
+      return handleResponse(res)
+    } catch (error: any) {
+      console.error('Register error:', error)
+      throw error
+    }
   },
 
   // Giriş yap
   async login(email: string, password: string) {
-    const res = await fetch(`${API_URL}/api/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
-    })
-    return res.json()
+    try {
+      const res = await fetch(`${API_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      })
+      return handleResponse(res)
+    } catch (error: any) {
+      console.error('Login error:', error)
+      throw error
+    }
   },
 
   // Çıkış yap
   async logout() {
-    const res = await fetch(`${API_URL}/api/auth/logout`, {
-      method: 'POST'
-    })
-    return res.json()
+    try {
+      const res = await fetch(`${API_URL}/api/auth/logout`, {
+        method: 'POST'
+      })
+      return handleResponse(res)
+    } catch (error: any) {
+      console.error('Logout error:', error)
+      throw error
+    }
   },
 
   // Kullanıcı bilgisi al
   async me() {
-    const res = await fetch(`${API_URL}/api/auth/me`)
-    return res.json()
+    try {
+      const res = await fetch(`${API_URL}/api/auth/me`)
+      return handleResponse(res)
+    } catch (error: any) {
+      console.error('Me error:', error)
+      throw error
+    }
   }
 }
 
@@ -46,48 +80,73 @@ export const authAPI = {
 export const productsAPI = {
   // Ürün listesi
   async getAll(params?: { category?: string; search?: string; limit?: number; offset?: number }) {
-    const query = new URLSearchParams()
-    if (params?.category) query.set('category', params.category)
-    if (params?.search) query.set('search', params.search)
-    if (params?.limit) query.set('limit', params.limit.toString())
-    if (params?.offset) query.set('offset', params.offset.toString())
-    
-    const res = await fetch(`${API_URL}/api/products?${query}`)
-    return res.json()
+    try {
+      const query = new URLSearchParams()
+      if (params?.category) query.set('category', params.category)
+      if (params?.search) query.set('search', params.search)
+      if (params?.limit) query.set('limit', params.limit.toString())
+      if (params?.offset) query.set('offset', params.offset.toString())
+      
+      const res = await fetch(`${API_URL}/api/products?${query}`)
+      return handleResponse(res)
+    } catch (error: any) {
+      console.error('Get products error:', error)
+      throw error
+    }
   },
 
   // Ürün detayı
   async getBySlug(slug: string) {
-    const res = await fetch(`${API_URL}/api/products/${slug}`)
-    return res.json()
+    try {
+      const res = await fetch(`${API_URL}/api/products/${slug}`)
+      return handleResponse(res)
+    } catch (error: any) {
+      console.error('Get product by slug error:', error)
+      throw error
+    }
   },
 
   // Ürün ekle (Admin)
   async create(data: any) {
-    const res = await fetch(`${API_URL}/api/products`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    })
-    return res.json()
+    try {
+      const res = await fetch(`${API_URL}/api/products`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      })
+      return handleResponse(res)
+    } catch (error: any) {
+      console.error('Create product error:', error)
+      throw error
+    }
   },
 
   // Ürün güncelle (Admin)
   async update(slug: string, data: any) {
-    const res = await fetch(`${API_URL}/api/products/${slug}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    })
-    return res.json()
+    try {
+      const res = await fetch(`${API_URL}/api/products/${slug}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      })
+      return handleResponse(res)
+    } catch (error: any) {
+      console.error('Update product error:', error)
+      throw error
+    }
   },
 
   // Ürün sil (Admin)
   async delete(slug: string) {
-    const res = await fetch(`${API_URL}/api/products/${slug}`, {
-      method: 'DELETE'
-    })
-    return res.json()
+    try {
+      const res = await fetch(`${API_URL}/api/products/${slug}`, {
+        method: 'DELETE'
+      })
+      return handleResponse(res)
+    } catch (error: any) {
+      console.error('Delete product error:', error)
+      throw error
+    }
   }
 }
 

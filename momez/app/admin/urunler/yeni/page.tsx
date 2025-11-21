@@ -40,7 +40,7 @@ export default function AdminProductFormPage() {
 
   useEffect(() => {
     const loadCategories = async () => {
-      const result = await categoriesAPI.getAll()
+      const result = await categoriesAPI.getAll() as { success: boolean; data?: any[]; error?: string }
       if (result.success && result.data) {
         setCategories(result.data)
       }
@@ -79,7 +79,7 @@ export default function AdminProductFormPage() {
     
     try {
       const uploadPromises = Array.from(files).map(async (file) => {
-        const result = await uploadAPI.uploadImage(file)
+        const result = await uploadAPI.uploadImage(file) as { success: boolean; url?: string; error?: string }
         if (result.success && result.url) {
           return result.url
         }
@@ -161,13 +161,14 @@ export default function AdminProductFormPage() {
       
       console.log('API yanıtı:', result)
       
-      if (result.success) {
+      const apiResult = result as { success: boolean; error?: string; data?: any }
+      if (apiResult.success) {
         toast.success('Ürün başarıyla eklendi!')
         setTimeout(() => {
           router.push('/admin/urunler')
         }, 1000)
       } else {
-        toast.error(result.error || 'Ürün eklenirken hata oluştu')
+        toast.error(apiResult.error || 'Ürün eklenirken hata oluştu')
       }
     } catch (error) {
       console.error('Submit error:', error)

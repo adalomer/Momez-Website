@@ -50,10 +50,10 @@ export async function GET(request: NextRequest) {
     // Numeric alanları parse et
     const formattedOrders = orders.map((order: any) => ({
       ...order,
-      subtotal: parseFloat(order.subtotal),
-      shipping_cost: parseFloat(order.shipping_cost),
-      total: parseFloat(order.total),
-      item_count: parseInt(order.item_count)
+      subtotal: parseFloat(order.subtotal || '0') || 0,
+      shipping_cost: parseFloat(order.shipping_cost || '0') || 0,
+      total: parseFloat(order.total || '0') || 0,
+      item_count: parseInt(order.item_count || '0') || 0
     }))
 
     return NextResponse.json({

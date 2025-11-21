@@ -56,8 +56,8 @@ export default function CartPage() {
   const checkAuthAndLoadCart = async () => {
     try {
       // Kullanıcı kontrolü
-      const userResult = await authAPI.me()
-      if (!userResult.success) {
+      const userResult = await authAPI.me() as { success: boolean; data?: any; error?: string }
+      if (!userResult || !userResult.success) {
         router.push('/auth/login?redirect=/sepet')
         return
       }
@@ -65,9 +65,9 @@ export default function CartPage() {
       setUser(userResult.data)
       
       // Sepeti yükle
-      const cartResult = await cartAPI.get()
-      if (cartResult.success) {
-        setCartItems(cartResult.data || [])
+      const cartResult = await cartAPI.get() as { success: boolean; data?: any[]; error?: string }
+      if (cartResult.success && cartResult.data) {
+        setCartItems(cartResult.data)
       }
     } catch (error) {
       console.error('Cart load error:', error)
@@ -95,9 +95,9 @@ export default function CartPage() {
       )
 
       // Sonra API'ye gönder
-      const result = await cartAPI.add(item.product_id, item.size, newQuantity)
+      const result = await cartAPI.add(item.product_id, item.size, newQuantity) as { success: boolean; error?: string }
       if (!result.success) {
-        toast.error('Miktar güncellenemedi')
+        toast.error(result.error || 'Miktar güncellenemedi')
         // Hata durumunda geri al
         await checkAuthAndLoadCart()
       }
@@ -109,12 +109,12 @@ export default function CartPage() {
 
   const removeItem = async (itemId: string) => {
     try {
-      const result = await cartAPI.remove(itemId)
+      const result = await cartAPI.remove(itemId) as { success: boolean; error?: string }
       if (result.success) {
         setCartItems(items => items.filter(i => i.id !== itemId))
         toast.success('Ürün sepetten çıkarıldı')
       } else {
-        toast.error('Ürün çıkarılamadı')
+        toast.error(result.error || 'Ürün çıkarılamadı')
       }
     } catch (error) {
       toast.error('Bir hata oluştu')

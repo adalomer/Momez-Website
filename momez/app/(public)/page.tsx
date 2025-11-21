@@ -46,14 +46,14 @@ export default function HomePage() {
       setLoading(true)
       
       // Ürünleri çek
-      const productsRes = await productsAPI.getAll({ limit: 8 })
-      if (productsRes.success) {
+      const productsRes = await productsAPI.getAll({ limit: 16 }) as { success: boolean; data?: any[]; error?: string }
+      if (productsRes.success && productsRes.data) {
         setProducts(productsRes.data)
       }
       
       // Kategorileri çek
-      const categoriesRes = await categoriesAPI.getAll()
-      if (categoriesRes.success) {
+      const categoriesRes = await categoriesAPI.getAll() as { success: boolean; data?: any[]; error?: string }
+      if (categoriesRes.success && categoriesRes.data) {
         setCategories(categoriesRes.data.slice(0, 6))
       }
 
@@ -112,7 +112,7 @@ export default function HomePage() {
         {campaigns.length > 0 && (
           <section className="mb-16">
             <div className="flex items-center justify-between mb-8">
-              <h2 className="text-2xl font-bold">Aktif Kampanyalar</h2>
+				<h2 className="text-2xl font-bold text-red-600">Aktif Kampanyalar</h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {campaigns.map((campaign) => (

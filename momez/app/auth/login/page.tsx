@@ -27,7 +27,7 @@ function LoginForm() {
     setLoading(true)
     
     try {
-      const result = await authAPI.login(email, password)
+      const result = await authAPI.login(email, password) as { success: boolean; data?: { user?: any }; error?: string }
       
       if (result.success && result.data?.user) {
         toast.success('Giriş başarılı! Yönlendiriliyorsunuz...')

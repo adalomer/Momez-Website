@@ -12,6 +12,8 @@ const pool = mysql.createPool({
   queueLimit: 0,
   enableKeepAlive: true,
   keepAliveInitialDelay: 0,
+  // Connection timeout
+  connectTimeout: 10000,
 })
 
 // Bağlantı test fonksiyonu
@@ -27,13 +29,19 @@ export async function testConnection() {
   }
 }
 
+// SQL injection koruması için tablo/kolon adı validasyonu
+function validateIdentifier(identifier: string): boolean {
+  // Sadece alfanumerik karakterler ve alt çizgiye izin ver
+  return /^[a-zA-Z_][a-zA-Z0-9_]*$/.test(identifier)
+}
+
 // Query helper fonksiyonu
 export async function query<T = any>(
   sql: string,
   params?: any[]
 ): Promise<T[]> {
   try {
-    const [rows] = await pool.execute(sql, params)
+    const [rows] = await pool.execute(sql, params || [])
     return rows as T[]
   } catch (error) {
     console.error('Query error:', error)
@@ -77,23 +85,46 @@ export const db = {
       offset?: number
     }
   ): Promise<T[]> {
-    let sql = `SELECT * FROM ${table}`
+    // SQL injection koruması
+    if (!validateIdentifier(table)) {
+      throw new Error(`Invalid table name: ${table}`)
+    }
+    
+    let sql = `SELECT * FROM \`${table}\``
     const params: any[] = []
     
     if (where && Object.keys(where).length > 0) {
-      const conditions = Object.keys(where).map(key => `${key} = ?`)
+      const conditions: string[] = []
+      for (const key of Object.keys(where)) {
+        if (!validateIdentifier(key)) {
+          throw new Error(`Invalid column name: ${key}`)
+        }
+        conditions.push(`\`${key}\` = ?`)
+        params.push(where[key])
+      }
       sql += ` WHERE ${conditions.join(' AND ')}`
-      params.push(...Object.values(where))
     }
     
     if (options?.orderBy) {
-      sql += ` ORDER BY ${options.orderBy}`
+      // ORDER BY için güvenli parsing
+      const orderParts = options.orderBy.trim().split(/\s+/)
+      const orderColumn = orderParts[0]
+      const orderDirection = orderParts[1]?.toUpperCase() === 'DESC' ? 'DESC' : 'ASC'
+      
+      if (!validateIdentifier(orderColumn)) {
+        throw new Error(`Invalid orderBy column: ${orderColumn}`)
+      }
+      sql += ` ORDER BY \`${orderColumn}\` ${orderDirection}`
     }
     
     if (options?.limit) {
-      sql += ` LIMIT ${options.limit}`
+      // MySQL'de LIMIT ve OFFSET prepared statement'lerde doğrudan parametre olarak kullanılamaz
+      // Sayısal değerler olduğu için güvenli string interpolation kullanıyoruz
+      const limit = Math.max(1, Math.min(1000, options.limit)) // Max 1000
+      sql += ` LIMIT ${limit}`
       if (options?.offset) {
-        sql += ` OFFSET ${options.offset}`
+        const offset = Math.max(0, options.offset)
+        sql += ` OFFSET ${offset}`
       }
     }
     
@@ -105,6 +136,17 @@ export const db = {
     table: string,
     where: Record<string, any>
   ): Promise<T | null> {
+    if (!validateIdentifier(table)) {
+      throw new Error(`Invalid table name: ${table}`)
+    }
+    
+    // WHERE koşullarını validate et
+    for (const key of Object.keys(where)) {
+      if (!validateIdentifier(key)) {
+        throw new Error(`Invalid column name: ${key}`)
+      }
+    }
+    
     const results = await this.findMany<T>(table, where, { limit: 1 })
     return results[0] || null
   },
@@ -114,11 +156,24 @@ export const db = {
     table: string,
     data: Record<string, any>
   ): Promise<T | null> {
+    if (!validateIdentifier(table)) {
+      throw new Error(`Invalid table name: ${table}`)
+    }
+    
     const keys = Object.keys(data)
     const values = Object.values(data)
-    const placeholders = keys.map(() => '?').join(', ')
     
-    const sql = `INSERT INTO ${table} (${keys.join(', ')}) VALUES (${placeholders})`
+    // Tüm kolon adlarını validate et
+    for (const key of keys) {
+      if (!validateIdentifier(key)) {
+        throw new Error(`Invalid column name: ${key}`)
+      }
+    }
+    
+    const placeholders = keys.map(() => '?').join(', ')
+    const columns = keys.map(k => `\`${k}\``).join(', ')
+    
+    const sql = `INSERT INTO \`${table}\` (${columns}) VALUES (${placeholders})`
     const [result] = await pool.execute(sql, values) as any
     
     // Eklenen kaydı geri döndür
@@ -131,10 +186,27 @@ export const db = {
     data: Record<string, any>,
     where: Record<string, any>
   ): Promise<number> {
-    const setClause = Object.keys(data).map(key => `${key} = ?`).join(', ')
-    const whereClause = Object.keys(where).map(key => `${key} = ?`).join(' AND ')
+    if (!validateIdentifier(table)) {
+      throw new Error(`Invalid table name: ${table}`)
+    }
     
-    const sql = `UPDATE ${table} SET ${setClause} WHERE ${whereClause}`
+    // SET kolonlarını validate et
+    const setClause = Object.keys(data).map(key => {
+      if (!validateIdentifier(key)) {
+        throw new Error(`Invalid column name: ${key}`)
+      }
+      return `\`${key}\` = ?`
+    }).join(', ')
+    
+    // WHERE kolonlarını validate et
+    const whereClause = Object.keys(where).map(key => {
+      if (!validateIdentifier(key)) {
+        throw new Error(`Invalid column name: ${key}`)
+      }
+      return `\`${key}\` = ?`
+    }).join(' AND ')
+    
+    const sql = `UPDATE \`${table}\` SET ${setClause} WHERE ${whereClause}`
     const params = [...Object.values(data), ...Object.values(where)]
     
     const [result] = await pool.execute(sql, params) as any
@@ -146,8 +218,19 @@ export const db = {
     table: string,
     where: Record<string, any>
   ): Promise<number> {
-    const whereClause = Object.keys(where).map(key => `${key} = ?`).join(' AND ')
-    const sql = `DELETE FROM ${table} WHERE ${whereClause}`
+    if (!validateIdentifier(table)) {
+      throw new Error(`Invalid table name: ${table}`)
+    }
+    
+    // WHERE kolonlarını validate et
+    const whereClause = Object.keys(where).map(key => {
+      if (!validateIdentifier(key)) {
+        throw new Error(`Invalid column name: ${key}`)
+      }
+      return `\`${key}\` = ?`
+    }).join(' AND ')
+    
+    const sql = `DELETE FROM \`${table}\` WHERE ${whereClause}`
     
     const [result] = await pool.execute(sql, Object.values(where)) as any
     return result.affectedRows
@@ -158,13 +241,23 @@ export const db = {
     table: string,
     where?: Record<string, any>
   ): Promise<number> {
-    let sql = `SELECT COUNT(*) as count FROM ${table}`
+    if (!validateIdentifier(table)) {
+      throw new Error(`Invalid table name: ${table}`)
+    }
+    
+    let sql = `SELECT COUNT(*) as count FROM \`${table}\``
     const params: any[] = []
     
     if (where && Object.keys(where).length > 0) {
-      const conditions = Object.keys(where).map(key => `${key} = ?`)
+      const conditions: string[] = []
+      for (const key of Object.keys(where)) {
+        if (!validateIdentifier(key)) {
+          throw new Error(`Invalid column name: ${key}`)
+        }
+        conditions.push(`\`${key}\` = ?`)
+        params.push(where[key])
+      }
       sql += ` WHERE ${conditions.join(' AND ')}`
-      params.push(...Object.values(where))
     }
     
     const results = await query<{ count: number }>(sql, params)
