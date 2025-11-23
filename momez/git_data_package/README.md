@@ -1,13 +1,22 @@
 # 📦 Git Data Package
 
-Bu klasör, projenin Git'e push edilmeyen ancak önemli olan verilerini içerir.
+Bu klasör, projenin restore scriptlerini içerir.
+
+⚠️ **ÖNEMLİ:** SQL backup dosyaları güvenlik nedeniyle Git'e dahil edilmemiştir.
 
 ## 📁 İçerik
 
-- `latest_backup.sql.gz` - En güncel MySQL backup
-- `uploads_backup.tar.gz` - Yüklenen dosyalar (resimler, vb.)
-- `mysql_data_backup.tar.gz` - MySQL data klasörü (opsiyonel)
 - `RESTORE.sh` - Otomatik restore scripti
+- `README.md` - Bu dosya
+
+## 🔐 SQL Backup Nereden Alınır?
+
+SQL backup dosyaları Git'e push edilmez (güvenlik nedeniyle). Backup'ı şu yollarla alabilirsiniz:
+
+1. **USB/Harici Disk:** Backup'ı USB'den kopyalayın
+2. **Cloud Storage:** Google Drive, Dropbox, vb.
+3. **Özel Sunucu:** Güvenli bir sunucudan indirin
+4. **Yeni Database:** Boş database ile başlayın
 
 ## 🚀 Yeni Cihazda Kurulum
 

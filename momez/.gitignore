@@ -73,13 +73,17 @@ Thumbs.db
 # MySQL & Database (ÖNEMLI!)
 /database/mysql_data/
 /database/mysql_data_backup*/
+
+# SQL Dosyaları (TÜM SQL dosyaları engellendi)
 *.sql
 *.sql.gz
-!/git_data_package/latest_backup.sql.gz
-
-# Backups (git_data_package hariç)
+*.sql.bz2
+*.sql.zip
 /backups/
-!/git_data_package/
+/git_data_package/*.sql
+/git_data_package/*.sql.gz
+/git_data_package/*.sql.bz2
+database_backup_*.sql
 
 # Docker
 .docker/
@@ -108,6 +112,8 @@ a.out
 test_*
 syntax_test
 
-# Git data package içindekileri izin ver
+# Git data package klasörü (README ve script'ler hariç SQL'ler engellendi)
 !git_data_package/
-!git_data_package/*
+!git_data_package/README.md
+!git_data_package/RESTORE.sh
+git_data_package/*.sql*

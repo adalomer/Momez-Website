@@ -5,19 +5,38 @@ Modern, full-stack e-ticaret platformu. Next.js, TypeScript, MySQL ve Docker ile
 ## 🚀 Hızlı Başlangıç
 
 ### Yeni Kurulum
+
+⚠️ **NOT:** SQL backup dosyaları güvenlik nedeniyle Git'e dahil edilmemiştir.
+
 ```bash
 # 1. Projeyi klonla
 git clone <repo-url>
 cd momez
 
-# 2. Verileri restore et
+# 2. SQL Backup'ı al (seçenekler):
+#    a) USB'den kopyala: cp /media/usb/backup.sql.gz backups/
+#    b) Cloud'dan indir: rclone copy gdrive:backups/ backups/
+#    c) Güvenli sunucudan: scp user@server:/path/backup.sql.gz backups/
+
+# 3. Restore script'ini çalıştır
 ./git_data_package/RESTORE.sh
 
-# 3. Docker'ı başlat
+# 4. Docker'ı başlat
 docker-compose up -d
 
-# 4. Tarayıcıda aç
+# 5. SQL Restore (gerekirse)
+./restore-backup.sh
+
+# 6. Tarayıcıda aç
 http://localhost:3000
+```
+
+### Alternatif: Boş Database ile Başlama
+```bash
+git clone <repo-url>
+cd momez
+docker-compose up -d
+# database/init.sql otomatik çalışacak
 ```
 
 ### Geliştirme Ortamı
