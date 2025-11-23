@@ -12,8 +12,11 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - mysql_data:/var/lib/mysql
+      # Host dizinine bind mount - veriler bilgisayarınızda kalır
+      - ./database/mysql_data:/var/lib/mysql
       - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+      # Backup klasörünü de mount edelim
+      - ./backups:/backups
     networks:
       - momez-network
     healthcheck:

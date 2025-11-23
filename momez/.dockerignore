@@ -12,3 +12,22 @@ README.md
 .vscode
 coverage
 .DS_Store
+
+# MySQL data ve backups (build context'e dahil edilmemeli)
+database/mysql_data
+database/mysql_data_backup*
+backups
+logs
+
+# Docker dosyaları
+docker-compose*.yml
+start-docker.sh
+start-docker.bat
+*.bat
+
+# Scripts
+backup.sh
+restore.sh
+auto-backup.sh
+restore-backup.sh
+migrate-to-bind-mount.sh

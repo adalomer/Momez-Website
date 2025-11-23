@@ -1,6 +1,4 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# dependencies
+# Dependencies
 /node_modules
 /.pnp
 .pnp.*
@@ -9,33 +7,107 @@
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
+package-lock.json
 
-# testing
+# Testing
 /coverage
+*.test.js
+*.spec.js
 
-# next.js
+# Next.js
 /.next/
 /out/
+.next/
+next-env.d.ts
 
-# production
+# Production
 /build
+/dist
 
-# misc
+# Misc
 .DS_Store
+Thumbs.db
 *.pem
 
-# debug
+# Debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+*.log
 
-# env files (can opt-in for committing if needed)
-.env*
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env*.local
 
-# vercel
+# Vercel
 .vercel
 
-# typescript
+# TypeScript
 *.tsbuildinfo
-next-env.d.ts
+
+# IDEs
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# MySQL & Database (ÖNEMLI!)
+/database/mysql_data/
+/database/mysql_data_backup*/
+*.sql
+*.sql.gz
+!/git_data_package/latest_backup.sql.gz
+
+# Backups (git_data_package hariç)
+/backups/
+!/git_data_package/
+
+# Docker
+.docker/
+docker-compose.override.yml
+
+# Logs
+/logs/
+*.log
+
+# Uploads (büyük dosyalar)
+/uploads/*
+!/uploads/.gitkeep
+
+# Cache
+.cache/
+.parcel-cache/
+.eslintcache
+
+# Temp
+*.tmp
+*.temp
+.temp/
+
+# Tests (workspace dosyaları)
+a.out
+test_*
+syntax_test
+
+# Git data package içindekileri izin ver
+!git_data_package/
+!git_data_package/*

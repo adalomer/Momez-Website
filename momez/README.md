@@ -1,169 +1,206 @@
-# momez - E-Ticaret Platformu 🛍️
+# 🛒 Momez E-Ticaret Sitesi
 
-Modern, responsive ve kullanıcı dostu ayakkabı e-ticaret sitesi. Next.js 14 ve Supabase ile geliştirilmiştir.
-
-![Next.js](https://img.shields.io/badge/Next.js-16.0-black)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.x-38bdf8)
-![Supabase](https://img.shields.io/badge/Supabase-Latest-3ecf8e)
-
-## ✨ Özellikler
-
-### 🛒 Müşteri Özellikleri
-- Modern ve responsive tasarım (Kırmızı-Beyaz tema)
-- Kategori bazlı ürün listeleme (Erkek/Kadın/Spor/Çocuk)
-- Ürün arama ve filtreleme
-- Ürün detay sayfası (5+ fotoğraf, beden seçimi)
-- Sepet yönetimi
-- Favoriler sistemi
-- Kullanıcı profil yönetimi
-- Sipariş takip
-- Kapıda ödeme
-
-### 👨‍💼 Admin Panel
-- Dashboard (istatistikler, grafikler)
-- Sipariş yönetimi
-- Ürün yönetimi (5+ fotoğraf, stok)
-- Numara bazlı stok takibi
-- Kategori yönetimi
-- Kampanya yönetimi
-- Kargo ücretleri yönetimi
-- Kullanıcı ve rol yönetimi
-- Raporlama
+Modern, full-stack e-ticaret platformu. Next.js, TypeScript, MySQL ve Docker ile geliştirilmiştir.
 
 ## 🚀 Hızlı Başlangıç
 
-### Supabase Olmadan Test (Sadece Tasarım)
-
+### Yeni Kurulum
 ```bash
-npm install
-npm run dev
+# 1. Projeyi klonla
+git clone <repo-url>
+cd momez
+
+# 2. Verileri restore et
+./git_data_package/RESTORE.sh
+
+# 3. Docker'ı başlat
+docker-compose up -d
+
+# 4. Tarayıcıda aç
+http://localhost:3000
 ```
 
-http://localhost:3000 adresine gidin.
+### Geliştirme Ortamı
+```bash
+# Dependencies yükle
+npm install
 
-⚠️ **Not**: Gerçek veri çalışmaz, sadece tasarım görünür.
+# Geliştirme modunda çalıştır
+npm run dev
 
-### Tam Kurulum (Tüm Özellikler)
-
-Detaylı kurulum için: **[QUICKSTART.md](./QUICKSTART.md)** ← Buraya tıklayın!
-
-**Kısa Özet:**
-1. Supabase hesabı oluşturun
-2. Yeni proje oluşturun
-3. SQL migration'ı çalıştırın
-4. `.env.local` dosyasını yapılandırın
-5. Admin kullanıcısı oluşturun
+# veya Docker ile
+docker-compose -f docker-compose.dev.yml up
+```
 
 ## 📁 Proje Yapısı
 
 ```
 momez/
-├── app/
-│   ├── (public)/          # Müşteri sayfaları
-│   │   ├── page.tsx       # Ana sayfa ✅
-│   │   └── layout.tsx
-│   ├── admin/             # Admin panel
-│   │   ├── page.tsx       # Dashboard ✅
-│   │   └── layout.tsx
-│   └── layout.tsx         # Root layout
-├── components/            # Paylaşılan componentler
-│   ├── Header.tsx         ✅
-│   ├── Footer.tsx         ✅
-│   └── admin/
-│       └── AdminSidebar.tsx ✅
-├── lib/supabase/          # Supabase utilities
-├── types/database.ts      # TypeScript types
-└── supabase/migrations/   # SQL migration
+├── app/                    # Next.js app router
+├── components/             # React bileşenleri
+├── lib/                    # Utility fonksiyonlar
+├── database/               # MySQL data ve init scripts
+├── git_data_package/       # Restore için backup'lar
+├── backups/                # Otomatik backup'lar
+├── uploads/                # Yüklenen dosyalar
+├── docker-compose.yml      # Docker yapılandırma
+└── scripts/                # Yardımcı scriptler
 ```
 
-## 🛠️ Teknoloji Stack
+## 🛠️ Teknolojiler
 
-- **Frontend/Backend**: Next.js 14 (App Router)
-- **Veritabanı**: Supabase (PostgreSQL)
-- **Authentication**: Supabase Auth
-- **Styling**: Tailwind CSS
-- **Dil**: TypeScript
-- **Icons**: Lucide React
-- **Bildirimler**: React Hot Toast
+- **Frontend:** Next.js 14, React, TypeScript, Tailwind CSS
+- **Backend:** Next.js API Routes, Node.js
+- **Database:** MySQL 8.0
+- **DevOps:** Docker, Docker Compose
+- **Tools:** phpMyAdmin, ESLint, TypeScript
+
+## 📊 Özellikler
+
+- ✅ Ürün yönetimi (CRUD)
+- ✅ Kullanıcı sistemi (kayıt/giriş)
+- ✅ Sepet ve sipariş yönetimi
+- ✅ Admin paneli
+- ✅ Kategori sistemi
+- ✅ Resim yükleme
+- ✅ Stok takibi
+- ✅ Kampanya yönetimi
+
+## 🔧 Konfigürasyon
+
+### Environment Variables
+`.env` dosyası oluşturun:
+```env
+DATABASE_HOST=mysql
+DATABASE_PORT=3306
+DATABASE_NAME=momez_db
+DATABASE_USER=momez_user
+DATABASE_PASSWORD=momez_password
+JWT_SECRET=your-secret-key
+NEXT_PUBLIC_API_URL=http://localhost:3000
+```
+
+## 🐳 Docker Komutları
+
+```bash
+# Başlat
+docker-compose up -d
+
+# Durdur
+docker-compose down
+
+# Logları göster
+docker-compose logs -f
+
+# Yeniden başlat
+docker-compose restart
+
+# Temizlik (veri korunur)
+docker-compose down
+docker system prune -a
+```
+
+## 💾 Backup & Restore
+
+### Backup Al
+```bash
+./auto-backup.sh
+```
+
+### Restore Et
+```bash
+./restore-backup.sh
+```
+
+### Otomatik Backup (Crontab)
+```bash
+crontab -e
+# Ekle:
+0 3 * * * cd /path/to/momez && ./auto-backup.sh
+```
 
 ## 📚 Dokümantasyon
 
-| Dosya | Açıklama |
-|-------|----------|
-| **[QUICKSTART.md](./QUICKSTART.md)** | 🚀 Hızlı başlangıç kılavuzu (ÖNERİLİR) |
-| **[SETUP_GUIDE.md](./SETUP_GUIDE.md)** | Detaylı kurulum talimatları |
-| **[DEV_NOTES.md](./DEV_NOTES.md)** | Geliştirici notları ve TODO |
-| **[PROJECT_STATUS.md](./PROJECT_STATUS.md)** | Proje durumu ve özellikler |
+Detaylı dokümantasyon için:
+- [Hızlı Başlangıç](./MYSQL_QUICK_START.md)
+- [Veri Koruma Rehberi](./DATABASE_PROTECTION_GUIDE.md)
+- [Farklı Cihaz Kurulumu](./FARKLÍ_CIHAZ_KURULUM.md)
+- [Sistem Durumu](./SISTEM_DURUMU.md)
 
-## 🎨 Tasarım Sistemi
+## 🌐 Erişim Bilgileri
 
-### Renkler
-- **Primary**: #ee2b2b (Kırmızı)
-- **Background Light**: #ffffff
-- **Background Dark**: #111111
+- **Web Sitesi:** http://localhost:3000
+- **phpMyAdmin:** http://localhost:8080
+- **MySQL:** localhost:3306
 
-### Responsive Breakpoints
-- Mobile: < 768px
-- Tablet: 768px - 1024px
-- Desktop: > 1024px
-
-## 📊 Veritabanı
-
-12 tablo içeren tam SQL şeması:
-- profiles, categories, products, product_stock
-- orders, order_items, addresses, shipping_rates
-- favorites, cart_items, campaigns, site_settings
-
-## 🔐 Güvenlik
-
-- ✅ Row Level Security (RLS)
-- ✅ Role-based access control
-- ✅ Secure environment variables
-- ✅ Authentication middleware
-- ✅ SQL injection protection
-
-## 📈 Durum
-
-**v0.1.0-alpha** - Temel altyapı tamamlandı
-
-✅ **Tamamlanan**:
-- Temel altyapı ve tasarım
-- Ana sayfa
-- Admin dashboard
-- Veritabanı şeması
-
-🚧 **Devam Eden**:
-- Ürün sayfaları
-- Sepet sistemi
-- Authentication
-
-## 🐛 Sorun mu Var?
-
-**"Invalid supabaseUrl" Hatası**:
-→ `.env.local` dosyasını yapılandırın ([QUICKSTART.md](./QUICKSTART.md))
-
-**Admin paneline giremiyorum**:
-→ Supabase'de kullanıcı rolünü "admin" yapın
-
-**Build hatası**:
-```bash
-rm -rf .next node_modules
-npm install
-npm run build
+### Database Login
+```
+Host: mysql
+Database: momez_db
+User: momez_user
+Password: momez_password
 ```
 
-## 📞 İletişim
+## 🔒 Güvenlik
 
-- **Email**: iletisim@momez.com
-- **Tel**: +90 555 123 4567
+- ⚠️ Production'da `.env` dosyasını güncellemeyi unutmayın
+- ⚠️ JWT_SECRET'i değiştirin
+- ⚠️ Database şifrelerini güçlü yapın
+- ⚠️ Private repository kullanın (hassas veriler var)
+
+## 🐛 Sorun Giderme
+
+### MySQL başlamıyor
+```bash
+sudo chown -R 999:999 database/mysql_data/
+docker-compose restart mysql
+```
+
+### Port 3000 kullanımda
+```bash
+# Kullanılan port'u bul
+sudo lsof -i :3000
+# Process'i sonlandır
+kill -9 <PID>
+```
+
+### Backup restore edilmiyor
+```bash
+# Root kullanıcısı ile dene
+docker exec -i momez-mysql mysql -uroot -prootpassword momez_db < backups/latest.sql.gz
+```
+
+## 📝 Geliştirme
+
+### Yeni Özellik Eklemek
+1. Feature branch oluştur: `git checkout -b feature/yeni-ozellik`
+2. Değişiklikleri yap
+3. Test et: `npm run test`
+4. Commit et: `git commit -m "feat: yeni özellik"`
+5. Push et: `git push origin feature/yeni-ozellik`
+6. Pull request aç
+
+### Kod Standartları
+- ESLint kullanılıyor
+- TypeScript strict mode aktif
+- Prettier ile format
+
+## 🤝 Katkıda Bulunma
+
+1. Fork edin
+2. Feature branch oluşturun
+3. Commit edin
+4. Push edin
+5. Pull Request açın
 
 ## 📄 Lisans
 
-Bu proje özel bir projedir.
+Private Project
+
+## 👤 İletişim
+
+Sorularınız için: [your-email@example.com]
 
 ---
 
-**momez** - Premium Ayakkabı Mağazası 🎉
-
-[Hızlı Başlangıç →](./QUICKSTART.md)
+**🎉 Başarılı bir şekilde kuruldu! İyi kodlamalar!**
