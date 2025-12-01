@@ -12,17 +12,20 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      # Host dizinine bind mount - veriler bilgisayarınızda kalır
-      - ./database/mysql_data:/var/lib/mysql
+      # Docker named volume kullanıyoruz (WSL2 uyumluluğu için)
+      - mysql_data:/var/lib/mysql
       - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
       # Backup klasörünü de mount edelim
       - ./backups:/backups
+    command: --default-authentication-plugin=mysql_native_password
     networks:
       - momez-network
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
       timeout: 20s
       retries: 10
+      interval: 10s
+      start_period: 60s
 
   # Next.js Application
   app:
