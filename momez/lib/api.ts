@@ -26,8 +26,12 @@ export const authAPI = {
     try {
       const res = await fetch(`${API_URL}/api/auth/register`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, name, phone })
+        headers: { 
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate'
+        },
+        body: JSON.stringify({ email, password, name, phone }),
+        cache: 'no-store'
       })
       return handleResponse(res)
     } catch (error: any) {
@@ -41,8 +45,12 @@ export const authAPI = {
     try {
       const res = await fetch(`${API_URL}/api/auth/login`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+        headers: { 
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate'
+        },
+        body: JSON.stringify({ email, password }),
+        cache: 'no-store'
       })
       return handleResponse(res)
     } catch (error: any) {
@@ -55,7 +63,8 @@ export const authAPI = {
   async logout() {
     try {
       const res = await fetch(`${API_URL}/api/auth/logout`, {
-        method: 'POST'
+        method: 'POST',
+        cache: 'no-store'
       })
       return handleResponse(res)
     } catch (error: any) {
@@ -67,7 +76,12 @@ export const authAPI = {
   // Kullanıcı bilgisi al
   async me() {
     try {
-      const res = await fetch(`${API_URL}/api/auth/me`)
+      const res = await fetch(`${API_URL}/api/auth/me`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate'
+        }
+      })
       return handleResponse(res)
     } catch (error: any) {
       console.error('Me error:', error)

@@ -43,8 +43,8 @@ export default function SignupPage() {
       if (result.success) {
         toast.success('Kayıt başarılı! Yönlendiriliyorsunuz...')
         setTimeout(() => {
-          router.push('/')
-          router.refresh()
+          // Tam sayfa yenilemesi yaparak önbelleği temizle
+          window.location.href = '/'
         }, 1000)
       } else {
         toast.error(result.error || 'Kayıt başarısız')

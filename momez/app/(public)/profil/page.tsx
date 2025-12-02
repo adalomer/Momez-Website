@@ -30,7 +30,13 @@ export default function ProfilePage() {
 
   const fetchUser = async () => {
     try {
-      const response = await fetch('/api/auth/me')
+      const response = await fetch('/api/auth/me', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache'
+        }
+      })
       const data = await response.json()
       
       if (data.success && data.data?.user) {
@@ -78,9 +84,12 @@ export default function ProfilePage() {
 
   const handleLogout = async () => {
     try {
-      await fetch('/api/auth/logout', { method: 'POST' })
-      router.push('/')
-      router.refresh()
+      await fetch('/api/auth/logout', { 
+        method: 'POST',
+        cache: 'no-store'
+      })
+      // Tam sayfa yenilemesi yap
+      window.location.href = '/'
     } catch (error) {
       toast.error('Çıkış yapılamadı')
     }

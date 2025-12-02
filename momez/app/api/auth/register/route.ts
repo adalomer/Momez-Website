@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { registerUser } from '@/lib/auth'
 
+// Bu endpoint'in cache'lenmemesini sağla
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export async function POST(request: NextRequest) {
   try {
     const { email, password, name, phone } = await request.json()
@@ -41,8 +45,14 @@ export async function POST(request: NextRequest) {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7 // 7 gün
+      maxAge: 60 * 60 * 24 * 7, // 7 gün
+      path: '/'
     })
+
+    // Cache'lemeyi önle
+    response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate')
+    response.headers.set('Pragma', 'no-cache')
+    response.headers.set('Expires', '0')
 
     return response
   } catch (error) {

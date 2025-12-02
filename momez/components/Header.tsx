@@ -54,14 +54,23 @@ export default function Header() {
 
   const fetchUser = async () => {
     try {
-      const response = await fetch('/api/auth/me')
+      const response = await fetch('/api/auth/me', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache'
+        }
+      })
       const data = await response.json()
       
       if (data.success && data.data?.user) {
         setUser(data.data.user)
+      } else {
+        setUser(null)
       }
     } catch (error) {
       console.error('User load error:', error)
+      setUser(null)
     } finally {
       setLoading(false)
     }
@@ -69,7 +78,13 @@ export default function Header() {
 
   const fetchCartCount = async () => {
     try {
-      const response = await fetch('/api/cart')
+      const response = await fetch('/api/cart', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache'
+        }
+      })
       const data = await response.json()
       
       if (data.success && data.data) {
@@ -87,16 +102,19 @@ export default function Header() {
       // Logout animasyonu için toast göster
       toast.loading('Çıkış yapılıyor...', { id: 'logout' })
       
-      await fetch('/api/auth/logout', { method: 'POST' })
+      await fetch('/api/auth/logout', { 
+        method: 'POST',
+        cache: 'no-store'
+      })
       
       toast.success('Başarıyla çıkış yapıldı', { id: 'logout' })
       
       setUser(null)
+      setCartCount(0)
       
-      // Kısa bir gecikme ile sayfayı yenile (animasyon için)
+      // Tam sayfa yenilemesi yap - tüm cache'i temizle
       setTimeout(() => {
-        router.push('/')
-        router.refresh()
+        window.location.href = '/'
       }, 500)
     } catch (error) {
       console.error('Logout error:', error)

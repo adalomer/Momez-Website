@@ -5,23 +5,23 @@ services:
     container_name: momez-mysql
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: momez_db
-      MYSQL_USER: momez_user
-      MYSQL_PASSWORD: momez_password
-    ports:
-      - "3306:3306"
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DATABASE_NAME:-momez_db}
+      MYSQL_USER: ${DATABASE_USER:-momez_user}
+      MYSQL_PASSWORD: ${DATABASE_PASSWORD}
+    # Production'da MySQL portunu dışarıya açmıyoruz (güvenlik)
+    # Sadece docker network içinden erişilebilir
+    # ports:
+    #   - "3306:3306"
     volumes:
-      # Docker named volume kullanıyoruz (WSL2 uyumluluğu için)
       - mysql_data:/var/lib/mysql
       - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
-      # Backup klasörünü de mount edelim
       - ./backups:/backups
     command: --default-authentication-plugin=mysql_native_password
     networks:
       - momez-network
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
       timeout: 20s
       retries: 10
       interval: 10s
@@ -34,18 +34,18 @@ services:
       dockerfile: Dockerfile
     container_name: momez-app
     restart: always
+    # Sadece localhost'tan erişim (Nginx reverse proxy kullanılacak)
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
     environment:
       - NODE_ENV=production
       - DATABASE_HOST=mysql
-      - DATABASE_PORT=3306
-      - DATABASE_NAME=momez_db
-      - DATABASE_USER=momez_user
-      - DATABASE_PASSWORD=momez_password
-      - JWT_SECRET=${JWT_SECRET:-your-secret-key-change-in-production}
-      - NEXT_PUBLIC_API_URL=http://localhost:3000
-      # E-posta ayarları
+      - DATABASE_PORT=${DATABASE_PORT:-3306}
+      - DATABASE_NAME=${DATABASE_NAME:-momez_db}
+      - DATABASE_USER=${DATABASE_USER:-momez_user}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
       - GMAIL_USER=${GMAIL_USER}
       - GMAIL_APP_PASSWORD=${GMAIL_APP_PASSWORD}
     depends_on:
@@ -62,17 +62,22 @@ services:
       retries: 3
       start_period: 40s
 
-  # phpMyAdmin (Opsiyonel - Database yönetimi için)
+  # phpMyAdmin - SADECE DEVELOPMENT/BAKIM İÇİN
+  # Production'da bu servisi kapalı tutun veya güçlü şifre ile koruyun
+  # Gerektiğinde: docker compose --profile admin up phpmyadmin -d
   phpmyadmin:
     image: phpmyadmin:latest
     container_name: momez-phpmyadmin
-    restart: always
+    restart: unless-stopped
+    profiles:
+      - admin  # Sadece açıkça çağrıldığında başlar
     ports:
-      - "8080:80"
+      - "127.0.0.1:8080:80"  # Sadece localhost'tan erişim
     environment:
       PMA_HOST: mysql
       PMA_PORT: 3306
-      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      PMA_ABSOLUTE_URI: /phpmyadmin/
     depends_on:
       - mysql
     networks:
