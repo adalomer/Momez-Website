@@ -45,6 +45,9 @@ services:
       - DATABASE_PASSWORD=momez_password
       - JWT_SECRET=${JWT_SECRET:-your-secret-key-change-in-production}
       - NEXT_PUBLIC_API_URL=http://localhost:3000
+      # E-posta ayarları
+      - GMAIL_USER=${GMAIL_USER}
+      - GMAIL_APP_PASSWORD=${GMAIL_APP_PASSWORD}
     depends_on:
       mysql:
         condition: service_healthy

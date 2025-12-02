@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db/mysql'
 import { v4 as uuidv4 } from 'uuid'
 import crypto from 'crypto'
+import { sendPasswordResetEmail } from '@/lib/email'
 
 // POST /api/auth/forgot-password - Şifre sıfırlama token'ı oluştur
 export async function POST(request: NextRequest) {
@@ -51,15 +52,27 @@ export async function POST(request: NextRequest) {
       [uuidv4(), user.id, resetToken, resetCode, expiresAt]
     )
     
-    // Gerçek uygulamada burada e-posta gönderilir
-    // Şimdilik geliştirme amaçlı kodu response'da döndürüyoruz
-    console.log(`[DEV] Şifre sıfırlama kodu (${email}): ${resetCode}`)
+    // E-posta gönder
+    const emailConfigured = process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD
+    
+    if (emailConfigured) {
+      const emailResult = await sendPasswordResetEmail(email.toLowerCase(), resetCode)
+      
+      if (!emailResult.success) {
+        console.error('Email gönderme hatası:', emailResult.error)
+        // E-posta gönderilemese bile devam et (güvenlik için)
+      }
+    } else {
+      // E-posta yapılandırılmamışsa konsola yaz (geliştirme modu)
+      console.log(`[DEV] Şifre sıfırlama kodu (${email}): ${resetCode}`)
+      console.log('[UYARI] E-posta göndermek için .env dosyasına GMAIL_USER ve GMAIL_APP_PASSWORD ekleyin')
+    }
     
     return NextResponse.json({
       success: true,
       message: 'E-posta adresinize şifre sıfırlama kodu gönderildi.',
-      // DEV MODE: Gerçek uygulamada bu kaldırılmalı
-      dev_code: process.env.NODE_ENV === 'development' ? resetCode : undefined
+      // DEV MODE: E-posta yapılandırılmadıysa kodu göster
+      dev_code: (!emailConfigured && process.env.NODE_ENV === 'development') ? resetCode : undefined
     })
   } catch (error) {
     console.error('Forgot Password Error:', error)
