@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
     
     await db.update(
       'users',
-      { password: hashedPassword },
+      { password_hash: hashedPassword },
       { id: user.id }
     )
     
