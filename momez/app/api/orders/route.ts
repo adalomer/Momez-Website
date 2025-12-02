@@ -32,10 +32,10 @@ export async function GET(request: NextRequest) {
         a.phone,
         a.city,
         a.district,
-        CONCAT(a.address_line1, IFNULL(CONCAT(' ', a.address_line2), '')) as address_line,
+        a.address_line,
         a.postal_code
       FROM orders o
-      LEFT JOIN addresses a ON o.address_id COLLATE utf8mb4_unicode_ci = a.id COLLATE utf8mb4_unicode_ci
+      LEFT JOIN user_addresses a ON o.address_id = a.id
       WHERE o.user_id = ?
       ORDER BY o.created_at DESC
     `
@@ -207,10 +207,10 @@ export async function POST(request: NextRequest) {
         a.phone,
         a.city,
         a.district,
-        CONCAT(a.address_line1, IFNULL(CONCAT(' ', a.address_line2), '')) as address_line,
+        a.address_line,
         a.postal_code
       FROM orders o
-      LEFT JOIN addresses a ON o.address_id COLLATE utf8mb4_unicode_ci = a.id COLLATE utf8mb4_unicode_ci
+      LEFT JOIN user_addresses a ON o.address_id = a.id
       WHERE o.id = ?
     `
     

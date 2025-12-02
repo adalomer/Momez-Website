@@ -265,7 +265,12 @@ export default function OrderDetailPage() {
                 )}
               </div>
             ) : (
-              <p className="text-slate-500 dark:text-slate-400 italic">Adres bilgisi bulunamadı</p>
+              <div className="p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+                <p className="text-amber-700 dark:text-amber-400 text-sm">
+                  <strong>Not:</strong> Bu sipariş için kayıtlı adres bilgisi bulunamadı. 
+                  Eski siparişlerde adres verileri ayrı bir tabloda saklanmamış olabilir.
+                </p>
+              </div>
             )}
           </div>
         </div>

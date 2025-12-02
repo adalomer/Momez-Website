@@ -300,3 +300,19 @@ FROM products p
 JOIN product_stock ps ON p.id = ps.product_id
 WHERE ps.quantity < 10 AND p.is_active = TRUE
 ORDER BY ps.quantity ASC;
+
+-- =====================================================
+-- Password Resets (Şifre Sıfırlama)
+-- =====================================================
+CREATE TABLE IF NOT EXISTS password_resets (
+    id VARCHAR(36) PRIMARY KEY,
+    user_id VARCHAR(36) NOT NULL,
+    token VARCHAR(255) NOT NULL,
+    reset_code VARCHAR(10) NOT NULL,
+    expires_at DATETIME NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_user (user_id),
+    INDEX idx_code (reset_code),
+    INDEX idx_expires (expires_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

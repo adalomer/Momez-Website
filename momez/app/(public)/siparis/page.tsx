@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import { MapPin, Plus, CreditCard, Banknote, Check } from 'lucide-react'
+import { MapPin, Plus, CreditCard, Banknote, Check, Trash2 } from 'lucide-react'
 import toast, { Toaster } from 'react-hot-toast'
 import { cartAPI, authAPI } from '@/lib/api'
 
@@ -160,6 +160,31 @@ export default function CheckoutPage() {
     }
   }
 
+  const handleDeleteAddress = async (addressId: string, addressTitle: string) => {
+    if (!confirm(`"${addressTitle}" adresini silmek istediğinize emin misiniz?`)) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/addresses?id=${addressId}`, {
+        method: 'DELETE'
+      })
+
+      const result = await response.json()
+      if (result.success) {
+        toast.success('Adres silindi')
+        setAddresses(addresses.filter(a => a.id !== addressId))
+        if (selectedAddress === addressId) {
+          setSelectedAddress('')
+        }
+      } else {
+        toast.error(result.error || 'Adres silinemedi')
+      }
+    } catch (error) {
+      toast.error('Bir hata oluştu')
+    }
+  }
+
   const handleSubmitOrder = async () => {
     if (!selectedAddress) {
       toast.error('Lütfen teslimat adresi seçin')
@@ -262,7 +287,7 @@ export default function CheckoutPage() {
                         className="sr-only"
                       />
                       <div className="flex items-start justify-between">
-                        <div>
+                        <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
                             <p className="font-bold text-slate-900 dark:text-white">{address.title}</p>
                             {address.is_default && (
@@ -278,9 +303,23 @@ export default function CheckoutPage() {
                             {address.postal_code && ` - ${address.postal_code}`}
                           </p>
                         </div>
-                        {selectedAddress === address.id && (
-                          <Check className="w-5 h-5 text-primary flex-shrink-0" />
-                        )}
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.preventDefault()
+                              e.stopPropagation()
+                              handleDeleteAddress(address.id, address.title)
+                            }}
+                            className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition"
+                            title="Adresi Sil"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                          {selectedAddress === address.id && (
+                            <Check className="w-5 h-5 text-primary flex-shrink-0" />
+                          )}
+                        </div>
                       </div>
                     </label>
                   ))}

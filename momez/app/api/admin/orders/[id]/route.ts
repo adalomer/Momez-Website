@@ -34,15 +34,15 @@ export async function GET(
         u.full_name as customer_name,
         u.email as customer_email,
         a.title as address_title,
-        a.full_name,
-        a.phone,
+        a.full_name as shipping_full_name,
+        a.phone as shipping_phone,
         a.city,
         a.district,
-        CONCAT(a.address_line1, IFNULL(CONCAT(' ', a.address_line2), '')) as address_line,
+        a.address_line,
         a.postal_code
       FROM orders o
-      LEFT JOIN users u ON o.user_id COLLATE utf8mb4_unicode_ci = u.id COLLATE utf8mb4_unicode_ci
-      LEFT JOIN addresses a ON o.shipping_address_id COLLATE utf8mb4_unicode_ci = a.id COLLATE utf8mb4_unicode_ci
+      LEFT JOIN users u ON o.user_id = u.id
+      LEFT JOIN user_addresses a ON o.address_id = a.id
       WHERE o.id = ?
     `
     
