@@ -30,15 +30,15 @@ export default {
         },
         background: {
           light: "#fafafa",
-          dark: "#0f0f0f",
+          dark: "#020617", // Slate 950
         },
         surface: {
           light: "#ffffff",
-          dark: "#1a1a1a",
+          dark: "#0f172a", // Slate 900
         },
         border: {
-          light: "#f3f4f6",
-          dark: "#2d2d2d",
+          light: "#e2e8f0",
+          dark: "#1e293b", // Slate 800
         },
       },
       fontFamily: {
@@ -53,6 +53,26 @@ export default {
       boxShadow: {
         'soft': '0 2px 15px -3px rgba(239, 68, 68, 0.1), 0 2px 6px -4px rgba(239, 68, 68, 0.1)',
         'soft-lg': '0 10px 40px -10px rgba(239, 68, 68, 0.15)',
+        'glow': '0 0 20px rgba(239, 68, 68, 0.3)',
+      },
+      animation: {
+        'fade-in': 'fadeIn 0.5s ease-out',
+        'slide-up': 'slideUp 0.5s ease-out',
+        'scale-in': 'scaleIn 0.3s ease-out',
+      },
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+        slideUp: {
+          '0%': { transform: 'translateY(20px)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
+        scaleIn: {
+          '0%': { transform: 'scale(0.9)', opacity: '0' },
+          '100%': { transform: 'scale(1)', opacity: '1' },
+        },
       },
     },
   },

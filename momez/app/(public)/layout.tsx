@@ -8,7 +8,7 @@ export default function PublicLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="bg-gradient-to-br from-background-light via-white to-accent-lighter dark:from-background-dark dark:via-gray-900 dark:to-gray-800 min-h-screen">
+    <div className="bg-background-light dark:bg-background-dark min-h-screen transition-colors duration-300">
       <Header />
       <main className="min-h-screen relative">
         <PageTransition>

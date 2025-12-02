@@ -15,7 +15,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="tr" className="light">
-      <body className="font-sans antialiased bg-white dark:bg-[#111111]">
+      <body className="font-sans antialiased bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-50 transition-colors duration-300">
         {children}
         <Toaster position="top-right" />
       </body>

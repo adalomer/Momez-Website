@@ -106,7 +106,7 @@ export default function ProfilePage() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Sidebar */}
           <div className="lg:col-span-1">
-            <div className="bg-white dark:bg-slate-800 rounded-xl border-2 border-slate-200 dark:border-slate-700 p-4 shadow-lg">
+            <div className="bg-white dark:bg-surface-dark rounded-xl border-2 border-border-light dark:border-border-dark p-4 shadow-lg transition-colors duration-300">
               <div className="space-y-2">
                 <Link
                   href="/profil"
@@ -142,7 +142,7 @@ export default function ProfilePage() {
 
           {/* Content */}
           <div className="lg:col-span-3">
-            <div className="bg-white dark:bg-slate-800 rounded-xl border-2 border-slate-200 dark:border-slate-700 shadow-lg p-6">
+            <div className="bg-white dark:bg-surface-dark rounded-xl border-2 border-border-light dark:border-border-dark shadow-lg p-6 transition-colors duration-300">
               <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">
                 Profil Bilgileri
               </h2>
@@ -156,7 +156,7 @@ export default function ProfilePage() {
                     type="email"
                     value={user?.email || ''}
                     disabled
-                    className="w-full px-4 py-3 rounded-xl border-2 border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-300 font-medium"
+                    className="w-full px-4 py-3 rounded-xl border-2 border-border-light dark:border-border-dark bg-slate-100 dark:bg-slate-900/50 text-slate-700 dark:text-slate-300 font-medium transition-colors duration-300"
                   />
                   <p className="text-sm text-slate-600 dark:text-slate-400 mt-1 font-medium">
                     E-posta adresi değiştirilemez
@@ -171,7 +171,7 @@ export default function ProfilePage() {
                     type="text"
                     value={formData.full_name}
                     onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-                    className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                    className="w-full px-4 py-3 rounded-lg border border-border-light dark:border-border-dark bg-white dark:bg-slate-900/50 text-slate-900 dark:text-white focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all duration-300"
                   />
                 </div>
 
@@ -184,11 +184,11 @@ export default function ProfilePage() {
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     placeholder="+90 555 123 4567"
-                    className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                    className="w-full px-4 py-3 rounded-lg border border-border-light dark:border-border-dark bg-white dark:bg-slate-900/50 text-slate-900 dark:text-white focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all duration-300"
                   />
                 </div>
 
-                <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
+                <div className="pt-4 border-t border-border-light dark:border-border-dark">
                   <button
                     type="submit"
                     disabled={saving}

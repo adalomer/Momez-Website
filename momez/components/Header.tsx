@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { ShoppingCart, Heart, User, Search, Menu, X, LogOut } from 'lucide-react'
+import { ShoppingCart, Heart, User, Search, Menu, X, LogOut, Sun, Moon } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
 
@@ -20,6 +20,32 @@ export default function Header() {
   const [user, setUser] = useState<UserData | null>(null)
   const [loading, setLoading] = useState(true)
   const [cartCount, setCartCount] = useState(0)
+  const [theme, setTheme] = useState<'light' | 'dark'>('light')
+
+  useEffect(() => {
+    // Initialize theme
+    if (typeof window !== 'undefined') {
+      if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        setTheme('dark')
+        document.documentElement.classList.add('dark')
+      } else {
+        setTheme('light')
+        document.documentElement.classList.remove('dark')
+      }
+    }
+  }, [])
+
+  const toggleTheme = () => {
+    if (theme === 'light') {
+      setTheme('dark')
+      document.documentElement.classList.add('dark')
+      localStorage.theme = 'dark'
+    } else {
+      setTheme('light')
+      document.documentElement.classList.remove('dark')
+      localStorage.theme = 'light'
+    }
+  }
 
   useEffect(() => {
     fetchUser()
@@ -87,7 +113,7 @@ export default function Header() {
   ]
 
   return (
-    <header className="sticky top-0 z-50 glass border-b border-border-light dark:border-border-dark shadow-soft">
+    <header className="sticky top-0 z-50 bg-white/90 dark:bg-surface-dark/90 backdrop-blur-md border-b border-border-light dark:border-border-dark shadow-soft transition-colors duration-300">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
@@ -203,6 +229,19 @@ export default function Header() {
                 <User className="h-5 w-5" />
               </Link>
             )}
+
+            {/* Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              className="flex items-center justify-center rounded-xl h-11 w-11 text-red-500 hover:bg-red-500 hover:text-white transition-all duration-300 hover:scale-110 ml-1"
+              aria-label="Tema Değiştir"
+            >
+              {theme === 'light' ? (
+                <Moon className="h-5 w-5 transition-all duration-300" />
+              ) : (
+                <Sun className="h-5 w-5 transition-all duration-300" />
+              )}
+            </button>
 
             {/* Mobile Menu Button */}
             <button

@@ -99,7 +99,7 @@ export default function ProductCard({ product, user }: ProductCardProps) {
     <>
       <div className="group">
         <Link href={`/urun/${product.slug}`}>
-          <div className="aspect-square rounded-lg overflow-hidden bg-gray-100 mb-3 relative">
+          <div className="aspect-square rounded-xl overflow-hidden bg-gray-100 dark:bg-surface-dark mb-3 relative shadow-sm hover:shadow-md transition-all duration-300">
             {product.images && product.images[0] ? (
               <Image
                 src={product.images[0].image_url}
@@ -127,7 +127,7 @@ export default function ProductCard({ product, user }: ProductCardProps) {
         
         <div className="space-y-2">
           <Link href={`/urun/${product.slug}`}>
-            <h3 className="font-semibold text-slate-900 dark:text-white group-hover:text-[#ee2b2b] transition line-clamp-2">
+            <h3 className="font-semibold text-slate-900 dark:text-slate-50 group-hover:text-primary-500 transition-colors duration-300 line-clamp-2">
               {product.name}
             </h3>
           </Link>
@@ -152,10 +152,10 @@ export default function ProductCard({ product, user }: ProductCardProps) {
           <div className="flex items-center gap-2">
             <button
               onClick={handleAddToFavorites}
-              className="group/fav flex-1 p-2.5 border-2 border-slate-300 hover:border-primary-500 hover:bg-primary-50 rounded-lg transition-all"
+              className="group/fav flex-1 p-2.5 border-2 border-border-light dark:border-border-dark hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-all duration-300"
               title="Favorilere Ekle"
             >
-              <Heart className="w-5 h-5 mx-auto text-slate-600 transition-all group-hover/fav:fill-primary-500 group-hover/fav:text-primary-500 group-hover/fav:scale-110" />
+              <Heart className="w-5 h-5 mx-auto text-slate-600 dark:text-slate-400 transition-all group-hover/fav:fill-primary-500 group-hover/fav:text-primary-500 group-hover/fav:scale-110" />
             </button>
             <button
               onClick={handleAddToCart}
@@ -172,10 +172,10 @@ export default function ProductCard({ product, user }: ProductCardProps) {
 
       {/* Beden Seçimi Modal */}
       {showSizeModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-slate-800 rounded-xl max-w-md w-full p-6">
-            <h3 className="text-xl font-bold mb-4">Beden Seçin</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+          <div className="bg-white dark:bg-surface-dark rounded-xl max-w-md w-full p-6 shadow-2xl border border-border-light dark:border-border-dark animate-scale-in">
+            <h3 className="text-xl font-bold mb-4 text-slate-900 dark:text-white">Beden Seçin</h3>
+            <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
               {product.name}
             </p>
             
