@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { User, Package, Heart, MapPin, Settings, LogOut } from 'lucide-react'
+import { User, Package, MapPin, LogOut } from 'lucide-react'
 import toast, { Toaster } from 'react-hot-toast'
 
 interface UserData {
@@ -116,18 +116,11 @@ export default function ProfilePage() {
                   Profil Bilgileri
                 </Link>
                 <Link
-                  href="/profil/siparisler"
+                  href="/siparislerim"
                   className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-900 dark:text-white hover:bg-red-100 hover:text-primary-600 transition-all font-medium"
                 >
                   <Package className="h-5 w-5" />
                   Siparişlerim
-                </Link>
-                <Link
-                  href="/favoriler"
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-900 dark:text-white hover:bg-red-100 hover:text-primary-600 transition-all font-medium"
-                >
-                  <Heart className="h-5 w-5" />
-                  Favorilerim
                 </Link>
                 <Link
                   href="/profil/adresler"
