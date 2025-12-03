@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useState, Suspense } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { authAPI } from '@/lib/api'
 import toast, { Toaster } from 'react-hot-toast'
 import AuthTransition from '@/components/AuthTransition'
@@ -11,10 +11,21 @@ function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const redirect = searchParams.get('redirect') || '/'
+  const registered = searchParams.get('registered')
   
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
+
+  // Kayıt sonrası yönlendirme mesajı
+  useEffect(() => {
+    if (registered === 'true') {
+      toast.success('Kayıt başarılı! Şimdi giriş yapabilirsiniz.', {
+        duration: 4000,
+        icon: '🎉'
+      })
+    }
+  }, [registered])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

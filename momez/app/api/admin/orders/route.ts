@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { query } from '@/lib/db/mysql'
 import { getUserFromToken } from '@/lib/auth'
 
+// Cache'lemeyi devre dışı bırak
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export async function GET(request: NextRequest) {
   try {
     const token = request.cookies.get('auth_token')?.value
@@ -56,10 +60,17 @@ export async function GET(request: NextRequest) {
       item_count: parseInt(order.item_count || '0') || 0
     }))
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       data: formattedOrders
     })
+    
+    // Cache'lemeyi önle
+    response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate')
+    response.headers.set('Pragma', 'no-cache')
+    response.headers.set('Expires', '0')
+    
+    return response
   } catch (error) {
     console.error('Admin Orders Error:', error)
     return NextResponse.json(

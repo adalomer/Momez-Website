@@ -21,6 +21,7 @@ export default function Header() {
   const [loading, setLoading] = useState(true)
   const [cartCount, setCartCount] = useState(0)
   const [theme, setTheme] = useState<'light' | 'dark'>('light')
+  const [fetchKey, setFetchKey] = useState(0) // Force re-fetch için
 
   useEffect(() => {
     // Initialize theme
@@ -47,18 +48,48 @@ export default function Header() {
     }
   }
 
+  // Sayfa yüklendiğinde ve pathname değiştiğinde kullanıcı bilgisini çek
   useEffect(() => {
+    // Her pathname değişiminde loading'i true yap ve yeniden fetch et
+    setLoading(true)
     fetchUser()
     fetchCartCount()
+  }, [pathname, fetchKey])
+
+  // Sayfa focus aldığında kullanıcı bilgisini yeniden çek (tab değişikliği vs.)
+  useEffect(() => {
+    const handleFocus = () => {
+      setFetchKey(prev => prev + 1) // Force re-fetch
+    }
+    
+    // Sayfa görünür olduğunda da kontrol et
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        setFetchKey(prev => prev + 1)
+      }
+    }
+    
+    window.addEventListener('focus', handleFocus)
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    
+    return () => {
+      window.removeEventListener('focus', handleFocus)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
   }, [])
 
   const fetchUser = async () => {
     try {
-      const response = await fetch('/api/auth/me', {
+      // Timestamp ekleyerek cache'i bypass et
+      const timestamp = Date.now()
+      const response = await fetch(`/api/auth/me?_t=${timestamp}`, {
+        method: 'GET',
         cache: 'no-store',
+        credentials: 'include',
         headers: {
           'Cache-Control': 'no-cache, no-store, must-revalidate',
-          'Pragma': 'no-cache'
+          'Pragma': 'no-cache',
+          'Expires': '0'
         }
       })
       const data = await response.json()
@@ -78,11 +109,15 @@ export default function Header() {
 
   const fetchCartCount = async () => {
     try {
-      const response = await fetch('/api/cart', {
+      const timestamp = Date.now()
+      const response = await fetch(`/api/cart?_t=${timestamp}`, {
+        method: 'GET',
         cache: 'no-store',
+        credentials: 'include',
         headers: {
           'Cache-Control': 'no-cache, no-store, must-revalidate',
-          'Pragma': 'no-cache'
+          'Pragma': 'no-cache',
+          'Expires': '0'
         }
       })
       const data = await response.json()

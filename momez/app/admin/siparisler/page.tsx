@@ -27,7 +27,15 @@ export default function AdminOrdersPage() {
 
   const fetchOrders = async () => {
     try {
-      const response = await fetch('/api/admin/orders')
+      const timestamp = Date.now()
+      const response = await fetch(`/api/admin/orders?_t=${timestamp}`, {
+        cache: 'no-store',
+        credentials: 'include',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache'
+        }
+      })
       const data = await response.json()
       
       if (data.success) {

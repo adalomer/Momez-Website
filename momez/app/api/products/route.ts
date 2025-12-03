@@ -81,8 +81,17 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { name, description, price, category_id, images, stock } = body
     
-    // Slug oluştur
-    const slug = name
+    // Validasyon
+    if (!name || !description || !price || !category_id) {
+      return NextResponse.json(
+        { success: false, error: 'Lütfen tüm zorunlu alanları doldurun' },
+        { status: 400 }
+      )
+    }
+    
+    // Benzersiz slug oluştur (timestamp ile)
+    const timestamp = Date.now()
+    const baseSlug = name
       .toLowerCase()
       .replace(/ğ/g, 'g')
       .replace(/ü/g, 'u')
@@ -92,6 +101,13 @@ export async function POST(request: NextRequest) {
       .replace(/ç/g, 'c')
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-|-$/g, '')
+    
+    // Slug benzersizliğini kontrol et
+    let slug = baseSlug
+    const existingProduct = await db.findOne('products', { slug: baseSlug })
+    if (existingProduct) {
+      slug = `${baseSlug}-${timestamp}`
+    }
     
     // Ürün ekle
     const product = await db.insert('products', {
@@ -107,25 +123,41 @@ export async function POST(request: NextRequest) {
     const productId = (product as any).id
     
     // Görselleri ekle
-    if (images && Array.isArray(images)) {
+    if (images && Array.isArray(images) && images.length > 0) {
       for (let i = 0; i < images.length; i++) {
-        await db.insert('product_images', {
-          product_id: productId,
-          image_url: images[i],
-          display_order: i,
-          is_primary: i === 0
-        })
+        try {
+          await db.insert('product_images', {
+            product_id: productId,
+            image_url: images[i],
+            display_order: i,
+            is_primary: i === 0
+          })
+        } catch (imgError) {
+          console.error('Image insert error:', imgError)
+        }
       }
     }
     
-    // Stok ekle
-    if (stock && Array.isArray(stock)) {
+    // Stok ekle - duplicate kontrolü ile
+    if (stock && Array.isArray(stock) && stock.length > 0) {
+      // Aynı bedenleri filtrele
+      const uniqueSizes = new Map()
       for (const s of stock) {
-        await db.insert('product_stock', {
-          product_id: productId,
-          size: s.size,
-          quantity: s.quantity
-        })
+        if (!uniqueSizes.has(s.size)) {
+          uniqueSizes.set(s.size, s.quantity)
+        }
+      }
+      
+      for (const [size, quantity] of uniqueSizes) {
+        try {
+          await db.insert('product_stock', {
+            product_id: productId,
+            size: size,
+            quantity: quantity
+          })
+        } catch (stockError) {
+          console.error('Stock insert error:', stockError)
+        }
       }
     }
     
@@ -134,10 +166,21 @@ export async function POST(request: NextRequest) {
       data: product,
       message: 'Ürün başarıyla eklendi'
     })
-  } catch (error) {
+  } catch (error: any) {
     console.error('Create Product Error:', error)
+    
+    // Hata mesajını daha anlaşılır yap
+    let errorMessage = 'Ürün eklenirken hata oluştu'
+    if (error?.sqlMessage?.includes('Duplicate entry')) {
+      if (error.sqlMessage.includes('slug')) {
+        errorMessage = 'Bu isimde bir ürün zaten mevcut. Farklı bir isim deneyin.'
+      } else if (error.sqlMessage.includes('product_stock')) {
+        errorMessage = 'Beden stok kaydı hatası. Lütfen tekrar deneyin.'
+      }
+    }
+    
     return NextResponse.json(
-      { success: false, error: 'Ürün eklenirken hata oluştu' },
+      { success: false, error: errorMessage },
       { status: 500 }
     )
   }

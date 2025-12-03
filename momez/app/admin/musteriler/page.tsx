@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Edit, X, Save } from 'lucide-react'
+import { Edit, X, Save, Trash2, AlertTriangle } from 'lucide-react'
 import toast, { Toaster } from 'react-hot-toast'
 
 interface Customer {
@@ -18,6 +18,7 @@ export default function CustomersPage() {
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null)
+  const [deletingCustomer, setDeletingCustomer] = useState<Customer | null>(null)
   const [editForm, setEditForm] = useState({
     full_name: '',
     email: '',
@@ -30,7 +31,15 @@ export default function CustomersPage() {
 
   const fetchCustomers = async () => {
     try {
-      const response = await fetch('/api/admin/customers')
+      const timestamp = Date.now()
+      const response = await fetch(`/api/admin/customers?_t=${timestamp}`, {
+        cache: 'no-store',
+        credentials: 'include',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache'
+        }
+      })
       const data = await response.json()
       
       if (data.success) {
@@ -82,6 +91,29 @@ export default function CustomersPage() {
         fetchCustomers()
       } else {
         toast.error(data.error || 'Güncelleme başarısız')
+      }
+    } catch (error) {
+      toast.error('Bir hata oluştu')
+    }
+  }
+
+  const handleDeleteCustomer = async () => {
+    if (!deletingCustomer) return
+
+    try {
+      const response = await fetch(`/api/admin/customers?id=${deletingCustomer.id}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        toast.success('Müşteri silindi')
+        setDeletingCustomer(null)
+        fetchCustomers()
+      } else {
+        toast.error(data.error || 'Silme başarısız')
       }
     } catch (error) {
       toast.error('Bir hata oluştu')
@@ -172,13 +204,22 @@ export default function CustomersPage() {
                       {new Date(customer.created_at).toLocaleDateString('tr-TR')}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <button
-                        onClick={() => openEditModal(customer)}
-                        className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 font-bold flex items-center gap-1 hover:scale-105 transition-transform"
-                      >
-                        <Edit className="h-4 w-4" />
-                        Düzenle
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => openEditModal(customer)}
+                          className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 font-bold flex items-center gap-1 hover:scale-105 transition-transform"
+                        >
+                          <Edit className="h-4 w-4" />
+                          Düzenle
+                        </button>
+                        <button
+                          onClick={() => setDeletingCustomer(customer)}
+                          className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 font-bold flex items-center gap-1 hover:scale-105 transition-transform"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                          Sil
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -264,6 +305,46 @@ export default function CustomersPage() {
               >
                 <Save className="h-4 w-4" />
                 Kaydet
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deletingCustomer && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-slate-800 rounded-xl max-w-md w-full p-6 border border-slate-200 dark:border-slate-700">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-3 bg-red-100 dark:bg-red-900/30 rounded-full">
+                <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />
+              </div>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                Müşteri Sil
+              </h2>
+            </div>
+
+            <p className="text-gray-600 dark:text-gray-400 mb-2">
+              <strong className="text-gray-900 dark:text-white">{deletingCustomer.full_name}</strong> isimli müşteriyi silmek istediğinizden emin misiniz?
+            </p>
+            
+            <p className="text-sm text-red-600 dark:text-red-400 mb-6">
+              ⚠️ Bu işlem geri alınamaz! Müşterinin tüm siparişleri, adresleri ve diğer verileri de silinecektir.
+            </p>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setDeletingCustomer(null)}
+                className="flex-1 px-4 py-2 border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
+              >
+                İptal
+              </button>
+              <button
+                onClick={handleDeleteCustomer}
+                className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors flex items-center justify-center gap-2"
+              >
+                <Trash2 className="h-4 w-4" />
+                Evet, Sil
               </button>
             </div>
           </div>

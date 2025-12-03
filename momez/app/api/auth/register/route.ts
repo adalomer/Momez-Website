@@ -34,19 +34,10 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Cookie'ye token kaydet
+    // Kayıt başarılı - cookie set etmiyoruz, kullanıcı login sayfasından giriş yapacak
     const response = NextResponse.json({
       success: true,
-      user: result.user,
-      message: 'Kayıt başarılı'
-    })
-
-    response.cookies.set('auth_token', result.token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7, // 7 gün
-      path: '/'
+      message: 'Kayıt başarılı. Lütfen giriş yapın.'
     })
 
     // Cache'lemeyi önle

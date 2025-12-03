@@ -16,6 +16,11 @@ export default function SignupPage() {
   const [password, setPassword] = useState('')
   const [passwordConfirm, setPasswordConfirm] = useState('')
   const [loading, setLoading] = useState(false)
+  
+  // Sözleşme onayları
+  const [acceptTerms, setAcceptTerms] = useState(false)
+  const [acceptKVKK, setAcceptKVKK] = useState(false)
+  const [acceptMarketing, setAcceptMarketing] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -35,16 +40,27 @@ export default function SignupPage() {
       return
     }
     
+    if (!acceptTerms) {
+      toast.error('Kullanım koşullarını kabul etmelisiniz')
+      return
+    }
+    
+    if (!acceptKVKK) {
+      toast.error('KVKK Aydınlatma Metnini kabul etmelisiniz')
+      return
+    }
+    
     setLoading(true)
     
     try {
-      const result = await authAPI.register(email, password, name, phone) as { success: boolean; error?: string }
+      const result = await authAPI.register(email, password, name, phone) as { success: boolean; user?: any; error?: string }
       
       if (result.success) {
-        toast.success('Kayıt başarılı! Yönlendiriliyorsunuz...')
+        toast.success('Kayıt başarılı! Giriş sayfasına yönlendiriliyorsunuz...')
+        
+        // Giriş sayfasına yönlendir - kullanıcı oradan giriş yapsın
         setTimeout(() => {
-          // Tam sayfa yenilemesi yaparak önbelleği temizle
-          window.location.href = '/'
+          window.location.href = '/auth/login?registered=true'
         }, 1000)
       } else {
         toast.error(result.error || 'Kayıt başarısız')
@@ -161,18 +177,61 @@ export default function SignupPage() {
               />
             </div>
 
-            <div className="flex items-start gap-2 text-sm">
-              <input type="checkbox" required className="mt-1 rounded text-[#ee2b2b] focus:ring-[#ee2b2b]" />
-              <span className="text-gray-700">
-                <Link href="/kvkk" className="text-[#ee2b2b] hover:underline">
-                  Kullanım koşullarını
-                </Link>{' '}
-                ve{' '}
-                <Link href="/gizlilik" className="text-[#ee2b2b] hover:underline">
-                  gizlilik politikasını
-                </Link>{' '}
-                okudum, kabul ediyorum.
-              </span>
+            {/* Sözleşme Onayları */}
+            <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+              <p className="text-sm font-medium text-gray-900">Yasal Onaylar</p>
+              
+              {/* Kullanım Koşulları ve Gizlilik */}
+              <div className="flex items-start gap-3">
+                <input 
+                  type="checkbox" 
+                  id="acceptTerms"
+                  checked={acceptTerms}
+                  onChange={(e) => setAcceptTerms(e.target.checked)}
+                  className="mt-1 h-4 w-4 rounded border-gray-300 text-[#ee2b2b] focus:ring-[#ee2b2b]" 
+                />
+                <label htmlFor="acceptTerms" className="text-sm text-gray-700">
+                  <Link href="/kullanim-kosullari" target="_blank" className="text-[#ee2b2b] hover:underline font-medium">
+                    Kullanım Koşulları
+                  </Link>
+                  {' '}ve{' '}
+                  <Link href="/gizlilik-politikasi" target="_blank" className="text-[#ee2b2b] hover:underline font-medium">
+                    Gizlilik Politikası
+                  </Link>
+                  &apos;nı okudum ve kabul ediyorum. <span className="text-red-500">*</span>
+                </label>
+              </div>
+              
+              {/* KVKK Onayı */}
+              <div className="flex items-start gap-3">
+                <input 
+                  type="checkbox" 
+                  id="acceptKVKK"
+                  checked={acceptKVKK}
+                  onChange={(e) => setAcceptKVKK(e.target.checked)}
+                  className="mt-1 h-4 w-4 rounded border-gray-300 text-[#ee2b2b] focus:ring-[#ee2b2b]" 
+                />
+                <label htmlFor="acceptKVKK" className="text-sm text-gray-700">
+                  <Link href="/kvkk" target="_blank" className="text-[#ee2b2b] hover:underline font-medium">
+                    KVKK Aydınlatma Metni
+                  </Link>
+                  &apos;ni okudum, kişisel verilerimin işlenmesini kabul ediyorum. <span className="text-red-500">*</span>
+                </label>
+              </div>
+              
+              {/* Pazarlama İzni (Opsiyonel) */}
+              <div className="flex items-start gap-3">
+                <input 
+                  type="checkbox" 
+                  id="acceptMarketing"
+                  checked={acceptMarketing}
+                  onChange={(e) => setAcceptMarketing(e.target.checked)}
+                  className="mt-1 h-4 w-4 rounded border-gray-300 text-[#ee2b2b] focus:ring-[#ee2b2b]" 
+                />
+                <label htmlFor="acceptMarketing" className="text-sm text-gray-700">
+                  Kampanya, indirim ve yeni ürünlerden haberdar olmak için e-posta ve SMS almak istiyorum. (İsteğe bağlı)
+                </label>
+              </div>
             </div>
 
             <button
