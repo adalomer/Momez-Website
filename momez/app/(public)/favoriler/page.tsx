@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import toast, { Toaster } from 'react-hot-toast'
 import { favoritesAPI, authAPI, cartAPI } from '@/lib/api'
+import { useLanguage } from '@/lib/i18n'
 
 interface FavoriteItem {
   id: number
@@ -23,6 +24,7 @@ export default function FavoritesPage() {
   const router = useRouter()
   const [favorites, setFavorites] = useState<FavoriteItem[]>([])
   const [loading, setLoading] = useState(true)
+  const { t, language } = useLanguage()
 
   useEffect(() => {
     checkAuthAndLoadFavorites()
@@ -42,7 +44,7 @@ export default function FavoritesPage() {
       }
     } catch (error) {
       console.error('Favorites load error:', error)
-      toast.error('Favoriler yüklenemedi')
+      toast.error(t('common.error'))
     } finally {
       setLoading(false)
     }
@@ -53,12 +55,12 @@ export default function FavoritesPage() {
       const result = await favoritesAPI.remove(productId) as { success: boolean; error?: string }
       if (result.success) {
         setFavorites(items => items.filter(i => i.product_id !== productId))
-        toast.success('Favorilerden çıkarıldı')
+        toast.success(t('favorites.removed'))
       } else {
-        toast.error(result.error || 'Çıkarılamadı')
+        toast.error(result.error || t('common.error'))
       }
     } catch (error) {
-      toast.error('Bir hata oluştu')
+      toast.error(t('common.error'))
     }
   }
 
@@ -68,7 +70,7 @@ export default function FavoritesPage() {
         <Toaster position="top-center" />
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4">Yükleniyor...</p>
+          <p className="mt-4">{t('common.loading')}</p>
         </div>
       </div>
     )
@@ -80,23 +82,23 @@ export default function FavoritesPage() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-2">
-            Favorilerim
+            {t('favorites.title')}
           </h1>
           <p className="text-lg text-slate-700 dark:text-slate-300 font-medium">
-            Beğendiğiniz ürünler burada
+            {t('favorites.subtitle')}
           </p>
         </div>
 
         {favorites.length === 0 ? (
           <div className="text-center py-16 bg-white dark:bg-slate-800 rounded-2xl border-2 border-slate-200 dark:border-slate-700 shadow-lg">
             <p className="text-slate-900 dark:text-white text-xl font-bold mb-4">
-              Henüz favori ürününüz yok
+              {t('favorites.empty')}
             </p>
             <Link
               href="/"
               className="inline-block px-8 py-4 bg-gradient-to-r from-primary to-primary-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all"
             >
-              Ürünleri Keşfet
+              {t('favorites.explore')}
             </Link>
           </div>
         ) : (
@@ -112,7 +114,7 @@ export default function FavoritesPage() {
                   />
                   {item.stock === 0 && (
                     <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                      <span className="text-white font-semibold">Stokta Yok</span>
+                      <span className="text-white font-semibold">{t('product.outOfStock')}</span>
                     </div>
                   )}
                 </Link>
@@ -147,7 +149,7 @@ export default function FavoritesPage() {
                       className="group/remove flex-1 px-4 py-3 border-2 border-red-300 dark:border-red-600 text-red-700 dark:text-red-400 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/30 transition-all flex items-center justify-center gap-2 font-bold"
                     >
                       <Trash2 className="w-4 h-4 group-hover/remove:scale-110 transition-transform" />
-                      Çıkar
+                      {t('cart.remove')}
                     </button>
                   </div>
                 </div>

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { ArrowLeft, Package, MapPin, CreditCard, Clock } from 'lucide-react'
 import toast, { Toaster } from 'react-hot-toast'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
 
 interface OrderItem {
   id: string
@@ -38,6 +39,7 @@ interface Order {
 }
 
 export default function OrderDetailPage() {
+  const { t, language } = useLanguage()
   const params = useParams()
   const router = useRouter()
   const [order, setOrder] = useState<Order | null>(null)
@@ -55,10 +57,10 @@ export default function OrderDetailPage() {
       if (data.success) {
         setOrder(data.data)
       } else {
-        toast.error('Sipariş yüklenirken hata oluştu')
+        toast.error(t('common.error'))
       }
     } catch (error) {
-      toast.error('Bağlantı hatası')
+      toast.error(t('common.error'))
     } finally {
       setLoading(false)
     }
@@ -75,13 +77,13 @@ export default function OrderDetailPage() {
       const data = await response.json()
       
       if (data.success) {
-        toast.success('Sipariş durumu güncellendi')
+        toast.success(t('admin.updateSuccess'))
         fetchOrder()
       } else {
-        toast.error(data.error || 'Güncelleme başarısız')
+        toast.error(data.error || t('common.error'))
       }
     } catch (error) {
-      toast.error('Güncelleme hatası')
+      toast.error(t('common.error'))
     }
   }
 
@@ -94,24 +96,36 @@ export default function OrderDetailPage() {
     cancelled: 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400',
   }
 
-  const statusLabels: Record<string, string> = {
-    pending: 'Beklemede',
-    confirmed: 'Onaylandı',
-    preparing: 'Hazırlanıyor',
-    shipped: 'Kargoda',
-    delivered: 'Teslim Edildi',
-    cancelled: 'İptal',
+  const getStatusLabel = (status: string) => {
+    const labels: Record<string, string> = {
+      pending: t('admin.pending'),
+      confirmed: t('admin.confirmed'),
+      preparing: t('admin.processing'),
+      shipped: t('admin.shipped'),
+      delivered: t('admin.delivered'),
+      cancelled: t('admin.cancelled'),
+    }
+    return labels[status] || status
   }
 
-  const paymentLabels: Record<string, string> = {
-    cash_on_delivery: 'Kapıda Ödeme',
-    card: 'Kredi Kartı',
+  const getPaymentLabel = (method: string) => {
+    const labels: Record<string, string> = {
+      cash_on_delivery: t('order.cashOnDelivery'),
+      card: t('order.creditCard'),
+    }
+    return labels[method] || method
+  }
+
+  const getLocale = () => {
+    if (language === 'ar') return 'ar-SA'
+    if (language === 'en') return 'en-US'
+    return 'tr-TR'
   }
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <div className="text-slate-600 dark:text-slate-400">Yükleniyor...</div>
+        <div className="text-slate-600 dark:text-slate-400">{t('common.loading')}</div>
       </div>
     )
   }
@@ -119,7 +133,7 @@ export default function OrderDetailPage() {
   if (!order) {
     return (
       <div className="flex items-center justify-center h-96">
-        <div className="text-slate-600 dark:text-slate-400">Sipariş bulunamadı</div>
+        <div className="text-slate-600 dark:text-slate-400">{t('order.notFound')}</div>
       </div>
     )
   }
@@ -138,7 +152,7 @@ export default function OrderDetailPage() {
         </button>
         <div className="flex-1">
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-            Sipariş Detayı
+            {t('order.detail')}
           </h1>
           <p className="text-slate-600 dark:text-slate-400 mt-1">
             {order.order_number}
@@ -150,12 +164,12 @@ export default function OrderDetailPage() {
             onChange={(e) => updateOrderStatus(e.target.value)}
             className="w-full px-4 py-3 border-2 border-slate-400 dark:border-slate-500 rounded-xl bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-bold hover:border-primary focus:border-primary focus:ring-2 focus:ring-primary-200 transition-all"
           >
-            <option value="pending">Beklemede</option>
-            <option value="confirmed">Onaylandı</option>
-            <option value="preparing">Hazırlanıyor</option>
-            <option value="shipped">Kargoda</option>
-            <option value="delivered">Teslim Edildi</option>
-            <option value="cancelled">İptal</option>
+            <option value="pending">{t('admin.pending')}</option>
+            <option value="confirmed">{t('admin.confirmed')}</option>
+            <option value="preparing">{t('admin.processing')}</option>
+            <option value="shipped">{t('admin.shipped')}</option>
+            <option value="delivered">{t('admin.delivered')}</option>
+            <option value="cancelled">{t('admin.cancelled')}</option>
           </select>
         </div>
       </div>
@@ -168,7 +182,7 @@ export default function OrderDetailPage() {
             <div className="flex items-center gap-2 mb-4">
               <Package className="h-5 w-5 text-slate-600 dark:text-slate-400" />
               <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
-                Sipariş Ürünleri
+                {t('order.products')}
               </h2>
             </div>
             
@@ -180,15 +194,15 @@ export default function OrderDetailPage() {
                       {item.product_name}
                     </h3>
                     <p className="text-sm text-slate-600 dark:text-slate-400">
-                      Beden: {item.size} • Adet: {item.quantity}
+                      {t('order.size')}: {item.size} • {t('order.quantity')}: {item.quantity}
                     </p>
                   </div>
                   <div className="text-right">
                     <p className="font-medium text-slate-900 dark:text-white">
-                      ₺{(item.price * item.quantity).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      ₺{(item.price * item.quantity).toLocaleString(getLocale(), { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </p>
                     <p className="text-sm text-slate-500 dark:text-slate-400">
-                      ₺{item.price.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} / adet
+                      ₺{item.price.toLocaleString(getLocale(), { minimumFractionDigits: 2, maximumFractionDigits: 2 })} / {t('order.perItem')}
                     </p>
                   </div>
                 </div>
@@ -198,16 +212,16 @@ export default function OrderDetailPage() {
             {/* Toplam */}
             <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700 space-y-2">
               <div className="flex justify-between text-slate-600 dark:text-slate-400">
-                <span>Ara Toplam</span>
-                <span>₺{order.subtotal?.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                <span>{t('order.subtotal')}</span>
+                <span>₺{order.subtotal?.toLocaleString(getLocale(), { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               </div>
               <div className="flex justify-between text-slate-600 dark:text-slate-400">
-                <span>Kargo</span>
-                <span>₺{order.shipping_cost?.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                <span>{t('order.shipping')}</span>
+                <span>₺{order.shipping_cost?.toLocaleString(getLocale(), { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               </div>
               <div className="flex justify-between text-lg font-bold text-slate-900 dark:text-white pt-2 border-t border-slate-200 dark:border-slate-700">
-                <span>Toplam</span>
-                <span>₺{order.total?.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                <span>{t('order.total')}</span>
+                <span>₺{order.total?.toLocaleString(getLocale(), { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               </div>
             </div>
           </div>
@@ -217,7 +231,7 @@ export default function OrderDetailPage() {
             <div className="flex items-center gap-2 mb-4">
               <MapPin className="h-5 w-5 text-slate-600 dark:text-slate-400" />
               <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
-                Teslimat Adresi
+                {t('order.deliveryAddress')}
               </h2>
             </div>
             
@@ -234,7 +248,7 @@ export default function OrderDetailPage() {
                   </p>
                 )}
                 {order.phone && <p className="flex items-center gap-2">
-                  <span className="text-slate-500">Tel:</span>
+                  <span className="text-slate-500">{t('order.phone')}:</span>
                   <a href={`tel:${order.phone}`} className="text-blue-600 hover:underline">
                     {order.phone}
                   </a>
@@ -248,7 +262,7 @@ export default function OrderDetailPage() {
                   </p>
                 )}
                 {order.postal_code && (
-                  <p className="text-sm text-slate-500">Posta Kodu: {order.postal_code}</p>
+                  <p className="text-sm text-slate-500">{t('order.postalCode')}: {order.postal_code}</p>
                 )}
                 {(order.city || order.district) && (
                   <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
@@ -259,7 +273,7 @@ export default function OrderDetailPage() {
                       className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
                     >
                       <MapPin className="w-4 h-4" />
-                      Haritada Göster
+                      {t('order.showOnMap')}
                     </a>
                   </div>
                 )}
@@ -267,8 +281,7 @@ export default function OrderDetailPage() {
             ) : (
               <div className="p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
                 <p className="text-amber-700 dark:text-amber-400 text-sm">
-                  <strong>Not:</strong> Bu sipariş için kayıtlı adres bilgisi bulunamadı. 
-                  Eski siparişlerde adres verileri ayrı bir tabloda saklanmamış olabilir.
+                  <strong>{t('order.note')}:</strong> {t('order.noAddressFound')}
                 </p>
               </div>
             )}
@@ -280,32 +293,32 @@ export default function OrderDetailPage() {
           {/* Sipariş Bilgileri */}
           <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
             <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
-              Sipariş Bilgileri
+              {t('order.orderInfo')}
             </h2>
             
             <div className="space-y-3">
               <div>
-                <p className="text-sm text-slate-500 dark:text-slate-400">Durum</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">{t('admin.status')}</p>
                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium mt-1 ${
                   statusColors[order.status as keyof typeof statusColors] || statusColors.pending
                 }`}>
-                  {statusLabels[order.status] || order.status}
+                  {getStatusLabel(order.status)}
                 </span>
               </div>
               
               <div>
-                <p className="text-sm text-slate-500 dark:text-slate-400">Sipariş Tarihi</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">{t('order.orderDate')}</p>
                 <p className="text-slate-900 dark:text-white">
-                  {new Date(order.created_at).toLocaleString('tr-TR')}
+                  {new Date(order.created_at).toLocaleString(getLocale())}
                 </p>
               </div>
               
               <div>
-                <p className="text-sm text-slate-500 dark:text-slate-400">Ödeme Yöntemi</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">{t('order.paymentMethod')}</p>
                 <div className="flex items-center gap-2 mt-1">
                   <CreditCard className="h-4 w-4 text-slate-600 dark:text-slate-400" />
                   <span className="text-slate-900 dark:text-white">
-                    {paymentLabels[order.payment_method] || order.payment_method}
+                    {getPaymentLabel(order.payment_method)}
                   </span>
                 </div>
               </div>
@@ -315,7 +328,7 @@ export default function OrderDetailPage() {
           {/* Müşteri Bilgileri */}
           <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
             <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
-              Müşteri Bilgileri
+              {t('order.customerInfo')}
             </h2>
             
             <div className="space-y-2">
@@ -332,7 +345,7 @@ export default function OrderDetailPage() {
           {order.notes && (
             <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
               <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
-                Sipariş Notu
+                {t('order.orderNote')}
               </h2>
               <p className="text-slate-700 dark:text-slate-300">
                 {order.notes}

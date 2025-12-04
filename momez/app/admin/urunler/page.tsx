@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Search, Plus, Edit, Trash2, Upload, X, Save } from 'lucide-react'
 import toast, { Toaster } from 'react-hot-toast'
 import { uploadAPI } from '@/lib/api'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
 
 interface Product {
   id: string
@@ -20,6 +21,7 @@ interface Product {
 }
 
 export default function AdminProductsPage() {
+  const { t } = useLanguage()
   const [searchTerm, setSearchTerm] = useState('')
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
@@ -63,10 +65,10 @@ export default function AdminProductsPage() {
       if (data.success) {
         setProducts(data.data || [])
       } else {
-        toast.error('Ürünler yüklenirken hata oluştu')
+        toast.error(t('common.error'))
       }
     } catch (error) {
-      toast.error('Bağlantı hatası')
+      toast.error(t('common.error'))
     } finally {
       setLoading(false)
     }
@@ -100,7 +102,7 @@ export default function AdminProductsPage() {
     if (!file) return
 
     if (!file.type.startsWith('image/')) {
-      toast.error('Lütfen bir resim dosyası seçin')
+      toast.error(t('common.error'))
       return
     }
 
@@ -113,13 +115,13 @@ export default function AdminProductsPage() {
           ...prev,
           images: [...prev.images, imageUrl]
         }))
-        toast.success('Görsel yüklendi')
+        toast.success(t('common.success'))
       } else {
-        toast.error(result.error || 'Görsel yüklenemedi')
+        toast.error(result.error || t('common.error'))
       }
     } catch (error) {
       console.error('Upload error:', error)
-      toast.error('Görsel yüklenirken hata oluştu')
+      toast.error(t('common.error'))
     } finally {
       setUploadingImage(false)
       e.target.value = ''
@@ -137,12 +139,12 @@ export default function AdminProductsPage() {
     if (!selectedProduct) return
 
     if (!editForm.price || parseFloat(editForm.price) <= 0) {
-      toast.error('Geçerli bir fiyat girin')
+      toast.error(t('common.error'))
       return
     }
 
     if (editForm.images.length === 0) {
-      toast.error('En az bir görsel gerekli')
+      toast.error(t('common.error'))
       return
     }
 
@@ -167,19 +169,19 @@ export default function AdminProductsPage() {
       const data = await response.json()
 
       if (data.success) {
-        toast.success('Ürün güncellendi')
+        toast.success(t('admin.updateSuccess'))
         setShowEditModal(false)
         fetchProducts()
       } else {
-        toast.error(data.error || 'Güncelleme başarısız')
+        toast.error(data.error || t('common.error'))
       }
     } catch (error) {
-      toast.error('Bir hata oluştu')
+      toast.error(t('common.error'))
     }
   }
 
   const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`"${name}" ürününü silmek istediğinize emin misiniz?`)) {
+    if (!confirm(t('admin.deleteConfirm'))) {
       return
     }
 
@@ -194,13 +196,13 @@ export default function AdminProductsPage() {
       const data = await response.json()
       
       if (data.success) {
-        toast.success('Ürün silindi')
+        toast.success(t('admin.deleteSuccess'))
         fetchProducts()
       } else {
-        toast.error(data.error || 'Ürün silinemedi')
+        toast.error(data.error || t('common.error'))
       }
     } catch (error) {
-      toast.error('Silme işlemi başarısız')
+      toast.error(t('common.error'))
     }
   }
 
@@ -220,10 +222,10 @@ export default function AdminProductsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-            Ürün Yönetimi
+            {t('admin.productManagement')}
           </h1>
           <p className="text-slate-600 dark:text-slate-400 mt-1">
-            {filteredProducts.length} ürün
+            {filteredProducts.length} {t('admin.products')}
           </p>
         </div>
         <Link 
@@ -231,7 +233,7 @@ export default function AdminProductsPage() {
           className="px-4 py-2 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors flex items-center gap-2"
         >
           <Plus className="h-5 w-5" />
-          Yeni Ürün
+          {t('admin.newProduct')}
         </Link>
       </div>
 
@@ -240,7 +242,7 @@ export default function AdminProductsPage() {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
         <input
           type="text"
-          placeholder="Ürün ara..."
+          placeholder={t('admin.searchProduct')}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
@@ -251,11 +253,11 @@ export default function AdminProductsPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {loading ? (
           <div className="col-span-full p-12 text-center text-slate-500">
-            Yükleniyor...
+            {t('common.loading')}
           </div>
         ) : filteredProducts.length === 0 ? (
           <div className="col-span-full p-12 text-center text-slate-500">
-            {searchTerm ? 'Ürün bulunamadı' : 'Henüz ürün eklenmemiş'}
+            {searchTerm ? t('admin.productNotFound') : t('admin.noProducts')}
           </div>
         ) : (
           filteredProducts.map((product) => {
@@ -274,12 +276,12 @@ export default function AdminProductsPage() {
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-slate-400">
-                      Görsel Yok
+                      {t('admin.noImage')}
                     </div>
                   )}
                   {hasDiscount && (
                     <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold">
-                      İNDİRİM
+                      {t('admin.discount')}
                     </div>
                   )}
                 </div>
@@ -314,10 +316,10 @@ export default function AdminProductsPage() {
                         ? 'text-orange-600 dark:text-orange-400'
                         : 'text-green-600 dark:text-green-400'
                     }`}>
-                      Stok: {totalStock}
+                      {t('admin.stock')}: {totalStock}
                     </span>
                     <span className="text-slate-500 dark:text-slate-400">
-                      {product.category?.name || 'Kategori yok'}
+                      {product.category?.name || t('admin.noCategory')}
                     </span>
                   </div>
 
@@ -327,7 +329,7 @@ export default function AdminProductsPage() {
                       className="flex-1 px-3 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center justify-center gap-2"
                     >
                       <Edit className="h-4 w-4" />
-                      Düzenle
+                      {t('common.edit')}
                     </button>
                     <button
                       onClick={() => handleDelete(product.id, product.name)}
@@ -348,13 +350,13 @@ export default function AdminProductsPage() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
           <div className="bg-white dark:bg-slate-800 rounded-xl max-w-4xl w-full p-6 my-8">
             <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-6">
-              Ürün Düzenle: {selectedProduct.name}
+              {t('admin.productEdit')}: {selectedProduct.name}
             </h2>
 
             {/* Ürün Adı */}
             <div className="mb-6">
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Ürün Adı *
+                {t('admin.productNameLabel')}
               </label>
               <input
                 type="text"
@@ -368,7 +370,7 @@ export default function AdminProductsPage() {
             {/* Açıklama */}
             <div className="mb-6">
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Açıklama *
+                {t('admin.descriptionLabel')}
               </label>
               <textarea
                 rows={4}
@@ -382,7 +384,7 @@ export default function AdminProductsPage() {
             {/* Kategori */}
             <div className="mb-6">
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Kategori *
+                {t('admin.categoryLabel')}
               </label>
               <select
                 value={editForm.category_id}
@@ -390,7 +392,7 @@ export default function AdminProductsPage() {
                 className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
                 required
               >
-                <option value="">Kategori Seçin</option>
+                <option value="">{t('admin.selectCategory')}</option>
                 {categories.map((cat) => (
                   <option key={cat.id} value={cat.id}>
                     {cat.name}
@@ -403,7 +405,7 @@ export default function AdminProductsPage() {
               {/* Fiyat */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                  Fiyat (₺) *
+                  {t('admin.priceLabel')}
                 </label>
                 <input
                   type="number"
@@ -418,7 +420,7 @@ export default function AdminProductsPage() {
               {/* İndirimli Fiyat */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                  İndirimli Fiyat (₺)
+                  {t('admin.discountPriceLabel')}
                 </label>
                 <input
                   type="number"
@@ -426,7 +428,6 @@ export default function AdminProductsPage() {
                   value={editForm.discount_price}
                   onChange={(e) => setEditForm(prev => ({ ...prev, discount_price: e.target.value }))}
                   className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
-                  placeholder="İndirim yoksa boş bırakın"
                 />
               </div>
             </div>
@@ -434,13 +435,13 @@ export default function AdminProductsPage() {
             {/* Görseller */}
             <div className="mt-6">
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
-                Ürün Görselleri
+                {t('admin.productImages')}
               </label>
               
               <div className="grid grid-cols-4 gap-4 mb-4">
                 {editForm.images.map((img, idx) => (
                   <div key={idx} className="relative aspect-square rounded-lg overflow-hidden bg-slate-200 dark:bg-slate-700 group">
-                    <img src={img} alt={`Görsel ${idx + 1}`} className="w-full h-full object-cover" />
+                    <img src={img} alt={`${t('admin.images')} ${idx + 1}`} className="w-full h-full object-cover" />
                     <button
                       onClick={() => removeImage(idx)}
                       className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
@@ -449,7 +450,7 @@ export default function AdminProductsPage() {
                     </button>
                     {idx === 0 && (
                       <div className="absolute bottom-1 left-1 bg-blue-500 text-white text-xs px-2 py-0.5 rounded">
-                        Ana
+                        {t('admin.mainImage')}
                       </div>
                     )}
                   </div>
@@ -459,7 +460,7 @@ export default function AdminProductsPage() {
               <label className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-lg cursor-pointer hover:border-primary transition-colors">
                 <Upload className="h-5 w-5 text-slate-500" />
                 <span className="text-sm text-slate-600 dark:text-slate-400">
-                  {uploadingImage ? 'Yükleniyor...' : 'Yeni Görsel Ekle'}
+                  {uploadingImage ? t('admin.uploading') : t('admin.addNewImage')}
                 </span>
                 <input
                   type="file"
@@ -474,7 +475,7 @@ export default function AdminProductsPage() {
             {/* Stok Yönetimi */}
             <div className="mt-6">
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
-                Stok Güncelle (Beden 36-46)
+                {t('admin.updateStock')}
               </label>
               <div className="grid grid-cols-4 gap-3">
                 {Array.from({ length: 11 }, (_, i) => (36 + i).toString()).map((size) => {
@@ -509,14 +510,14 @@ export default function AdminProductsPage() {
                 }}
                 className="flex-1 px-4 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700"
               >
-                İptal
+                {t('common.cancel')}
               </button>
               <button
                 onClick={handleUpdateProduct}
                 className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 flex items-center justify-center gap-2"
               >
                 <Save className="h-5 w-5" />
-                Kaydet
+                {t('common.save')}
               </button>
             </div>
           </div>

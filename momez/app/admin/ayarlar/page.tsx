@@ -3,8 +3,10 @@
 import { useState, useEffect } from 'react'
 import { Save } from 'lucide-react'
 import toast, { Toaster } from 'react-hot-toast'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
 
 export default function AdminSettingsPage() {
+  const { t } = useLanguage()
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [settings, setSettings] = useState({
@@ -54,7 +56,7 @@ export default function AdminSettingsPage() {
         })
       }
     } catch (error) {
-      toast.error('Ayarlar yüklenemedi')
+      toast.error(t('common.error'))
     } finally {
       setLoading(false)
     }
@@ -74,12 +76,12 @@ export default function AdminSettingsPage() {
       const data = await response.json()
       
       if (data.success) {
-        toast.success('Ayarlar kaydedildi')
+        toast.success(t('admin.saveSuccess'))
       } else {
-        toast.error(data.error || 'Kaydetme başarısız')
+        toast.error(data.error || t('common.error'))
       }
     } catch (error) {
-      toast.error('Kaydetme hatası')
+      toast.error(t('common.error'))
     } finally {
       setSaving(false)
     }
@@ -92,7 +94,7 @@ export default function AdminSettingsPage() {
   if (loading) {
     return (
       <div className="p-12 text-center text-slate-500">
-        Yükleniyor...
+        {t('common.loading')}
       </div>
     )
   }
@@ -104,10 +106,10 @@ export default function AdminSettingsPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-          Genel Ayarlar
+          {t('admin.generalSettings')}
         </h1>
         <p className="text-slate-600 dark:text-slate-400 mt-1">
-          Site ayarlarını yönetin
+          {t('admin.manageSettings')}
         </p>
       </div>
 
@@ -117,12 +119,12 @@ export default function AdminSettingsPage() {
           {/* Site Info */}
           <div>
             <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
-              Site Bilgileri
+              {t('admin.siteInfo')}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
-                  Site Adı
+                  {t('admin.siteName')}
                 </label>
                 <input
                   type="text"
@@ -133,7 +135,7 @@ export default function AdminSettingsPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
-                  Site Sloganı
+                  {t('admin.siteSlogan')}
                 </label>
                 <input
                   type="text"
@@ -144,7 +146,7 @@ export default function AdminSettingsPage() {
               </div>
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
-                  Site Açıklaması
+                  {t('admin.siteDescription')}
                 </label>
                 <textarea
                   rows={3}
@@ -159,12 +161,12 @@ export default function AdminSettingsPage() {
           {/* Contact Info */}
           <div className="pt-6 border-t border-slate-200 dark:border-slate-700">
             <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
-              İletişim Bilgileri
+              {t('admin.contactInfo')}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
-                  E-posta
+                  {t('admin.email')}
                 </label>
                 <input
                   type="email"
@@ -175,7 +177,7 @@ export default function AdminSettingsPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
-                  Telefon
+                  {t('admin.phone')}
                 </label>
                 <input
                   type="tel"
@@ -186,7 +188,7 @@ export default function AdminSettingsPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
-                  WhatsApp
+                  {t('admin.whatsapp')}
                 </label>
                 <input
                   type="tel"
@@ -197,7 +199,7 @@ export default function AdminSettingsPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
-                  Adres
+                  {t('admin.address')}
                 </label>
                 <input
                   type="text"
@@ -212,12 +214,12 @@ export default function AdminSettingsPage() {
           {/* Shipping Settings */}
           <div className="pt-6 border-t border-slate-200 dark:border-slate-700">
             <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
-              Kargo Ayarları
+              {t('admin.shippingSettings')}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
-                  Ücretsiz Kargo Limiti (TL)
+                  {t('admin.freeShippingLimit')}
                 </label>
                 <input
                   type="number"
@@ -228,7 +230,7 @@ export default function AdminSettingsPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
-                  Standart Kargo Ücreti (TL)
+                  {t('admin.standardShippingFee')}
                 </label>
                 <input
                   type="number"
@@ -243,7 +245,7 @@ export default function AdminSettingsPage() {
           {/* Social Media */}
           <div className="pt-6 border-t border-slate-200 dark:border-slate-700">
             <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
-              Sosyal Medya
+              {t('admin.socialMedia')}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -301,7 +303,7 @@ export default function AdminSettingsPage() {
               className="px-6 py-3 bg-primary hover:bg-primary/90 disabled:opacity-50 text-white font-medium rounded-lg transition-colors flex items-center gap-2"
             >
               <Save className="h-5 w-5" />
-              {saving ? 'Kaydediliyor...' : 'Ayarları Kaydet'}
+              {saving ? t('admin.saving') : t('admin.saveSettings')}
             </button>
           </div>
         </form>

@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react'
 import { productsAPI, cartAPI, favoritesAPI } from '@/lib/api'
 import toast, { Toaster } from 'react-hot-toast'
 import { useRouter } from 'next/navigation'
+import { useLanguage } from '@/lib/i18n'
 
 export default function ProductDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const router = useRouter()
@@ -15,6 +16,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
   const [selectedSize, setSelectedSize] = useState<string>('')
   const [quantity, setQuantity] = useState(1)
   const [selectedImage, setSelectedImage] = useState(0)
+  const { t, language } = useLanguage()
 
   useEffect(() => {
     loadProduct()
@@ -30,12 +32,12 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
         setProduct(result.data)
         // Otomatik seçim kaldırıldı - Kullanıcı beden seçmeli
       } else {
-        toast.error(result.error || 'Ürün bulunamadı')
+        toast.error(result.error || t('common.error'))
         router.push('/')
       }
     } catch (error) {
       console.error('Product load error:', error)
-      toast.error('Ürün yüklenirken hata oluştu')
+      toast.error(t('common.error'))
       router.push('/')
     } finally {
       setLoading(false)
@@ -44,7 +46,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
 
   const handleAddToCart = async () => {
     if (!selectedSize) {
-      toast.error('Lütfen beden seçin')
+      toast.error(t('product.pleaseSelectSize'))
       return
     }
 
@@ -52,11 +54,11 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
       const result = await cartAPI.add(product.id, selectedSize, quantity) as { success: boolean; error?: string }
       
       if (result.success) {
-        toast.success('Ürün sepete eklendi')
+        toast.success(t('product.addedToCart'))
       } else {
         // Giriş gerekiyor
         if (result.error?.includes('Giriş')) {
-          toast.error('Sepete eklemek için giriş yapmalısınız', {
+          toast.error(t('product.loginRequired'), {
             duration: 3000,
             icon: '🔒'
           })
@@ -64,11 +66,11 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
             router.push(`/auth/login?redirect=/urun/${product.slug}`)
           }, 1500)
         } else {
-          toast.error(result.error || 'Sepete eklenemedi')
+          toast.error(result.error || t('common.error'))
         }
       }
     } catch (error) {
-      toast.error('Sepete eklenirken hata oluştu')
+      toast.error(t('common.error'))
     }
   }
 
@@ -77,10 +79,10 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
       const result = await favoritesAPI.add(product.id) as { success: boolean; error?: string }
       
       if (result.success) {
-        toast.success('Favorilere eklendi', { id: 'favorite-add' })
+        toast.success(t('product.addedToFavorites'), { id: 'favorite-add' })
       } else {
         if (result.error?.includes('Giriş')) {
-          toast.error('Favorilere eklemek için giriş yapmalısınız', {
+          toast.error(t('product.loginRequired'), {
             duration: 3000,
             icon: '🔒',
             id: 'favorite-error'
@@ -89,11 +91,11 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
             router.push(`/auth/login?redirect=/urun/${product.slug}`)
           }, 1500)
         } else {
-          toast.error(result.error || 'Favorilere eklenemedi', { id: 'favorite-error' })
+          toast.error(result.error || t('common.error'), { id: 'favorite-error' })
         }
       }
     } catch (error) {
-      toast.error('Favorilere eklenirken hata oluştu', { id: 'favorite-error' })
+      toast.error(t('common.error'), { id: 'favorite-error' })
     }
   }
 
@@ -103,7 +105,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
         <Toaster position="top-center" />
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#ee2b2b] mx-auto"></div>
-          <p className="mt-4 text-gray-600">Yükleniyor...</p>
+          <p className="mt-4 text-gray-600">{t('common.loading')}</p>
         </div>
       </div>
     )
@@ -121,8 +123,8 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
       
       <div className="container mx-auto px-4 py-8">
         {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 mb-8">
-          <Link href="/" className="hover:text-primary-500 dark:hover:text-primary-400 transition-colors">Ana Sayfa</Link>
+        <div className={`flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 mb-8 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
+          <Link href="/" className="hover:text-primary-500 dark:hover:text-primary-400 transition-colors">{t('nav.home')}</Link>
           <span>/</span>
           {product.category && (
             <>
@@ -173,7 +175,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
                 </>
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-slate-400 dark:text-slate-500">
-                  Görsel Yok
+                  {t('product.noImage')}
                 </div>
               )}
             </div>
@@ -213,7 +215,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
 
             {/* Beden Seçimi */}
             <div className="mb-6">
-              <label className="block text-sm font-medium mb-3 text-slate-900 dark:text-white">Beden Seç</label>
+              <label className="block text-sm font-medium mb-3 text-slate-900 dark:text-white">{t('product.selectSize')}</label>
               <div className="grid grid-cols-6 gap-2">
                 {Array.from({ length: 11 }, (_, i) => 36 + i).map((size) => {
                   const sizeStr = size.toString()
@@ -238,12 +240,12 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
                       </button>
                       {hasStock && (
                         <span className="text-xs text-center mt-1 text-green-600 dark:text-green-400 font-medium">
-                          {quantity} adet
+                          {quantity} {t('product.stockCount')}
                         </span>
                       )}
                       {!hasStock && (
                         <span className="text-xs text-center mt-1 text-slate-400 dark:text-slate-600">
-                          Yok
+                          {t('product.notAvailable')}
                         </span>
                       )}
                     </div>
@@ -252,14 +254,14 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
               </div>
               {selectedSize && (
                 <p className="text-sm text-slate-600 dark:text-slate-400 mt-2">
-                  Stok: {availableStock} adet
+                  {t('product.stock')}: {availableStock} {t('product.stockCount')}
                 </p>
               )}
             </div>
 
             {/* Miktar */}
             <div className="mb-6">
-              <label className="block text-sm font-medium mb-3 text-slate-900 dark:text-white">Miktar</label>
+              <label className="block text-sm font-medium mb-3 text-slate-900 dark:text-white">{t('product.quantity')}</label>
               <div className="flex items-center gap-4">
                 <button
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
@@ -286,7 +288,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
                 className="w-full px-6 py-4 border-2 border-primary-500 bg-white dark:bg-transparent text-primary-500 hover:bg-primary-500 hover:text-white font-bold rounded-xl shadow-lg hover:shadow-xl flex items-center justify-center gap-2 transition-all transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
                 <ShoppingCart className="w-5 h-5" />
-                Sepete Ekle
+                {t('product.addToCart')}
               </button>
               
               <button
@@ -294,7 +296,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
                 className="w-full px-6 py-4 border-2 border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white font-bold rounded-lg flex items-center justify-center gap-2 transition-all duration-300"
               >
                 <Heart className="w-5 h-5" />
-                Favorilere Ekle
+                {t('product.addToFavorites')}
               </button>
             </div>
 
@@ -302,11 +304,11 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
             <div className="border-t border-border-light dark:border-border-dark pt-6 space-y-4">
               <div className="flex items-center gap-3 text-slate-700 dark:text-slate-300">
                 <Truck className="w-5 h-5" />
-                <span>Ücretsiz kargo (150 TL üzeri)</span>
+                <span>{t('product.freeShipping')}</span>
               </div>
               {product.description && (
                 <div className="pt-4">
-                  <h3 className="font-semibold mb-2 text-slate-900 dark:text-white">Ürün Açıklaması</h3>
+                  <h3 className="font-semibold mb-2 text-slate-900 dark:text-white">{t('product.description')}</h3>
                   <p className="text-slate-600 dark:text-slate-400 whitespace-pre-line">{product.description}</p>
                 </div>
               )}

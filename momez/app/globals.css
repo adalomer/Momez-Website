@@ -239,3 +239,85 @@ body, .glass, .glass-dark, .btn-primary, .btn-secondary, input, select, textarea
   backdrop-filter: blur(10px);
   border: 1px solid rgba(45, 45, 45, 0.5);
 }
+
+/* RTL (Right-to-Left) Support for Arabic */
+[dir="rtl"] {
+  text-align: right;
+}
+
+[dir="rtl"] .flex {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .flex-row {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .flex-row-reverse {
+  flex-direction: row;
+}
+
+/* RTL için özel sınıflar - flex için RTL devre dışı bırakmak istediğimizde */
+[dir="rtl"] .ltr-flex {
+  flex-direction: row;
+}
+
+[dir="rtl"] .gap-2,
+[dir="rtl"] .gap-3,
+[dir="rtl"] .gap-4 {
+  /* Gap her iki yönde de çalışır */
+}
+
+/* Navigation ve menülerde RTL düzeltmesi */
+[dir="rtl"] nav .flex {
+  flex-direction: row;
+}
+
+[dir="rtl"] .space-x-2 > * + *,
+[dir="rtl"] .space-x-3 > * + *,
+[dir="rtl"] .space-x-4 > * + * {
+  margin-left: 0;
+  margin-right: var(--tw-space-x-reverse);
+}
+
+/* Icon positions for RTL */
+[dir="rtl"] .ml-2 {
+  margin-left: 0;
+  margin-right: 0.5rem;
+}
+
+[dir="rtl"] .mr-2 {
+  margin-right: 0;
+  margin-left: 0.5rem;
+}
+
+[dir="rtl"] .ml-3 {
+  margin-left: 0;
+  margin-right: 0.75rem;
+}
+
+[dir="rtl"] .mr-3 {
+  margin-right: 0;
+  margin-left: 0.75rem;
+}
+
+[dir="rtl"] .pl-4 {
+  padding-left: 0;
+  padding-right: 1rem;
+}
+
+[dir="rtl"] .pr-4 {
+  padding-right: 0;
+  padding-left: 1rem;
+}
+
+/* RTL için border düzeltmeleri */
+[dir="rtl"] .border-l {
+  border-left: 0;
+  border-right-width: 1px;
+}
+
+[dir="rtl"] .border-r {
+  border-right: 0;
+  border-left-width: 1px;
+}

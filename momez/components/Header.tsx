@@ -5,6 +5,8 @@ import { usePathname, useRouter } from 'next/navigation'
 import { ShoppingCart, Heart, User, Search, Menu, X, LogOut, Sun, Moon } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
+import LanguageSwitcher from './LanguageSwitcher'
+import { useLanguage } from '@/lib/i18n'
 
 interface UserData {
   id: number
@@ -153,16 +155,18 @@ export default function Header() {
       }, 500)
     } catch (error) {
       console.error('Logout error:', error)
-      toast.error('Çıkış yapılırken hata oluştu', { id: 'logout' })
+      toast.error(t('common.error'), { id: 'logout' })
     }
   }
 
+  const { t } = useLanguage()
+
   const navLinks = [
-    { href: '/', label: 'Ana Sayfa' },
-    { href: '/kategori/erkek', label: 'Erkek' },
-    { href: '/kategori/kadin', label: 'Kadın' },
-    { href: '/kategori/cocuk', label: 'Çocuk' },
-    { href: '/kampanyalar', label: 'Kampanyalar' },
+    { href: '/', label: t('nav.home') },
+    { href: '/kategori/erkek', label: t('nav.men') },
+    { href: '/kategori/kadin', label: t('nav.women') },
+    { href: '/kategori/cocuk', label: t('nav.kids') },
+    { href: '/kampanyalar', label: t('nav.campaigns') },
   ]
 
   return (
@@ -203,7 +207,7 @@ export default function Header() {
             <Link
               href="/sepet"
               className="relative flex items-center justify-center rounded-xl h-11 w-11 text-red-500 hover:bg-red-500 hover:text-white transition-all duration-300 hover:scale-110"
-              aria-label="Sepet"
+              aria-label={t('nav.cart')}
             >
               <ShoppingCart className="h-5 w-5 transition-all duration-300" />
               {cartCount > 0 && (
@@ -216,7 +220,7 @@ export default function Header() {
             <Link
               href="/favoriler"
               className="flex items-center justify-center rounded-xl h-11 w-11 text-red-500 hover:bg-red-500 hover:text-white transition-all duration-300 hover:scale-110 group"
-              aria-label="Favoriler"
+              aria-label={t('nav.favorites')}
             >
               <Heart className="h-5 w-5 transition-all duration-300 group-hover:fill-current" />
             </Link>
@@ -255,20 +259,20 @@ export default function Header() {
                       href="/profil"
                       className="block px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all font-medium"
                     >
-                      Profilim
+                      {t('nav.profile')}
                     </Link>
                     <Link
                       href="/profil/siparisler"
                       className="block px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all font-medium"
                     >
-                      Siparişlerim
+                      {t('admin.orders')}
                     </Link>
                     <button
                       onClick={handleLogout}
                       className="w-full text-left px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg flex items-center gap-2 transition-all font-medium"
                     >
                       <LogOut className="h-4 w-4" />
-                      Çıkış Yap
+                      {t('nav.logout')}
                     </button>
                   </div>
                 </div>
@@ -277,7 +281,7 @@ export default function Header() {
               <Link
                 href="/auth/login"
                 className="flex items-center justify-center rounded-xl h-11 w-11 hover:bg-accent-lighter hover:text-primary-600 transition-all hover:scale-105"
-                aria-label="Giriş Yap"
+                aria-label={t('nav.login')}
               >
                 <User className="h-5 w-5" />
               </Link>
@@ -295,6 +299,9 @@ export default function Header() {
                 <Sun className="h-5 w-5 transition-all duration-300" />
               )}
             </button>
+
+            {/* Language Switcher */}
+            <LanguageSwitcher />
 
             {/* Mobile Menu Button */}
             <button

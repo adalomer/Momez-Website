@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react'
 import { productsAPI, categoriesAPI } from '@/lib/api'
 import toast, { Toaster } from 'react-hot-toast'
 import ProductCard from '@/components/ProductCard'
+import { useLanguage } from '@/lib/i18n'
 
 interface UserData {
   id: string
@@ -20,6 +21,7 @@ export default function HomePage() {
   const [categories, setCategories] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState<UserData | null>(null)
+  const { t, language } = useLanguage()
 
   useEffect(() => {
     loadData()
@@ -65,7 +67,7 @@ export default function HomePage() {
       }
     } catch (error) {
       console.error('Data load error:', error)
-      toast.error('Veriler yüklenirken hata oluştu')
+      toast.error(t('common.error'))
     } finally {
       setLoading(false)
     }
@@ -77,7 +79,7 @@ export default function HomePage() {
         <Toaster position="top-center" />
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#ee2b2b] mx-auto"></div>
-          <p className="mt-4 text-gray-600">Yükleniyor...</p>
+          <p className="mt-4 text-gray-600">{t('common.loading')}</p>
         </div>
       </div>
     )
@@ -90,18 +92,18 @@ export default function HomePage() {
       {/* Hero Banner */}
       <section className="relative h-[500px] bg-gradient-to-r from-[#ee2b2b] to-red-700 mb-16">
         <div className="container mx-auto px-4 h-full flex items-center">
-          <div className="text-white max-w-2xl">
+          <div className={`text-white max-w-2xl ${language === 'ar' ? 'text-right mr-auto' : ''}`}>
             <h1 className="text-5xl font-bold mb-4">
-              Yeni Sezon Koleksiyonu
+              {t('home.hero.title')}
             </h1>
             <p className="text-xl mb-8">
-              En trend ayakkabı modelleri ve özel indirimler sizi bekliyor
+              {t('home.hero.subtitle')}
             </p>
             <Link
               href="/kategori/tum-urunler"
               className="inline-block bg-white text-[#ee2b2b] px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition"
             >
-              Alışverişe Başla
+              {t('home.hero.cta')}
             </Link>
           </div>
         </div>
@@ -112,7 +114,7 @@ export default function HomePage() {
         {campaigns.length > 0 && (
           <section className="mb-16">
             <div className="flex items-center justify-between mb-8">
-				<h2 className="text-2xl font-bold text-red-600">Aktif Kampanyalar</h2>
+				<h2 className="text-2xl font-bold text-red-600">{t('home.activeCampaigns')}</h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {campaigns.map((campaign) => (
@@ -143,7 +145,7 @@ export default function HomePage() {
                     <h3 className="font-bold text-lg mb-1">{campaign.title}</h3>
                     <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{campaign.description}</p>
                     <div className="text-xs text-gray-500 mt-2">
-                      {new Date(campaign.end_date).toLocaleDateString('tr-TR')} tarihine kadar
+                      {new Date(campaign.end_date).toLocaleDateString(language === 'ar' ? 'ar-SA' : language === 'en' ? 'en-US' : 'tr-TR')} {t('home.untilDate')}
                     </div>
                   </div>
                 </div>
@@ -155,15 +157,15 @@ export default function HomePage() {
         {/* Kategoriler */}
         <section className="mb-16">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl font-bold text-red-500">Kategoriler</h2>
+            <h2 className="text-2xl font-bold text-red-500">{t('home.categories')}</h2>
             <Link href="/kategoriler" className="text-[#ee2b2b] hover:underline">
-              Tümünü Gör
+              {t('home.viewAll')}
             </Link>
           </div>
           
           {categories.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
-              Henüz kategori eklenmemiş
+              {t('home.noCategories')}
             </div>
           ) : (
             <div className="relative">
@@ -194,7 +196,7 @@ export default function HomePage() {
                         {category.name}
                       </p>
                       <p className="text-center text-xs text-gray-500">
-                        {category.product_count || 0} ürün
+                        {category.product_count || 0} {t('home.products')}
                       </p>
                     </Link>
                   ))}
@@ -208,23 +210,23 @@ export default function HomePage() {
         <section>
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h2 className="text-2xl font-bold mb-2 text-red-500">Öne Çıkan Ürünler</h2>
-              <p className="text-red-500">En çok satılan ve beğenilen ürünler</p>
+              <h2 className="text-2xl font-bold mb-2 text-red-500">{t('home.featured')}</h2>
+              <p className="text-red-500">{t('home.featuredDesc')}</p>
             </div>
             <Link href="/kategori/tum-urunler" className="text-[#ee2b2b] hover:underline">
-              Tümünü Gör
+              {t('home.viewAll')}
             </Link>
           </div>
           
           {products.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-gray-500 mb-4">Henüz ürün eklenmemiş</p>
+              <p className="text-gray-500 mb-4">{t('home.noProducts')}</p>
               {user?.role === 'admin' && (
                 <Link 
                   href="/admin/urunler/yeni" 
                   className="inline-block bg-[#ee2b2b] text-white px-6 py-2 rounded-lg hover:bg-red-700 transition"
                 >
-                  İlk ürünü ekle
+                  {t('home.addFirstProduct')}
                 </Link>
               )}
             </div>

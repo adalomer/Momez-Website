@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import toast, { Toaster } from 'react-hot-toast'
 import { cartAPI, authAPI } from '@/lib/api'
+import { useLanguage } from '@/lib/i18n'
 
 interface CartItem {
   id: string
@@ -26,6 +27,7 @@ export default function CartPage() {
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState<any>(null)
   const [shippingSettings, setShippingSettings] = useState({ freeLimit: 500, fee: 50 })
+  const { t, language } = useLanguage()
 
   useEffect(() => {
     checkAuthAndLoadCart()
@@ -71,7 +73,7 @@ export default function CartPage() {
       }
     } catch (error) {
       console.error('Cart load error:', error)
-      toast.error('Sepet yüklenemedi')
+      toast.error(t('common.error'))
     } finally {
       setLoading(false)
     }
@@ -84,7 +86,7 @@ export default function CartPage() {
     if (!item) return
     
     if (newQuantity > item.stock) {
-      toast.error('Stok miktarını aştınız')
+      toast.error(t('cart.stockExceeded'))
       return
     }
 
@@ -97,12 +99,12 @@ export default function CartPage() {
       // Sonra API'ye gönder
       const result = await cartAPI.add(item.product_id, item.size, newQuantity) as { success: boolean; error?: string }
       if (!result.success) {
-        toast.error(result.error || 'Miktar güncellenemedi')
+        toast.error(result.error || t('common.error'))
         // Hata durumunda geri al
         await checkAuthAndLoadCart()
       }
     } catch (error) {
-      toast.error('Bir hata oluştu')
+      toast.error(t('common.error'))
       await checkAuthAndLoadCart()
     }
   }
@@ -112,12 +114,12 @@ export default function CartPage() {
       const result = await cartAPI.remove(itemId) as { success: boolean; error?: string }
       if (result.success) {
         setCartItems(items => items.filter(i => i.id !== itemId))
-        toast.success('Ürün sepetten çıkarıldı')
+        toast.success(t('cart.itemRemoved'))
       } else {
-        toast.error(result.error || 'Ürün çıkarılamadı')
+        toast.error(result.error || t('common.error'))
       }
     } catch (error) {
-      toast.error('Bir hata oluştu')
+      toast.error(t('common.error'))
     }
   }
 
@@ -132,7 +134,7 @@ export default function CartPage() {
         <Toaster position="top-center" />
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4">Yükleniyor...</p>
+          <p className="mt-4">{t('common.loading')}</p>
         </div>
       </div>
     )
@@ -143,19 +145,19 @@ export default function CartPage() {
       <Toaster position="top-center" />
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-8">
-          Sepetim
+          {t('cart.title')}
         </h1>
 
         {cartItems.length === 0 ? (
           <div className="text-center py-16 bg-white dark:bg-slate-800 rounded-xl">
             <p className="text-slate-600 dark:text-slate-400 text-lg mb-4">
-              Sepetiniz boş
+              {t('cart.empty')}
             </p>
             <Link
               href="/"
               className="inline-block px-6 py-3 bg-primary hover:bg-primary/90 text-white font-bold rounded-lg transition-colors"
             >
-              Alışverişe Başla
+              {t('cart.continue')}
             </Link>
           </div>
         ) : (
@@ -182,7 +184,7 @@ export default function CartPage() {
                           </h3>
                         </Link>
                         <p className="text-sm text-slate-600 dark:text-slate-400">
-                          Beden: {item.size}
+                          {t('product.size')}: {item.size}
                         </p>
                       </div>
                       
@@ -226,30 +228,30 @@ export default function CartPage() {
             <div className="lg:col-span-1">
               <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 sticky top-4">
                 <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-6">
-                  Sipariş Özeti
+                  {t('checkout.summary')}
                 </h2>
                 
                 <div className="space-y-3 mb-6">
                   <div className="flex justify-between text-slate-600 dark:text-slate-400">
-                    <span>Ara Toplam</span>
+                    <span>{t('cart.subtotal')}</span>
                     <span>₺{subtotal.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-slate-600 dark:text-slate-400">
-                    <span>Kargo</span>
-                    <span>{shipping === 0 ? 'Ücretsiz' : `₺${shipping.toFixed(2)}`}</span>
+                    <span>{t('cart.shipping')}</span>
+                    <span>{shipping === 0 ? t('cart.freeShipping') : `₺${shipping.toFixed(2)}`}</span>
                   </div>
                   {shipping === 0 && (
                     <p className="text-xs text-green-600 dark:text-green-400">
-                      ✓ {shippingSettings.freeLimit} TL ve üzeri alışverişlerde kargo ücretsiz
+                      ✓ {t('cart.freeShippingNote').replace('{limit}', shippingSettings.freeLimit.toString())}
                     </p>
                   )}
                   {remainingForFreeShipping > 0 && shipping > 0 && (
                     <p className="text-xs text-slate-500">
-                      {remainingForFreeShipping.toFixed(2)} TL daha alışveriş yapın, kargo ücretsiz olsun
+                      {t('cart.remainingForFree').replace('{amount}', remainingForFreeShipping.toFixed(2))}
                     </p>
                   )}
                   <div className="border-t border-slate-200 dark:border-slate-700 pt-3 flex justify-between text-lg font-bold text-slate-900 dark:text-white">
-                    <span>Toplam</span>
+                    <span>{t('cart.total')}</span>
                     <span>₺{total.toFixed(2)}</span>
                   </div>
                 </div>
@@ -258,7 +260,7 @@ export default function CartPage() {
                   href="/siparis"
                   className="block w-full px-6 py-3 bg-primary hover:bg-primary/90 text-white font-bold rounded-lg text-center transition-colors"
                 >
-                  Siparişi Tamamla
+                  {t('cart.checkout')}
                 </Link>
               </div>
             </div>

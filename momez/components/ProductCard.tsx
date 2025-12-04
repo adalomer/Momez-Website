@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 import { cartAPI, favoritesAPI, authAPI } from '@/lib/api'
+import { useLanguage } from '@/lib/i18n'
 
 interface Product {
   id: string
@@ -27,12 +28,13 @@ export default function ProductCard({ product, user }: ProductCardProps) {
   const [showSizeModal, setShowSizeModal] = useState(false)
   const [selectedSize, setSelectedSize] = useState<string>('')
   const [adding, setAdding] = useState(false)
+  const { t } = useLanguage()
 
   const displayPrice = product.discount_price || product.price
 
   const handleAddToCart = async () => {
     if (!user) {
-      toast.error('Sepete eklemek için giriş yapın', {
+      toast.error(t('product.loginRequired'), {
         duration: 2000,
         icon: '🔒'
       })
@@ -40,7 +42,7 @@ export default function ProductCard({ product, user }: ProductCardProps) {
     }
 
     if (!product.in_stock) {
-      toast.error('Bu ürün stokta yok')
+      toast.error(t('product.outOfStock'))
       return
     }
 
@@ -49,7 +51,7 @@ export default function ProductCard({ product, user }: ProductCardProps) {
 
   const handleAddToFavorites = async () => {
     if (!user) {
-      toast.error('Favorilere eklemek için giriş yapın', {
+      toast.error(t('product.loginRequired'), {
         duration: 2000,
         icon: '🔒'
       })
@@ -59,18 +61,18 @@ export default function ProductCard({ product, user }: ProductCardProps) {
     try {
       const result = await favoritesAPI.add(product.id)
       if (result.success) {
-        toast.success('Favorilere eklendi')
+        toast.success(t('product.addedToFavorites'))
       } else {
-        toast.error(result.error || 'Favorilere eklenemedi')
+        toast.error(result.error || t('common.error'))
       }
     } catch (error) {
-      toast.error('Bir hata oluştu')
+      toast.error(t('common.error'))
     }
   }
 
   const confirmAddToCart = async () => {
     if (!selectedSize) {
-      toast.error('Lütfen bir beden seçin')
+      toast.error(t('product.pleaseSelectSize'))
       return
     }
 
@@ -78,14 +80,14 @@ export default function ProductCard({ product, user }: ProductCardProps) {
     try {
       const result = await cartAPI.add(product.id, selectedSize, 1)
       if (result.success) {
-        toast.success('Ürün sepete eklendi')
+        toast.success(t('product.addedToCart'))
         setShowSizeModal(false)
         setSelectedSize('')
       } else {
-        toast.error(result.error || 'Sepete eklenemedi')
+        toast.error(result.error || t('common.error'))
       }
     } catch (error) {
-      toast.error('Bir hata oluştu')
+      toast.error(t('common.error'))
     } finally {
       setAdding(false)
     }
@@ -109,17 +111,17 @@ export default function ProductCard({ product, user }: ProductCardProps) {
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-gray-400">
-                Görsel Yok
+                {t('product.noImage')}
               </div>
             )}
             {!product.in_stock && (
               <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                <span className="text-white font-semibold">Stokta Yok</span>
+                <span className="text-white font-semibold">{t('product.outOfStock')}</span>
               </div>
             )}
             {product.discount_price && (
               <div className="absolute top-2 right-2 bg-[#ee2b2b] text-white px-2 py-1 rounded text-sm font-bold">
-                %{Math.round((1 - product.discount_price / product.price) * 100)} İNDİRİM
+                %{Math.round((1 - product.discount_price / product.price) * 100)} {t('product.discount')}
               </div>
             )}
           </div>
@@ -153,7 +155,7 @@ export default function ProductCard({ product, user }: ProductCardProps) {
             <button
               onClick={handleAddToFavorites}
               className="group/fav flex-1 p-2.5 border-2 border-border-light dark:border-border-dark hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-all duration-300"
-              title="Favorilere Ekle"
+              title={t('product.addToFavorites')}
             >
               <Heart className="w-5 h-5 mx-auto text-slate-600 dark:text-slate-400 transition-all group-hover/fav:fill-primary-500 group-hover/fav:text-primary-500 group-hover/fav:scale-110" />
             </button>
@@ -161,10 +163,10 @@ export default function ProductCard({ product, user }: ProductCardProps) {
               onClick={handleAddToCart}
               className="flex-1 px-3 py-2.5 border-2 border-red-500 bg-white text-red-500 hover:bg-red-500 hover:text-white rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-bold"
               disabled={!product.in_stock}
-              title="Sepete Ekle"
+              title={t('product.addToCart')}
             >
               <ShoppingCart className="w-5 h-5" />
-              <span className="text-sm font-bold">Sepete Ekle</span>
+              <span className="text-sm font-bold">{t('product.addToCart')}</span>
             </button>
           </div>
         </div>
@@ -174,7 +176,7 @@ export default function ProductCard({ product, user }: ProductCardProps) {
       {showSizeModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
           <div className="bg-white dark:bg-surface-dark rounded-xl max-w-md w-full p-6 shadow-2xl border border-border-light dark:border-border-dark animate-scale-in">
-            <h3 className="text-xl font-bold mb-4 text-slate-900 dark:text-white">Beden Seçin</h3>
+            <h3 className="text-xl font-bold mb-4 text-slate-900 dark:text-white">{t('product.selectSize')}</h3>
             <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
               {product.name}
             </p>
@@ -214,14 +216,14 @@ export default function ProductCard({ product, user }: ProductCardProps) {
                 className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition"
                 disabled={adding}
               >
-                İptal
+                {t('common.cancel')}
               </button>
               <button
                 onClick={confirmAddToCart}
                 disabled={!selectedSize || adding}
                 className="flex-1 px-4 py-2 bg-[#ee2b2b] text-white rounded-lg hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {adding ? 'Ekleniyor...' : 'Sepete Ekle'}
+                {adding ? t('common.loading') : t('product.addToCart')}
               </button>
             </div>
           </div>

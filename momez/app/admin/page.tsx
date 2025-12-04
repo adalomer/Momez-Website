@@ -10,6 +10,7 @@ import {
   AlertCircle
 } from 'lucide-react'
 import toast, { Toaster } from 'react-hot-toast'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
 
 interface Stats {
   totalOrders: number
@@ -36,6 +37,7 @@ interface LowStockProduct {
 }
 
 export default function AdminDashboard() {
+  const { t } = useLanguage()
   const [stats, setStats] = useState<Stats | null>(null)
   const [recentOrders, setRecentOrders] = useState<Order[]>([])
   const [lowStockProducts, setLowStockProducts] = useState<LowStockProduct[]>([])
@@ -55,11 +57,11 @@ export default function AdminDashboard() {
         setRecentOrders(data.data.recentOrders)
         setLowStockProducts(data.data.lowStockProducts)
       } else {
-        toast.error('Veriler yüklenemedi')
+        toast.error(t('common.error'))
       }
     } catch (error) {
       console.error('Dashboard load error:', error)
-      toast.error('Bir hata oluştu')
+      toast.error(t('common.error'))
     } finally {
       setLoading(false)
     }
@@ -67,12 +69,12 @@ export default function AdminDashboard() {
 
   const getStatusBadge = (status: string) => {
     const badges: Record<string, { label: string; class: string }> = {
-      pending: { label: 'Beklemede', class: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' },
-      confirmed: { label: 'Onaylandı', class: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' },
-      preparing: { label: 'Hazırlanıyor', class: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400' },
-      shipped: { label: 'Kargoda', class: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400' },
-      delivered: { label: 'Teslim Edildi', class: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' },
-      cancelled: { label: 'İptal', class: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' },
+      pending: { label: t('admin.pending'), class: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' },
+      confirmed: { label: t('admin.confirmed'), class: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' },
+      preparing: { label: t('admin.processing'), class: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400' },
+      shipped: { label: t('admin.shipped'), class: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400' },
+      delivered: { label: t('admin.delivered'), class: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' },
+      cancelled: { label: t('admin.cancelled'), class: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' },
     }
     return badges[status] || badges.pending
   }
@@ -83,7 +85,7 @@ export default function AdminDashboard() {
         <Toaster position="top-center" />
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4">Yükleniyor...</p>
+          <p className="mt-4">{t('common.loading')}</p>
         </div>
       </div>
     )
@@ -94,9 +96,9 @@ export default function AdminDashboard() {
       <Toaster position="top-center" />
       
       <div>
-        <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Dashboard</h1>
+        <h1 className="text-3xl font-bold text-slate-900 dark:text-white">{t('admin.dashboard')}</h1>
         <p className="text-slate-600 dark:text-slate-400 mt-1">
-          Hoş geldiniz! İşletmenizin genel durumu.
+          {t('admin.welcome')}! {t('admin.welcomeSubtitle')}.
         </p>
       </div>
 
@@ -111,7 +113,7 @@ export default function AdminDashboard() {
           <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">
             {stats?.totalOrders || 0}
           </h3>
-          <p className="text-sm text-slate-600 dark:text-slate-400">Toplam Sipariş</p>
+          <p className="text-sm text-slate-600 dark:text-slate-400">{t('admin.totalOrders')}</p>
         </div>
 
         <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm">
@@ -123,7 +125,7 @@ export default function AdminDashboard() {
           <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">
             ₺{Number(stats?.totalRevenue || 0).toFixed(2)}
           </h3>
-          <p className="text-sm text-slate-600 dark:text-slate-400">Toplam Gelir</p>
+          <p className="text-sm text-slate-600 dark:text-slate-400">{t('admin.totalRevenue')}</p>
         </div>
 
         <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm">
@@ -135,7 +137,7 @@ export default function AdminDashboard() {
           <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">
             {stats?.totalProducts || 0}
           </h3>
-          <p className="text-sm text-slate-600 dark:text-slate-400">Toplam Ürün</p>
+          <p className="text-sm text-slate-600 dark:text-slate-400">{t('admin.totalProducts')}</p>
         </div>
 
         <Link href="/admin/musteriler" className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow">
@@ -147,7 +149,7 @@ export default function AdminDashboard() {
           <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">
             {stats?.totalCustomers || 0}
           </h3>
-          <p className="text-sm text-slate-600 dark:text-slate-400">Toplam Müşteri</p>
+          <p className="text-sm text-slate-600 dark:text-slate-400">{t('admin.totalCustomers')}</p>
         </Link>
       </div>
 
@@ -156,15 +158,15 @@ export default function AdminDashboard() {
         <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
           <div className="p-6 border-b border-slate-200 dark:border-slate-700">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-bold text-slate-900 dark:text-white">Son Siparişler</h2>
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white">{t('admin.recentOrders')}</h2>
               <Link href="/admin/siparisler" className="text-sm text-primary hover:underline">
-                Tümünü Gör
+                {t('admin.viewAll')}
               </Link>
             </div>
           </div>
           <div className="p-6">
             {recentOrders.length === 0 ? (
-              <p className="text-center text-slate-500 py-8">Henüz sipariş yok</p>
+              <p className="text-center text-slate-500 py-8">{t('admin.noOrders')}</p>
             ) : (
               <div className="space-y-4">
                 {recentOrders.map((order) => {
@@ -200,26 +202,26 @@ export default function AdminDashboard() {
         <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
           <div className="p-6 border-b border-slate-200 dark:border-slate-700">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-bold text-slate-900 dark:text-white">Düşük Stok Uyarıları</h2>
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white">{t('admin.lowStockAlerts')}</h2>
               <AlertCircle className="h-5 w-5 text-red-500" />
             </div>
           </div>
           <div className="p-6">
             {lowStockProducts.length === 0 ? (
-              <p className="text-center text-slate-500 py-8">Düşük stoklu ürün yok</p>
+              <p className="text-center text-slate-500 py-8">{t('admin.noLowStock')}</p>
             ) : (
               <div className="space-y-4">
                 {lowStockProducts.map((product) => (
                   <div key={`${product.id}-${product.size}`} className="flex items-center justify-between py-3 border-b border-slate-100 dark:border-slate-700 last:border-0">
                     <div>
                       <p className="font-medium text-slate-900 dark:text-white">{product.name}</p>
-                      <p className="text-sm text-slate-600 dark:text-slate-400">Beden: {product.size}</p>
+                      <p className="text-sm text-slate-600 dark:text-slate-400">{t('admin.size')} {product.size}</p>
                     </div>
                     <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                       product.stock <= 3 ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' : 
                       'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
                     }`}>
-                      {product.stock} adet
+                      {product.stock} {t('admin.pieces')}
                     </span>
                   </div>
                 ))}

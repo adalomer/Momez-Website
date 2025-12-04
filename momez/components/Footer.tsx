@@ -2,9 +2,11 @@
 
 import Link from 'next/link'
 import { Facebook, Instagram } from 'lucide-react'
+import { useLanguage } from '@/lib/i18n'
 
 export default function Footer() {
   const currentYear = new Date().getFullYear()
+  const { t } = useLanguage()
 
   return (
     <footer className="bg-white dark:bg-background-dark border-t border-slate-200/80 dark:border-slate-800/80">
@@ -21,7 +23,7 @@ export default function Footer() {
               <span className="text-xl font-bold text-slate-900 dark:text-white">momez</span>
             </div>
             <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
-              Premium ayakkabı koleksiyonları ile stil ve konforun buluşma noktası.
+              {t('home.hero.subtitle')}
             </p>
             <div className="flex gap-3">
               <a
@@ -47,31 +49,31 @@ export default function Footer() {
 
           {/* Shop Links */}
           <div>
-            <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">Alışveriş</h3>
+            <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">{t('nav.categories')}</h3>
             <ul className="space-y-2">
               <li>
                 <Link href="/kategori/erkek" className="text-sm text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
-                  Erkek Ayakkabı
+                  {t('nav.men')}
                 </Link>
               </li>
               <li>
                 <Link href="/kategori/kadin" className="text-sm text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
-                  Kadın Ayakkabı
+                  {t('nav.women')}
                 </Link>
               </li>
               <li>
                 <Link href="/kategori/spor" className="text-sm text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
-                  Spor Ayakkabı
+                  {t('nav.sports')}
                 </Link>
               </li>
               <li>
                 <Link href="/kategori/cocuk" className="text-sm text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
-                  Çocuk Ayakkabı
+                  {t('nav.kids')}
                 </Link>
               </li>
               <li>
                 <Link href="/indirim" className="text-sm text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
-                  İndirimli Ürünler
+                  {t('product.discount')}
                 </Link>
               </li>
             </ul>
@@ -81,26 +83,26 @@ export default function Footer() {
 
           {/* About Links */}
           <div>
-            <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">Kurumsal</h3>
+            <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">{t('footer.about')}</h3>
             <ul className="space-y-2">
               <li>
                 <Link href="/hakkimizda" className="text-sm text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
-                  Hakkımızda
+                  {t('footer.about')}
                 </Link>
               </li>
               <li>
                 <Link href="/iletisim" className="text-sm text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
-                  İletişim
+                  {t('footer.contact')}
                 </Link>
               </li>
               <li>
                 <Link href="/gizlilik-politikasi" className="text-sm text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
-                  Gizlilik Politikası
+                  {t('footer.privacy')}
                 </Link>
               </li>
               <li>
                 <Link href="/kullanim-kosullari" className="text-sm text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
-                  Kullanım Koşulları
+                  {t('footer.terms')}
                 </Link>
               </li>
             </ul>
@@ -111,11 +113,11 @@ export default function Footer() {
         <div className="mt-12 pt-8 border-t border-slate-200/80 dark:border-slate-800/80">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-sm text-slate-600 dark:text-slate-400">
-              © {currentYear} momez. Tüm Hakları Saklıdır.
+              {t('footer.copyright')}
             </p>
             <div className="flex gap-4">
               <span className="text-sm text-slate-600 dark:text-slate-400">
-                İletişim: <a href="tel:+905551234567" className="hover:text-primary">+90 555 123 4567</a>
+                {t('footer.contact')}: <a href="tel:+905551234567" className="hover:text-primary">+90 555 123 4567</a>
               </span>
               <span className="text-sm text-slate-600 dark:text-slate-400">
                 Email: <a href="mailto:iletisim@momez.com" className="hover:text-primary">iletisim@momez.com</a>

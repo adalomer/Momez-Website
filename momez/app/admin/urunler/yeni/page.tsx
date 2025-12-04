@@ -34,7 +34,7 @@ export default function AdminProductFormPage() {
     tags: ''
   })
   
-  const [sizeStocks, setSizeStocks] = useState<Record<string, number>>({})
+  const [sizeStocks, setSizeStocks] = useState<Record<string, string>>({})
 
   const availableSizes = ['36', '37', '38', '39', '40', '41', '42', '43', '44', '45', '46']
 
@@ -55,20 +55,15 @@ export default function AdminProductFormPage() {
         : [...prev, size]
       
       if (!newSizes.includes(size)) {
-        const newStocks = {...sizeStocks}
-        delete newStocks[size]
-        setSizeStocks(newStocks)
+        setSizeStocks(prev => {
+          const newStocks = {...prev}
+          delete newStocks[size]
+          return newStocks
+        })
       }
       
       return newSizes
     })
-  }
-  
-  const handleStockChange = (size: string, value: string) => {
-    setSizeStocks(prev => ({
-      ...prev,
-      [size]: parseInt(value) || 0
-    }))
   }
   
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -134,7 +129,7 @@ export default function AdminProductFormPage() {
     
     const stockData = selectedSizes.map(size => ({
       size,
-      quantity: sizeStocks[size] || 0
+      quantity: parseInt(sizeStocks[size]) || 0
     }))
     
     setLoading(true)
@@ -214,9 +209,8 @@ export default function AdminProductFormPage() {
                   </label>
                   <input
                     type="text"
-                    required
                     value={formData.name}
-                    onChange={e => setFormData({...formData, name: e.target.value})}
+                    onChange={e => setFormData(prev => ({...prev, name: e.target.value}))}
                     placeholder="Örn: AeroGlide Pro"
                     className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
                   />
@@ -227,10 +221,9 @@ export default function AdminProductFormPage() {
                     Açıklama *
                   </label>
                   <textarea
-                    required
                     rows={5}
                     value={formData.description}
-                    onChange={e => setFormData({...formData, description: e.target.value})}
+                    onChange={e => setFormData(prev => ({...prev, description: e.target.value}))}
                     placeholder="Ürün hakkında detaylı açıklama"
                     className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary resize-none"
                   />
@@ -242,9 +235,8 @@ export default function AdminProductFormPage() {
                       Kategori *
                     </label>
                     <select
-                      required
                       value={formData.category_id}
-                      onChange={e => setFormData({...formData, category_id: e.target.value})}
+                      onChange={e => setFormData(prev => ({...prev, category_id: e.target.value}))}
                       className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
                     >
                       <option value="">Kategori Seçin</option>
@@ -259,12 +251,15 @@ export default function AdminProductFormPage() {
                       Fiyat (₺) *
                     </label>
                     <input
-                      type="number"
-                      required
-                      min="0"
-                      step="0.01"
+                      type="text"
+                      inputMode="decimal"
                       value={formData.price}
-                      onChange={e => setFormData({...formData, price: e.target.value})}
+                      onChange={e => {
+                        const val = e.target.value
+                        if (val === '' || /^\d*\.?\d*$/.test(val)) {
+                          setFormData(prev => ({...prev, price: val}))
+                        }
+                      }}
                       placeholder="1899.00"
                       className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
                     />
@@ -278,7 +273,7 @@ export default function AdminProductFormPage() {
                   <input
                     type="text"
                     value={formData.sku}
-                    onChange={e => setFormData({...formData, sku: e.target.value})}
+                    onChange={e => setFormData(prev => ({...prev, sku: e.target.value}))}
                     placeholder="AGLP-2024-001"
                     className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
                   />
@@ -326,10 +321,33 @@ export default function AdminProductFormPage() {
                             {size}
                           </div>
                           <input
-                            type="number"
-                            min="0"
-                            value={sizeStocks[size] || 0}
-                            onChange={e => handleStockChange(size, e.target.value)}
+                            type="text"
+                            inputMode="numeric"
+                            value={sizeStocks[size] ?? ''}
+                            onChange={e => {
+                              const val = e.target.value
+                              // Sadece rakam kabul et, başındaki 0'ları temizle
+                              if (val === '') {
+                                setSizeStocks(prev => ({...prev, [size]: ''}))
+                              } else if (/^\d+$/.test(val)) {
+                                // Başındaki gereksiz 0'ları kaldır (örn: 045 -> 45)
+                                setSizeStocks(prev => ({...prev, [size]: String(parseInt(val))}))
+                              }
+                            }}
+                            onFocus={e => {
+                              // Focus olunca 0 ise temizle
+                              if (e.target.value === '0') {
+                                setSizeStocks(prev => ({...prev, [size]: ''}))
+                              }
+                              e.target.select()
+                            }}
+                            onBlur={e => {
+                              // Boşsa 0 yap
+                              if (e.target.value === '') {
+                                setSizeStocks(prev => ({...prev, [size]: '0'}))
+                              }
+                            }}
+                            placeholder="0"
                             className="flex-1 px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
                           />
                         </div>
@@ -387,7 +405,7 @@ export default function AdminProductFormPage() {
                   <input 
                     type="checkbox" 
                     checked={formData.is_active}
-                    onChange={e => setFormData({...formData, is_active: e.target.checked})}
+                    onChange={e => setFormData(prev => ({...prev, is_active: e.target.checked}))}
                     className="w-5 h-5 rounded border-slate-300 text-primary focus:ring-primary" 
                   />
                   <span className="text-slate-700 dark:text-slate-300">Aktif</span>
@@ -396,7 +414,7 @@ export default function AdminProductFormPage() {
                   <input 
                     type="checkbox"
                     checked={formData.is_featured}
-                    onChange={e => setFormData({...formData, is_featured: e.target.checked})}
+                    onChange={e => setFormData(prev => ({...prev, is_featured: e.target.checked}))}
                     className="w-5 h-5 rounded border-slate-300 text-primary focus:ring-primary" 
                   />
                   <span className="text-slate-700 dark:text-slate-300">Öne Çıkan</span>
@@ -405,7 +423,7 @@ export default function AdminProductFormPage() {
                   <input 
                     type="checkbox"
                     checked={formData.is_new}
-                    onChange={e => setFormData({...formData, is_new: e.target.checked})}
+                    onChange={e => setFormData(prev => ({...prev, is_new: e.target.checked}))}
                     className="w-5 h-5 rounded border-slate-300 text-primary focus:ring-primary" 
                   />
                   <span className="text-slate-700 dark:text-slate-300">Yeni</span>
@@ -420,7 +438,7 @@ export default function AdminProductFormPage() {
               <input
                 type="text"
                 value={formData.tags}
-                onChange={e => setFormData({...formData, tags: e.target.value})}
+                onChange={e => setFormData(prev => ({...prev, tags: e.target.value}))}
                 placeholder="koşu, spor, hafif"
                 className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
               />

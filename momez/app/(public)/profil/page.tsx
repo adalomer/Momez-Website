@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { User, Package, MapPin, LogOut } from 'lucide-react'
 import toast, { Toaster } from 'react-hot-toast'
+import { useLanguage } from '@/lib/i18n'
 
 interface UserData {
   id: string
@@ -23,6 +24,7 @@ export default function ProfilePage() {
     full_name: '',
     phone: ''
   })
+  const { t, language } = useLanguage()
 
   useEffect(() => {
     fetchUser()
@@ -49,7 +51,7 @@ export default function ProfilePage() {
         router.push('/auth/login')
       }
     } catch (error) {
-      toast.error('Kullanıcı bilgileri yüklenemedi')
+      toast.error(t('common.error'))
       router.push('/auth/login')
     } finally {
       setLoading(false)
@@ -70,13 +72,13 @@ export default function ProfilePage() {
       const data = await response.json()
       
       if (data.success) {
-        toast.success('Profil güncellendi')
+        toast.success(t('profile.updated'))
         fetchUser()
       } else {
-        toast.error(data.error || 'Güncelleme başarısız')
+        toast.error(data.error || t('common.error'))
       }
     } catch (error) {
-      toast.error('Güncelleme hatası')
+      toast.error(t('common.error'))
     } finally {
       setSaving(false)
     }
@@ -91,14 +93,14 @@ export default function ProfilePage() {
       // Tam sayfa yenilemesi yap
       window.location.href = '/'
     } catch (error) {
-      toast.error('Çıkış yapılamadı')
+      toast.error(t('common.error'))
     }
   }
 
   if (loading) {
     return (
       <div className="min-h-screen py-12 flex items-center justify-center">
-        <p className="text-slate-600 dark:text-slate-400">Yükleniyor...</p>
+        <p className="text-slate-600 dark:text-slate-400">{t('common.loading')}</p>
       </div>
     )
   }
@@ -109,7 +111,7 @@ export default function ProfilePage() {
       
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-8">
-          Hesabım
+          {t('profile.title')}
         </h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -122,28 +124,28 @@ export default function ProfilePage() {
                   className="flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-primary to-primary-600 text-white font-bold shadow-lg"
                 >
                   <User className="h-5 w-5" />
-                  Profil Bilgileri
+                  {t('profile.info')}
                 </Link>
                 <Link
                   href="/siparislerim"
                   className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-900 dark:text-white hover:bg-red-100 hover:text-primary-600 transition-all font-medium"
                 >
                   <Package className="h-5 w-5" />
-                  Siparişlerim
+                  {t('profile.orders')}
                 </Link>
                 <Link
                   href="/profil/adresler"
                   className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-900 dark:text-white hover:bg-red-100 hover:text-primary-600 transition-all font-medium"
                 >
                   <MapPin className="h-5 w-5" />
-                  Adreslerim
+                  {t('profile.addresses')}
                 </Link>
                 <button
                   onClick={handleLogout}
                   className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-700 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 transition-all font-medium"
                 >
                   <LogOut className="h-5 w-5" />
-                  Çıkış Yap
+                  {t('nav.logout')}
                 </button>
               </div>
             </div>
@@ -153,13 +155,13 @@ export default function ProfilePage() {
           <div className="lg:col-span-3">
             <div className="bg-white dark:bg-surface-dark rounded-xl border-2 border-border-light dark:border-border-dark shadow-lg p-6 transition-colors duration-300">
               <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">
-                Profil Bilgileri
+                {t('profile.info')}
               </h2>
 
               <form className="space-y-6" onSubmit={handleSubmit}>
                 <div>
                   <label className="block text-sm font-bold text-slate-900 dark:text-white mb-2">
-                    E-posta
+                    {t('auth.email')}
                   </label>
                   <input
                     type="email"
@@ -168,13 +170,13 @@ export default function ProfilePage() {
                     className="w-full px-4 py-3 rounded-xl border-2 border-border-light dark:border-border-dark bg-slate-100 dark:bg-slate-900/50 text-slate-700 dark:text-slate-300 font-medium transition-colors duration-300"
                   />
                   <p className="text-sm text-slate-600 dark:text-slate-400 mt-1 font-medium">
-                    E-posta adresi değiştirilemez
+                    {t('profile.emailNote')}
                   </p>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
-                    Ad Soyad
+                    {t('auth.name')}
                   </label>
                   <input
                     type="text"
@@ -186,7 +188,7 @@ export default function ProfilePage() {
 
                 <div>
                   <label className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
-                    Telefon
+                    {t('auth.phone')}
                   </label>
                   <input
                     type="tel"
@@ -203,7 +205,7 @@ export default function ProfilePage() {
                     disabled={saving}
                     className="px-6 py-3 bg-primary hover:bg-primary/90 disabled:opacity-50 text-white font-medium rounded-lg transition-colors"
                   >
-                    {saving ? 'Kaydediliyor...' : 'Değişiklikleri Kaydet'}
+                    {saving ? t('profile.saving') : t('profile.saveChanges')}
                   </button>
                 </div>
               </form>
