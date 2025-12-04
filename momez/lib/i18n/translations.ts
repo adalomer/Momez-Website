@@ -108,6 +108,21 @@ export const translations: Record<Language, Record<string, string>> = {
     'auth.noAccount': 'Hesabınız yok mu?',
     'auth.hasAccount': 'Zaten hesabınız var mı?',
     
+    // Login
+    'login.welcome': 'Hoş Geldiniz',
+    'login.subtitle': 'Hesabınıza giriş yapın',
+    'login.rememberMe': 'Beni hatırla',
+    'login.loggingIn': 'Giriş yapılıyor...',
+    'login.noAccount': 'Hesabınız yok mu?',
+    'login.fillAllFields': 'Lütfen tüm alanları doldurun',
+    'login.success': 'Giriş başarılı! Yönlendiriliyorsunuz...',
+    'login.invalidCredentials': 'E-posta veya şifre hatalı. Lütfen tekrar deneyin.',
+    'login.registerSuccess': 'Kayıt başarılı! Şimdi giriş yapabilirsiniz.',
+    
+    // Logout
+    'logout.loggingOut': 'Çıkış yapılıyor...',
+    'logout.success': 'Başarıyla çıkış yapıldı',
+    
     // Profile
     'profile.title': 'Hesabım',
     'profile.info': 'Profil Bilgileri',
@@ -181,7 +196,9 @@ export const translations: Record<Language, Record<string, string>> = {
     'order.creditCard': 'Kredi Kartı',
     'order.customerInfo': 'Müşteri Bilgileri',
     'order.orderNote': 'Sipariş Notu',
+    'order.orderNotes': 'Sipariş Notu',
     'order.notFound': 'Sipariş bulunamadı',
+    'order.noAddress': 'Bu sipariş için kayıtlı adres bilgisi bulunamadı.',
     
     // Admin Panel
     'admin.title': 'momez Admin',
@@ -294,6 +311,44 @@ export const translations: Record<Language, Record<string, string>> = {
     'admin.deleteSuccess': 'Başarıyla silindi',
     'admin.saveSuccess': 'Başarıyla kaydedildi',
     'admin.updateSuccess': 'Başarıyla güncellendi',
+    'admin.loadError': 'Veriler yüklenirken hata oluştu',
+    
+    // Orders
+    'orders.searchPlaceholder': 'Sipariş ara...',
+    'orders.notFound': 'Sipariş bulunamadı',
+    'orders.productCount': 'Ürün Sayısı',
+    'orders.products': 'ürün',
+    
+    // Categories
+    'categories.newCategory': 'Yeni Kategori',
+    'categories.addNew': 'Yeni Kategori Ekle',
+    'categories.editCategory': 'Kategori Düzenle',
+    'categories.categoryName': 'Kategori Adı',
+    'categories.categoryNamePlaceholder': 'Örn: Erkek Ayakkabı',
+    'categories.categoryImage': 'Kategori Görseli',
+    'categories.selectImage': 'Görsel Seç',
+    'categories.selectNewImage': 'Yeni Görsel Seç',
+    'categories.nameRequired': 'Kategori adı gerekli',
+    'categories.added': 'Kategori eklendi',
+    'categories.updated': 'Kategori güncellendi',
+    'categories.deleted': 'Kategori silindi',
+    
+    // Campaigns
+    'campaigns.newCampaign': 'Yeni Kampanya',
+    'campaigns.addNew': 'Yeni Kampanya Ekle',
+    'campaigns.addCampaign': 'Kampanya Ekle',
+    'campaigns.noCampaigns': 'Henüz kampanya eklenmemiş',
+    'campaigns.title': 'Kampanya Başlığı',
+    'campaigns.image': 'Kampanya Görseli',
+    'campaigns.discountType': 'İndirim Tipi',
+    'campaigns.discountValue': 'İndirim Değeri',
+    'campaigns.percentage': 'Yüzde (%)',
+    'campaigns.fixedAmount': 'Sabit Tutar (₺)',
+    'campaigns.startDate': 'Başlangıç Tarihi',
+    'campaigns.endDate': 'Bitiş Tarihi',
+    'campaigns.fillRequired': 'Lütfen tüm zorunlu alanları doldurun',
+    'campaigns.added': 'Kampanya eklendi',
+    'campaigns.deleted': 'Kampanya silindi',
   },
   
   en: {
@@ -395,6 +450,21 @@ export const translations: Record<Language, Record<string, string>> = {
     'auth.noAccount': "Don't have an account?",
     'auth.hasAccount': 'Already have an account?',
     
+    // Login
+    'login.welcome': 'Welcome',
+    'login.subtitle': 'Sign in to your account',
+    'login.rememberMe': 'Remember me',
+    'login.loggingIn': 'Signing in...',
+    'login.noAccount': "Don't have an account?",
+    'login.fillAllFields': 'Please fill in all fields',
+    'login.success': 'Login successful! Redirecting...',
+    'login.invalidCredentials': 'Invalid email or password. Please try again.',
+    'login.registerSuccess': 'Registration successful! You can now sign in.',
+    
+    // Logout
+    'logout.loggingOut': 'Signing out...',
+    'logout.success': 'Successfully signed out',
+    
     // Profile
     'profile.title': 'My Account',
     'profile.info': 'Profile Information',
@@ -468,6 +538,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'order.creditCard': 'Credit Card',
     'order.customerInfo': 'Customer Information',
     'order.orderNote': 'Order Note',
+    'order.orderNotes': 'Order Notes',
     'order.notFound': 'Order not found',
     
     // Admin Panel
@@ -581,6 +652,46 @@ export const translations: Record<Language, Record<string, string>> = {
     'admin.deleteCustomerWarning': 'This action cannot be undone! All customer orders, addresses and other data will be deleted.',
     'admin.yesDelete': 'Yes, Delete',
     'admin.totalCustomersCount': 'Total {count} customers',
+    
+    // Orders
+    'orders.searchPlaceholder': 'Search orders...',
+    'orders.notFound': 'Order not found',
+    'orders.productCount': 'Products',
+    'orders.products': 'products',
+    
+    // Categories
+    'categories.newCategory': 'New Category',
+    'categories.addNew': 'Add New Category',
+    'categories.editCategory': 'Edit Category',
+    'categories.categoryName': 'Category Name',
+    'categories.categoryNamePlaceholder': 'E.g: Men Shoes',
+    'categories.categoryImage': 'Category Image',
+    'categories.selectImage': 'Select Image',
+    'categories.selectNewImage': 'Select New Image',
+    'categories.nameRequired': 'Category name is required',
+    'categories.added': 'Category added',
+    'categories.updated': 'Category updated',
+    'categories.deleted': 'Category deleted',
+    
+    // Campaigns
+    'campaigns.newCampaign': 'New Campaign',
+    'campaigns.addNew': 'Add New Campaign',
+    'campaigns.addCampaign': 'Add Campaign',
+    'campaigns.noCampaigns': 'No campaigns added yet',
+    'campaigns.title': 'Campaign Title',
+    'campaigns.image': 'Campaign Image',
+    'campaigns.discountType': 'Discount Type',
+    'campaigns.discountValue': 'Discount Value',
+    'campaigns.percentage': 'Percentage (%)',
+    'campaigns.fixedAmount': 'Fixed Amount (₺)',
+    'campaigns.startDate': 'Start Date',
+    'campaigns.endDate': 'End Date',
+    'campaigns.fillRequired': 'Please fill in all required fields',
+    'campaigns.added': 'Campaign added',
+    'campaigns.deleted': 'Campaign deleted',
+    
+    // Admin
+    'admin.loadError': 'Error loading data',
   },
   
   ar: {
@@ -681,6 +792,21 @@ export const translations: Record<Language, Record<string, string>> = {
     'auth.forgotPassword': 'نسيت كلمة المرور',
     'auth.noAccount': 'ليس لديك حساب؟',
     'auth.hasAccount': 'لديك حساب بالفعل؟',
+    
+    // Login
+    'login.welcome': 'مرحباً بك',
+    'login.subtitle': 'قم بتسجيل الدخول إلى حسابك',
+    'login.rememberMe': 'تذكرني',
+    'login.loggingIn': 'جاري تسجيل الدخول...',
+    'login.noAccount': 'ليس لديك حساب؟',
+    'login.fillAllFields': 'يرجى ملء جميع الحقول',
+    'login.success': 'تم تسجيل الدخول بنجاح! جاري التوجيه...',
+    'login.invalidCredentials': 'البريد الإلكتروني أو كلمة المرور غير صحيحة. حاول مرة أخرى.',
+    'login.registerSuccess': 'تم التسجيل بنجاح! يمكنك الآن تسجيل الدخول.',
+    
+    // Logout
+    'logout.loggingOut': 'جاري تسجيل الخروج...',
+    'logout.success': 'تم تسجيل الخروج بنجاح',
     
     // Profile
     'profile.title': 'حسابي',
@@ -862,6 +988,49 @@ export const translations: Record<Language, Record<string, string>> = {
     'order.showOnMap': 'عرض على الخريطة',
     'order.notFound': 'لم يتم العثور على الطلب',
     'order.noAddress': 'لم يتم العثور على معلومات العنوان لهذا الطلب...',
+    'order.phone': 'الهاتف',
+    'order.cashOnDelivery': 'الدفع عند الاستلام',
+    'order.creditCard': 'بطاقة ائتمان',
+    
+    // Orders
+    'orders.searchPlaceholder': 'البحث عن الطلبات...',
+    'orders.notFound': 'لم يتم العثور على طلب',
+    'orders.productCount': 'عدد المنتجات',
+    'orders.products': 'منتج',
+    
+    // Categories
+    'categories.newCategory': 'فئة جديدة',
+    'categories.addNew': 'إضافة فئة جديدة',
+    'categories.editCategory': 'تعديل الفئة',
+    'categories.categoryName': 'اسم الفئة',
+    'categories.categoryNamePlaceholder': 'مثال: أحذية رجالية',
+    'categories.categoryImage': 'صورة الفئة',
+    'categories.selectImage': 'اختر صورة',
+    'categories.selectNewImage': 'اختر صورة جديدة',
+    'categories.nameRequired': 'اسم الفئة مطلوب',
+    'categories.added': 'تمت إضافة الفئة',
+    'categories.updated': 'تم تحديث الفئة',
+    'categories.deleted': 'تم حذف الفئة',
+    
+    // Campaigns
+    'campaigns.newCampaign': 'حملة جديدة',
+    'campaigns.addNew': 'إضافة حملة جديدة',
+    'campaigns.addCampaign': 'إضافة الحملة',
+    'campaigns.noCampaigns': 'لا توجد حملات بعد',
+    'campaigns.title': 'عنوان الحملة',
+    'campaigns.image': 'صورة الحملة',
+    'campaigns.discountType': 'نوع الخصم',
+    'campaigns.discountValue': 'قيمة الخصم',
+    'campaigns.percentage': 'نسبة مئوية (%)',
+    'campaigns.fixedAmount': 'مبلغ ثابت (₺)',
+    'campaigns.startDate': 'تاريخ البدء',
+    'campaigns.endDate': 'تاريخ الانتهاء',
+    'campaigns.fillRequired': 'يرجى ملء جميع الحقول المطلوبة',
+    'campaigns.added': 'تمت إضافة الحملة',
+    'campaigns.deleted': 'تم حذف الحملة',
+    
+    // Admin
+    'admin.loadError': 'حدث خطأ في تحميل البيانات',
   },
 }
 

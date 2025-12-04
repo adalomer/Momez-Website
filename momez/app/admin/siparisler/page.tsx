@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Search } from 'lucide-react'
 import toast, { Toaster } from 'react-hot-toast'
+import { useLanguage } from '@/lib/i18n'
 
 interface Order {
   id: string
@@ -20,6 +21,7 @@ export default function AdminOrdersPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
+  const { t } = useLanguage()
 
   useEffect(() => {
     fetchOrders()
@@ -41,10 +43,10 @@ export default function AdminOrdersPage() {
       if (data.success) {
         setOrders(data.data || [])
       } else {
-        toast.error('Siparişler yüklenirken hata oluştu')
+        toast.error(t('admin.loadError'))
       }
     } catch (error) {
-      toast.error('Bağlantı hatası')
+      toast.error(t('common.error'))
     } finally {
       setLoading(false)
     }
@@ -61,18 +63,18 @@ export default function AdminOrdersPage() {
       const data = await response.json()
       
       if (data.success) {
-        toast.success('Sipariş durumu güncellendi')
+        toast.success(t('admin.updateSuccess'))
         fetchOrders()
       } else {
-        toast.error(data.error || 'Güncelleme başarısız')
+        toast.error(data.error || t('common.error'))
       }
     } catch (error) {
-      toast.error('Güncelleme hatası')
+      toast.error(t('common.error'))
     }
   }
 
   const deleteOrder = async (orderId: string, orderNumber: string) => {
-    if (!confirm(`${orderNumber} numaralı siparişi silmek istediğinize emin misiniz? Bu işlem geri alınamaz.`)) {
+    if (!confirm(t('admin.deleteConfirm'))) {
       return
     }
 
@@ -84,13 +86,13 @@ export default function AdminOrdersPage() {
       const data = await response.json()
       
       if (data.success) {
-        toast.success('Sipariş silindi')
+        toast.success(t('admin.deleteSuccess'))
         fetchOrders()
       } else {
-        toast.error(data.error || 'Silme başarısız')
+        toast.error(data.error || t('common.error'))
       }
     } catch (error) {
-      toast.error('Silme hatası')
+      toast.error(t('common.error'))
     }
   }
 
@@ -104,12 +106,12 @@ export default function AdminOrdersPage() {
   }
 
   const statusLabels: Record<string, string> = {
-    pending: 'Beklemede',
-    confirmed: 'Onaylandı',
-    preparing: 'Hazırlanıyor',
-    shipped: 'Kargoda',
-    delivered: 'Teslim Edildi',
-    cancelled: 'İptal',
+    pending: t('admin.pending'),
+    confirmed: t('admin.confirmed'),
+    preparing: t('admin.processing'),
+    shipped: t('admin.shipped'),
+    delivered: t('admin.delivered'),
+    cancelled: t('admin.cancelled'),
   }
 
   const filteredOrders = orders.filter(order =>
@@ -125,10 +127,10 @@ export default function AdminOrdersPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-          Sipariş Yönetimi
+          {t('admin.orderManagement')}
         </h1>
         <p className="text-slate-600 dark:text-slate-400 mt-1">
-          {filteredOrders.length} sipariş
+          {filteredOrders.length} {t('admin.orders').toLowerCase()}
         </p>
       </div>
 
@@ -137,7 +139,7 @@ export default function AdminOrdersPage() {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
         <input
           type="text"
-          placeholder="Sipariş ara..."
+          placeholder={t('orders.searchPlaceholder')}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
@@ -148,11 +150,11 @@ export default function AdminOrdersPage() {
       <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
         {loading ? (
           <div className="p-12 text-center text-slate-500">
-            Yükleniyor...
+            {t('common.loading')}
           </div>
         ) : filteredOrders.length === 0 ? (
           <div className="p-12 text-center text-slate-500">
-            {searchTerm ? 'Sipariş bulunamadı' : 'Henüz sipariş yok'}
+            {searchTerm ? t('orders.notFound') : t('admin.noOrders')}
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -160,25 +162,25 @@ export default function AdminOrdersPage() {
               <thead className="bg-slate-50 dark:bg-slate-900">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">
-                    Sipariş No
+                    {t('admin.orderNo')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">
-                    Müşteri
+                    {t('admin.customer')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">
-                    Tarih
+                    {t('admin.date')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">
-                    Ürün Sayısı
+                    {t('orders.productCount')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">
-                    Toplam
+                    {t('order.total')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">
-                    Durum
+                    {t('admin.status')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">
-                    İşlem
+                    {t('common.actions')}
                   </th>
                 </tr>
               </thead>
@@ -207,7 +209,7 @@ export default function AdminOrdersPage() {
                       {new Date(order.created_at).toLocaleDateString('tr-TR')}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-slate-700 dark:text-slate-300">
-                      {order.item_count} ürün
+                      {order.item_count} {t('orders.products')}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap font-medium text-slate-900 dark:text-white">
                       ₺{(Number(order.total) || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -236,12 +238,12 @@ export default function AdminOrdersPage() {
                           onChange={(e) => updateOrderStatus(order.id, e.target.value)}
                           className="text-sm border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 cursor-pointer transition-all"
                         >
-                          <option value="pending">Beklemede</option>
-                          <option value="confirmed">Onaylandı</option>
-                          <option value="preparing">Hazırlanıyor</option>
-                          <option value="shipped">Kargoda</option>
-                          <option value="delivered">Teslim Edildi</option>
-                          <option value="cancelled">İptal</option>
+                          <option value="pending">{t('admin.pending')}</option>
+                          <option value="confirmed">{t('admin.confirmed')}</option>
+                          <option value="preparing">{t('admin.processing')}</option>
+                          <option value="shipped">{t('admin.shipped')}</option>
+                          <option value="delivered">{t('admin.delivered')}</option>
+                          <option value="cancelled">{t('admin.cancelled')}</option>
                         </select>
                         <button
                           onClick={() => deleteOrder(order.id, order.order_number)}

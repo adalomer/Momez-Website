@@ -281,7 +281,7 @@ export default function OrderDetailPage() {
             ) : (
               <div className="p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
                 <p className="text-amber-700 dark:text-amber-400 text-sm">
-                  <strong>{t('order.note')}:</strong> {t('order.noAddressFound')}
+                  {t('order.noAddress')}
                 </p>
               </div>
             )}
@@ -345,7 +345,7 @@ export default function OrderDetailPage() {
           {order.notes && (
             <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
               <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
-                {t('order.orderNote')}
+                {t('order.orderNotes')}
               </h2>
               <p className="text-slate-700 dark:text-slate-300">
                 {order.notes}

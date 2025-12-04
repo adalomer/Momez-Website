@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { Plus, Edit, Trash2 } from 'lucide-react'
 import toast, { Toaster } from 'react-hot-toast'
+import { useLanguage } from '@/lib/i18n'
 
 interface Campaign {
   id: string
@@ -21,6 +22,7 @@ export default function AdminCampaignsPage() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
+  const { t } = useLanguage()
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -43,10 +45,10 @@ export default function AdminCampaignsPage() {
       if (data.success) {
         setCampaigns(data.data || [])
       } else {
-        toast.error('Kampanyalar yüklenirken hata oluştu')
+        toast.error(t('admin.loadError'))
       }
     } catch (error) {
-      toast.error('Bağlantı hatası')
+      toast.error(t('common.error'))
     } finally {
       setLoading(false)
     }
@@ -56,7 +58,7 @@ export default function AdminCampaignsPage() {
     e.preventDefault()
     
     if (!formData.title || !formData.discount_value || !formData.start_date || !formData.end_date) {
-      toast.error('Lütfen tüm zorunlu alanları doldurun')
+      toast.error(t('campaigns.fillRequired'))
       return
     }
 
@@ -73,7 +75,7 @@ export default function AdminCampaignsPage() {
       const data = await response.json()
       
       if (data.success) {
-        toast.success('Kampanya eklendi')
+        toast.success(t('campaigns.added'))
         setShowModal(false)
         setFormData({
           title: '',
@@ -86,15 +88,15 @@ export default function AdminCampaignsPage() {
         })
         fetchCampaigns()
       } else {
-        toast.error(data.error || 'Kampanya eklenemedi')
+        toast.error(data.error || t('common.error'))
       }
     } catch (error) {
-      toast.error('Ekleme işlemi başarısız')
+      toast.error(t('common.error'))
     }
   }
 
   const handleDelete = async (id: string, title: string) => {
-    if (!confirm(`"${title}" kampanyasını silmek istediğinize emin misiniz?`)) {
+    if (!confirm(t('admin.deleteConfirm'))) {
       return
     }
 
@@ -106,13 +108,13 @@ export default function AdminCampaignsPage() {
       const data = await response.json()
       
       if (data.success) {
-        toast.success('Kampanya silindi')
+        toast.success(t('campaigns.deleted'))
         fetchCampaigns()
       } else {
-        toast.error(data.error || 'Kampanya silinemedi')
+        toast.error(data.error || t('common.error'))
       }
     } catch (error) {
-      toast.error('Silme işlemi başarısız')
+      toast.error(t('common.error'))
     }
   }
 
@@ -124,10 +126,10 @@ export default function AdminCampaignsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-            Kampanya Yönetimi
+            {t('admin.campaignManagement')}
           </h1>
           <p className="text-slate-600 dark:text-slate-400 mt-1">
-            {campaigns.length} kampanya
+            {campaigns.length} {t('admin.campaigns').toLowerCase()}
           </p>
         </div>
         <button 
@@ -135,18 +137,18 @@ export default function AdminCampaignsPage() {
           className="px-4 py-2 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors flex items-center gap-2"
         >
           <Plus className="h-5 w-5" />
-          Yeni Kampanya
+          {t('campaigns.newCampaign')}
         </button>
       </div>
 
       {/* Campaigns List */}
       {loading ? (
         <div className="p-12 text-center text-slate-500">
-          Yükleniyor...
+          {t('common.loading')}
         </div>
       ) : campaigns.length === 0 ? (
         <div className="p-12 text-center text-slate-500 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
-          Henüz kampanya eklenmemiş
+          {t('campaigns.noCampaigns')}
         </div>
       ) : (
         <div className="space-y-4">
@@ -182,13 +184,13 @@ export default function AdminCampaignsPage() {
                         ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400'
                         : 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-400'
                     }`}>
-                      {campaign.is_active ? 'Aktif' : 'Pasif'}
+                      {campaign.is_active ? t('admin.active') : t('admin.inactive')}
                     </span>
                   </div>
                   
                   <div className="flex items-center gap-6 text-sm text-slate-600 dark:text-slate-400 mb-4">
-                    <span>Başlangıç: {new Date(campaign.start_date).toLocaleDateString('tr-TR')}</span>
-                    <span>Bitiş: {new Date(campaign.end_date).toLocaleDateString('tr-TR')}</span>
+                    <span>{t('campaigns.startDate')}: {new Date(campaign.start_date).toLocaleDateString('tr-TR')}</span>
+                    <span>{t('campaigns.endDate')}: {new Date(campaign.end_date).toLocaleDateString('tr-TR')}</span>
                   </div>
                   
                   <div className="flex gap-2">
@@ -197,7 +199,7 @@ export default function AdminCampaignsPage() {
                       className="px-3 py-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors flex items-center gap-2"
                     >
                       <Trash2 className="h-4 w-4" />
-                      Sil
+                      {t('common.delete')}
                     </button>
                   </div>
                 </div>
@@ -213,14 +215,14 @@ export default function AdminCampaignsPage() {
           <div className="bg-white dark:bg-slate-800 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-slate-200 dark:border-slate-700">
               <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
-                Yeni Kampanya Ekle
+                {t('campaigns.addNew')}
               </h2>
             </div>
             
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
-                  Kampanya Başlığı *
+                  {t('campaigns.title')} *
                 </label>
                 <input
                   type="text"
@@ -233,7 +235,7 @@ export default function AdminCampaignsPage() {
 
               <div>
                 <label className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
-                  Açıklama
+                  {t('admin.description')}
                 </label>
                 <textarea
                   value={formData.description}
@@ -245,7 +247,7 @@ export default function AdminCampaignsPage() {
 
               <div>
                 <label className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
-                  Kampanya Görseli
+                  {t('campaigns.image')}
                 </label>
                 <input
                   type="file"
@@ -272,21 +274,21 @@ export default function AdminCampaignsPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
-                    İndirim Tipi *
+                    {t('campaigns.discountType')} *
                   </label>
                   <select
                     value={formData.discount_type}
                     onChange={(e) => setFormData({ ...formData, discount_type: e.target.value as 'percentage' | 'fixed' })}
                     className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
                   >
-                    <option value="percentage">Yüzde (%)</option>
-                    <option value="fixed">Sabit Tutar (₺)</option>
+                    <option value="percentage">{t('campaigns.percentage')}</option>
+                    <option value="fixed">{t('campaigns.fixedAmount')}</option>
                   </select>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
-                    İndirim Değeri *
+                    {t('campaigns.discountValue')} *
                   </label>
                   <input
                     type="number"
@@ -302,7 +304,7 @@ export default function AdminCampaignsPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
-                    Başlangıç Tarihi *
+                    {t('campaigns.startDate')} *
                   </label>
                   <input
                     type="date"
@@ -315,7 +317,7 @@ export default function AdminCampaignsPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
-                    Bitiş Tarihi *
+                    {t('campaigns.endDate')} *
                   </label>
                   <input
                     type="date"
@@ -333,13 +335,13 @@ export default function AdminCampaignsPage() {
                   onClick={() => setShowModal(false)}
                   className="px-6 py-3 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
                 >
-                  İptal
+                  {t('common.cancel')}
                 </button>
                 <button
                   type="submit"
                   className="px-6 py-3 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors"
                 >
-                  Kampanya Ekle
+                  {t('campaigns.addCampaign')}
                 </button>
               </div>
             </form>

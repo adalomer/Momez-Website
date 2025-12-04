@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import { usePathname } from 'next/navigation'
 import { Language, languages, getTranslation } from './translations'
 
 interface LanguageContextType {
@@ -16,6 +17,7 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>('tr')
   const [mounted, setMounted] = useState(false)
+  const pathname = usePathname()
 
   useEffect(() => {
     // LocalStorage'dan dil tercihini al
@@ -28,12 +30,26 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (mounted) {
-      // HTML dir attribute'unu güncelle
-      const langConfig = languages.find(l => l.code === language)
-      document.documentElement.dir = langConfig?.dir || 'ltr'
+      // Admin panelinde RTL uygulamayı atla - admin her zaman LTR olmalı
+      const isAdminPanel = pathname?.startsWith('/admin')
+      
+      if (isAdminPanel) {
+        // Admin panelinde her zaman LTR
+        document.documentElement.dir = 'ltr'
+        document.documentElement.classList.remove('rtl')
+      } else {
+        // Public sayfalarda dile göre dir ayarla
+        const langConfig = languages.find(l => l.code === language)
+        document.documentElement.dir = langConfig?.dir || 'ltr'
+        if (langConfig?.dir === 'rtl') {
+          document.documentElement.classList.add('rtl')
+        } else {
+          document.documentElement.classList.remove('rtl')
+        }
+      }
       document.documentElement.lang = language
     }
-  }, [language, mounted])
+  }, [language, mounted, pathname])
 
   const setLanguage = (lang: Language) => {
     setLanguageState(lang)

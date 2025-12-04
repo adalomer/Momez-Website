@@ -6,12 +6,14 @@ import { useState, useEffect, Suspense } from 'react'
 import { authAPI } from '@/lib/api'
 import toast, { Toaster } from 'react-hot-toast'
 import AuthTransition from '@/components/AuthTransition'
+import { useLanguage } from '@/lib/i18n'
 
 function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const redirect = searchParams.get('redirect') || '/'
   const registered = searchParams.get('registered')
+  const { t } = useLanguage()
   
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -20,18 +22,18 @@ function LoginForm() {
   // Kayıt sonrası yönlendirme mesajı
   useEffect(() => {
     if (registered === 'true') {
-      toast.success('Kayıt başarılı! Şimdi giriş yapabilirsiniz.', {
+      toast.success(t('login.registerSuccess'), {
         duration: 4000,
         icon: '🎉'
       })
     }
-  }, [registered])
+  }, [registered, t])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
     if (!email || !password) {
-      toast.error('Lütfen tüm alanları doldurun')
+      toast.error(t('login.fillAllFields'))
       return
     }
     
@@ -41,7 +43,7 @@ function LoginForm() {
       const result = await authAPI.login(email, password) as { success: boolean; data?: { user?: any }; error?: string }
       
       if (result.success && result.data?.user) {
-        toast.success('Giriş başarılı! Yönlendiriliyorsunuz...')
+        toast.success(t('login.success'))
         
         // Role göre yönlendirme
         const targetUrl = result.data.user.role === 'admin' 
@@ -51,10 +53,10 @@ function LoginForm() {
         // Hemen yönlendir
         window.location.href = targetUrl
       } else {
-        toast.error(result.error || 'Giriş başarısız')
+        toast.error(t('login.invalidCredentials'))
       }
     } catch (error) {
-      toast.error('Giriş yapılırken hata oluştu')
+      toast.error(t('login.invalidCredentials'))
     } finally {
       setLoading(false)
     }
@@ -76,10 +78,10 @@ function LoginForm() {
               <span className="text-2xl font-bold text-[#ee2b2b]">momez</span>
             </Link>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Hoş Geldiniz
+              {t('login.welcome')}
             </h1>
             <p className="text-gray-600">
-              Hesabınıza giriş yapın
+              {t('login.subtitle')}
             </p>
           </div>
 
@@ -87,7 +89,7 @@ function LoginForm() {
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-900 mb-2">
-                E-posta
+                {t('auth.email')}
               </label>
               <input
                 id="email"
@@ -103,7 +105,7 @@ function LoginForm() {
 
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-900 mb-2">
-                Şifre
+                {t('auth.password')}
               </label>
               <input
                 id="password"
@@ -120,10 +122,10 @@ function LoginForm() {
             <div className="flex items-center justify-between text-sm">
               <label className="flex items-center gap-2 text-gray-700">
                 <input type="checkbox" className="rounded text-[#ee2b2b] focus:ring-[#ee2b2b]" />
-                <span>Beni hatırla</span>
+                <span>{t('login.rememberMe')}</span>
               </label>
               <Link href="/auth/forgot-password" className="text-[#ee2b2b] hover:underline">
-                Şifremi unuttum
+                {t('auth.forgotPassword')}
               </Link>
             </div>
 
@@ -132,14 +134,14 @@ function LoginForm() {
               disabled={loading}
               className="w-full px-6 py-4 bg-[#ee2b2b] hover:bg-red-700 text-white font-bold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
+              {loading ? t('login.loggingIn') : t('auth.login')}
             </button>
           </form>
 
           <div className="mt-6 text-center text-sm text-gray-600">
-            Hesabınız yok mu?{' '}
+            {t('login.noAccount')}{' '}
             <Link href="/auth/signup" className="text-[#ee2b2b] hover:underline font-medium">
-              Kayıt Olun
+              {t('auth.register')}
             </Link>
           </div>
         </div>

@@ -30,11 +30,10 @@ export default function RootLayout({
                     document.documentElement.classList.remove('dark');
                   }
                   var lang = localStorage.getItem('language');
-                  if (lang === 'ar') {
-                    document.documentElement.dir = 'rtl';
-                    document.documentElement.lang = 'ar';
-                  } else if (lang === 'en') {
+                  if (lang === 'en') {
                     document.documentElement.lang = 'en';
+                  } else if (lang === 'ar') {
+                    document.documentElement.lang = 'ar';
                   }
                 } catch (e) {}
               })();

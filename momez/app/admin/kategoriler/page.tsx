@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Plus, Edit, Trash2, Eye, Upload, X } from 'lucide-react'
 import toast, { Toaster } from 'react-hot-toast'
 import { categoriesAPI, uploadAPI } from '@/lib/api'
+import { useLanguage } from '@/lib/i18n'
 
 interface Category {
   id: string
@@ -21,6 +22,7 @@ export default function AdminCategoriesPage() {
   const [showEditModal, setShowEditModal] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
   const [uploadingImage, setUploadingImage] = useState(false)
+  const { t } = useLanguage()
   
   const [formData, setFormData] = useState({
     name: '',
@@ -82,7 +84,7 @@ export default function AdminCategoriesPage() {
     e.preventDefault()
     
     if (!formData.name.trim()) {
-      toast.error('Kategori adı gerekli')
+      toast.error(t('categories.nameRequired'))
       return
     }
 
@@ -103,7 +105,7 @@ export default function AdminCategoriesPage() {
       }) as { success: boolean; error?: string }
 
       if (result.success) {
-        toast.success('Kategori eklendi')
+        toast.success(t('categories.added'))
         setShowAddModal(false)
         setFormData({ name: '', image_url: '' })
         loadCategories()
@@ -140,34 +142,34 @@ export default function AdminCategoriesPage() {
       }) as { success: boolean; error?: string }
 
       if (result.success) {
-        toast.success('Kategori güncellendi')
+        toast.success(t('categories.updated'))
         setShowEditModal(false)
         setSelectedCategory(null)
         setFormData({ name: '', image_url: '' })
         loadCategories()
       } else {
-        toast.error(result.error || 'Kategori güncellenemedi')
+        toast.error(result.error || t('common.error'))
       }
     } catch (error) {
-      toast.error('Bir hata oluştu')
+      toast.error(t('common.error'))
     }
   }
 
   const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`"${name}" kategorisini silmek istediğinize emin misiniz?`)) {
+    if (!confirm(t('admin.deleteConfirm'))) {
       return
     }
 
     try {
       const result = await categoriesAPI.delete(id) as { success: boolean; error?: string }
       if (result.success) {
-        toast.success('Kategori silindi')
+        toast.success(t('categories.deleted'))
         loadCategories()
       } else {
-        toast.error(result.error || 'Kategori silinemedi')
+        toast.error(result.error || t('common.error'))
       }
     } catch (error) {
-      toast.error('Bir hata oluştu')
+      toast.error(t('common.error'))
     }
   }
 
@@ -188,10 +190,10 @@ export default function AdminCategoriesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-            Kategori Yönetimi
+            {t('admin.categoryManagement')}
           </h1>
           <p className="text-slate-600 dark:text-slate-400 mt-1">
-            {categories.length} kategori
+            {categories.length} {t('admin.categories').toLowerCase()}
           </p>
         </div>
         <button 
@@ -199,7 +201,7 @@ export default function AdminCategoriesPage() {
           onClick={() => setShowAddModal(true)}
         >
           <Plus className="h-5 w-5" />
-          Yeni Kategori
+          {t('categories.newCategory')}
         </button>
       </div>
 
@@ -237,7 +239,7 @@ export default function AdminCategoriesPage() {
                       ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400'
                       : 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-400'
                   }`}>
-                    {category.is_active ? 'Aktif' : 'Pasif'}
+                    {category.is_active ? t('admin.active') : t('admin.inactive')}
                   </span>
                 </div>
                 
@@ -247,7 +249,7 @@ export default function AdminCategoriesPage() {
                     onClick={() => openEditModal(category)}
                   >
                     <Edit className="h-4 w-4" />
-                    Düzenle
+                    {t('common.edit')}
                   </button>
                   <button 
                     className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
@@ -267,32 +269,32 @@ export default function AdminCategoriesPage() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-slate-800 rounded-xl max-w-md w-full p-6">
             <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4">
-              Yeni Kategori Ekle
+              {t('categories.addNew')}
             </h2>
             <form onSubmit={handleAdd} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                  Kategori Adı
+                  {t('categories.categoryName')}
                 </label>
                 <input
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                   className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
-                  placeholder="Örn: Erkek Ayakkabı"
+                  placeholder={t('categories.categoryNamePlaceholder')}
                   required
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                  Kategori Görseli
+                  {t('categories.categoryImage')}
                 </label>
                 <div className="space-y-3">
                   <label className="flex items-center justify-center gap-2 px-4 py-2 border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-lg cursor-pointer hover:border-primary transition-colors">
                     <Upload className="h-5 w-5 text-slate-500" />
                     <span className="text-sm text-slate-600 dark:text-slate-400">
-                      {uploadingImage ? 'Yükleniyor...' : 'Görsel Seç'}
+                      {uploadingImage ? t('admin.uploading') : t('categories.selectImage')}
                     </span>
                     <input
                       type="file"
@@ -330,13 +332,13 @@ export default function AdminCategoriesPage() {
                   }}
                   className="flex-1 px-4 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700"
                 >
-                  İptal
+                  {t('common.cancel')}
                 </button>
                 <button
                   type="submit"
                   className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90"
                 >
-                  Ekle
+                  {t('common.add')}
                 </button>
               </div>
             </form>
@@ -349,12 +351,12 @@ export default function AdminCategoriesPage() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-slate-800 rounded-xl max-w-md w-full p-6">
             <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4">
-              Kategori Düzenle
+              {t('categories.editCategory')}
             </h2>
             <form onSubmit={handleEdit} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                  Kategori Adı
+                  {t('categories.categoryName')}
                 </label>
                 <input
                   type="text"
@@ -367,13 +369,13 @@ export default function AdminCategoriesPage() {
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                  Kategori Görseli
+                  {t('categories.categoryImage')}
                 </label>
                 <div className="space-y-3">
                   <label className="flex items-center justify-center gap-2 px-4 py-2 border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-lg cursor-pointer hover:border-primary transition-colors">
                     <Upload className="h-5 w-5 text-slate-500" />
                     <span className="text-sm text-slate-600 dark:text-slate-400">
-                      {uploadingImage ? 'Yükleniyor...' : 'Yeni Görsel Seç'}
+                      {uploadingImage ? t('admin.uploading') : t('categories.selectNewImage')}
                     </span>
                     <input
                       type="file"
@@ -412,13 +414,13 @@ export default function AdminCategoriesPage() {
                   }}
                   className="flex-1 px-4 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700"
                 >
-                  İptal
+                  {t('common.cancel')}
                 </button>
                 <button
                   type="submit"
                   className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90"
                 >
-                  Güncelle
+                  {t('common.update')}
                 </button>
               </div>
             </form>

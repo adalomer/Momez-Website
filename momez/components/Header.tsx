@@ -137,14 +137,14 @@ export default function Header() {
   const handleLogout = async () => {
     try {
       // Logout animasyonu için toast göster
-      toast.loading('Çıkış yapılıyor...', { id: 'logout' })
+      toast.loading(t('logout.loggingOut'), { id: 'logout' })
       
       await fetch('/api/auth/logout', { 
         method: 'POST',
         cache: 'no-store'
       })
       
-      toast.success('Başarıyla çıkış yapıldı', { id: 'logout' })
+      toast.success(t('logout.success'), { id: 'logout' })
       
       setUser(null)
       setCartCount(0)

@@ -74,17 +74,21 @@ export default function AdminSidebar() {
     <>
       {/* Mobile Menu Button */}
       <button
-        className="lg:hidden fixed top-4 start-4 z-50 p-2 bg-white dark:bg-slate-800 rounded-lg shadow-lg"
+        dir="ltr"
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-white dark:bg-slate-800 rounded-lg shadow-lg"
         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+        style={{ left: '1rem', right: 'auto' }}
       >
         {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
       </button>
 
       {/* Sidebar */}
       <aside
-        className={`fixed lg:sticky top-0 start-0 z-40 w-64 h-screen transition-transform ${
-          mobileMenuOpen ? 'translate-x-0 rtl:-translate-x-0' : '-translate-x-full rtl:translate-x-full lg:translate-x-0 lg:rtl:translate-x-0'
-        } bg-white dark:bg-slate-900 border-e border-slate-200 dark:border-slate-700`}
+        dir="ltr"
+        className={`fixed lg:sticky top-0 left-0 z-40 w-64 h-screen transition-transform ${
+          mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+        } bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-700`}
+        style={{ left: 0, right: 'auto', textAlign: 'left' }}
       >
         <div className="flex flex-col h-full p-4">
           {/* Logo */}
@@ -200,8 +204,10 @@ export default function AdminSidebar() {
       {/* Mobile Overlay */}
       {mobileMenuOpen && (
         <div
+          dir="ltr"
           className="fixed inset-0 bg-black/50 z-30 lg:hidden"
           onClick={() => setMobileMenuOpen(false)}
+          style={{ left: 0, right: 0 }}
         />
       )}
     </>
