@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db, query } from '@/lib/db/mysql'
+import { getUserFromToken } from '@/lib/auth'
 
 // GET /api/products - Tüm ürünleri listele
 export async function GET(request: NextRequest) {
@@ -78,6 +79,23 @@ export async function GET(request: NextRequest) {
 // POST /api/products - Yeni ürün ekle (Admin)
 export async function POST(request: NextRequest) {
   try {
+    // Admin yetki kontrolü
+    const token = request.cookies.get('auth_token')?.value
+    if (!token) {
+      return NextResponse.json(
+        { success: false, error: 'Giriş yapılmamış' },
+        { status: 401 }
+      )
+    }
+    
+    const user = await getUserFromToken(token)
+    if (!user || user.role !== 'admin') {
+      return NextResponse.json(
+        { success: false, error: 'Yetkisiz erişim' },
+        { status: 403 }
+      )
+    }
+
     const body = await request.json()
     const { name, description, price, category_id, images, stock } = body
     

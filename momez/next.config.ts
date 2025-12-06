@@ -73,7 +73,8 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: 'Access-Control-Allow-Origin',
-            value: process.env.NEXT_PUBLIC_API_URL || '*',
+            // Production'da wildcard (*) KULLANILMAMALI - spesifik domain belirt
+            value: process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? '' : '*'),
           },
           {
             key: 'Access-Control-Allow-Methods',
@@ -82,6 +83,10 @@ const nextConfig: NextConfig = {
           {
             key: 'Access-Control-Allow-Headers',
             value: 'Content-Type, Authorization',
+          },
+          {
+            key: 'Access-Control-Allow-Credentials',
+            value: 'true',
           },
           {
             key: 'Cache-Control',

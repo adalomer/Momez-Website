@@ -1,12 +1,20 @@
 import mysql from 'mysql2/promise'
 
+// Environment değişkenlerini kontrol et
+const requiredEnvVars = ['DATABASE_HOST', 'DATABASE_NAME', 'DATABASE_USER', 'DATABASE_PASSWORD']
+for (const envVar of requiredEnvVars) {
+  if (!process.env[envVar]) {
+    console.warn(`Warning: ${envVar} environment variable is not set`)
+  }
+}
+
 // MySQL bağlantı havuzu oluştur
 const pool = mysql.createPool({
   host: process.env.DATABASE_HOST || 'localhost',
   port: parseInt(process.env.DATABASE_PORT || '3306'),
   database: process.env.DATABASE_NAME || 'momez_db',
   user: process.env.DATABASE_USER || 'momez_user',
-  password: process.env.DATABASE_PASSWORD || 'momez_password',
+  password: process.env.DATABASE_PASSWORD, // Varsayılan değer kaldırıldı - güvenlik için
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
