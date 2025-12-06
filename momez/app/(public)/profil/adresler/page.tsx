@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { User, Package, MapPin, LogOut, Plus, Trash2 } from 'lucide-react'
 import toast, { Toaster } from 'react-hot-toast'
+import { useLanguage } from '@/lib/i18n'
 
 interface Address {
   id: string
@@ -21,6 +22,7 @@ interface Address {
 
 export default function AddressesPage() {
   const router = useRouter()
+  const { t } = useLanguage()
   const [loading, setLoading] = useState(true)
   const [addresses, setAddresses] = useState<Address[]>([])
   const [showModal, setShowModal] = useState(false)
@@ -50,7 +52,7 @@ export default function AddressesPage() {
         router.push('/giris')
       }
     } catch (error) {
-      toast.error('Adresler yüklenemedi')
+      toast.error(t('address.loadError'))
     } finally {
       setLoading(false)
     }
@@ -60,29 +62,29 @@ export default function AddressesPage() {
     const errors: Record<string, string> = {}
 
     if (!formData.title.trim()) {
-      errors.title = 'Adres başlığı gerekli'
+      errors.title = t('address.error.titleRequired')
     }
     if (!formData.full_name.trim()) {
-      errors.full_name = 'Ad soyad gerekli'
+      errors.full_name = t('address.error.fullNameRequired')
     }
     if (!formData.phone.trim()) {
-      errors.phone = 'Telefon numarası gerekli'
+      errors.phone = t('address.error.phoneRequired')
     } else if (!/^[+]?[0-9\s()-]{10,}$/.test(formData.phone)) {
-      errors.phone = 'Geçerli bir telefon numarası girin'
+      errors.phone = t('address.error.phoneInvalid')
     }
     if (!formData.address.trim()) {
-      errors.address = 'Adres gerekli'
+      errors.address = t('address.error.addressRequired')
     }
     if (!formData.district.trim()) {
-      errors.district = 'İlçe gerekli'
+      errors.district = t('address.error.districtRequired')
     }
     if (!formData.city.trim()) {
-      errors.city = 'Şehir gerekli'
+      errors.city = t('address.error.cityRequired')
     }
     if (!formData.postal_code.trim()) {
-      errors.postal_code = 'Posta kodu gerekli'
+      errors.postal_code = t('address.error.postalCodeRequired')
     } else if (!/^\d{5}$/.test(formData.postal_code)) {
-      errors.postal_code = 'Posta kodu 5 haneli olmalı'
+      errors.postal_code = t('address.error.postalCodeInvalid')
     }
 
     setFormErrors(errors)
@@ -93,7 +95,7 @@ export default function AddressesPage() {
     e.preventDefault()
     
     if (!validateForm()) {
-      toast.error('Lütfen tüm alanları doğru doldurun')
+      toast.error(t('address.fillAllFields'))
       return
     }
 
@@ -107,7 +109,7 @@ export default function AddressesPage() {
       const data = await response.json()
       
       if (data.success) {
-        toast.success('Adres eklendi')
+        toast.success(t('address.added'))
         setShowModal(false)
         setFormData({
           title: '',
@@ -121,15 +123,15 @@ export default function AddressesPage() {
         setFormErrors({})
         fetchAddresses()
       } else {
-        toast.error(data.error || 'Adres eklenemedi')
+        toast.error(data.error || t('address.addError'))
       }
     } catch (error) {
-      toast.error('Ekleme hatası')
+      toast.error(t('address.addError'))
     }
   }
 
   const handleDelete = async (id: string, title: string) => {
-    if (!confirm(`"${title}" adresini silmek istediğinize emin misiniz?`)) {
+    if (!confirm(`"${title}" ${t('address.deleteConfirm')}`)) {
       return
     }
 
@@ -141,13 +143,13 @@ export default function AddressesPage() {
       const data = await response.json()
       
       if (data.success) {
-        toast.success('Adres silindi')
+        toast.success(t('address.deleted'))
         fetchAddresses()
       } else {
-        toast.error(data.error || 'Adres silinemedi')
+        toast.error(data.error || t('address.deleteError'))
       }
     } catch (error) {
-      toast.error('Silme hatası')
+      toast.error(t('address.deleteError'))
     }
   }
 
@@ -157,14 +159,14 @@ export default function AddressesPage() {
       router.push('/')
       router.refresh()
     } catch (error) {
-      toast.error('Çıkış yapılamadı')
+      toast.error(t('address.logoutError'))
     }
   }
 
   if (loading) {
     return (
       <div className="min-h-screen py-12 flex items-center justify-center">
-        <p className="text-slate-600 dark:text-slate-400">Yükleniyor...</p>
+        <p className="text-slate-600 dark:text-slate-400">{t('address.loading')}</p>
       </div>
     )
   }
@@ -175,7 +177,7 @@ export default function AddressesPage() {
       
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-8">
-          Hesabım
+          {t('profile.title')}
         </h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -188,28 +190,28 @@ export default function AddressesPage() {
                   className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-900 dark:text-white hover:bg-red-100 hover:text-primary-600 transition-all font-medium"
                 >
                   <User className="h-5 w-5" />
-                  Profil Bilgileri
+                  {t('profile.info')}
                 </Link>
                 <Link
                   href="/siparislerim"
                   className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-900 dark:text-white hover:bg-red-100 hover:text-primary-600 transition-all font-medium"
                 >
                   <Package className="h-5 w-5" />
-                  Siparişlerim
+                  {t('profile.orders')}
                 </Link>
                 <Link
                   href="/profil/adresler"
                   className="flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-primary to-primary-600 text-white font-bold shadow-lg"
                 >
                   <MapPin className="h-5 w-5" />
-                  Adreslerim
+                  {t('profile.addresses')}
                 </Link>
                 <button
                   onClick={handleLogout}
                   className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-700 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 transition-all font-medium"
                 >
                   <LogOut className="h-5 w-5" />
-                  Çıkış Yap
+                  {t('profile.logout')}
                 </button>
               </div>
             </div>
@@ -220,26 +222,26 @@ export default function AddressesPage() {
             <div className="bg-white dark:bg-slate-800 rounded-xl border-2 border-slate-200 dark:border-slate-700 shadow-lg p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
-                  Adreslerim
+                  {t('address.title')}
                 </h2>
                 <button
                   onClick={() => setShowModal(true)}
                   className="btn-primary flex items-center gap-2 px-6 py-3 rounded-xl font-bold shadow-soft hover:shadow-lg transition-all"
                 >
                   <Plus className="h-5 w-5" />
-                  Yeni Adres
+                  {t('address.new')}
                 </button>
               </div>
 
               {addresses.length === 0 ? (
                 <div className="text-center py-12">
                   <MapPin className="h-16 w-16 text-primary-300 mx-auto mb-4" />
-                  <p className="text-slate-700 dark:text-slate-300 text-lg mb-4">Henüz adres eklenmemiş</p>
+                  <p className="text-slate-700 dark:text-slate-300 text-lg mb-4">{t('address.noAddress')}</p>
                   <button
                     onClick={() => setShowModal(true)}
                     className="btn-primary px-8 py-3 rounded-xl font-bold shadow-soft"
                   >
-                    İlk Adresini Ekle
+                    {t('address.addFirst')}
                   </button>
                 </div>
               ) : (
@@ -251,7 +253,7 @@ export default function AddressesPage() {
                     >
                       {address.is_default && (
                         <span className="absolute top-3 right-3 px-3 py-1 bg-gradient-to-r from-primary to-primary-600 text-white text-xs font-bold rounded-full shadow-soft">
-                          Varsayılan
+                          {t('address.default')}
                         </span>
                       )}
                       
@@ -281,7 +283,7 @@ export default function AddressesPage() {
                           className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 font-medium px-3 py-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
                         >
                           <Trash2 className="h-4 w-4" />
-                          Sil
+                          {t('address.delete')}
                         </button>
                       </div>
                     </div>
@@ -296,123 +298,123 @@ export default function AddressesPage() {
       {/* Add Address Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="glass rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-soft-lg">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 dark:border-slate-700">
             <div className="p-6 border-b border-slate-200 dark:border-slate-700">
-              <h2 className="text-2xl font-bold gradient-text">
-                Yeni Adres Ekle
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
+                {t('address.add')}
               </h2>
             </div>
             
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div>
                 <label className="block text-sm font-bold text-slate-800 dark:text-white mb-2">
-                  Adres Başlığı *
+                  {t('address.addressTitle')} *
                 </label>
                 <input
                   type="text"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className={`w-full px-4 py-3 rounded-xl border-2 ${formErrors.title ? 'border-red-500' : 'border-slate-300 dark:border-slate-700'} bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all`}
-                  placeholder="Ev, İş, vb."
+                  className={`w-full px-4 py-3 rounded-xl border-2 ${formErrors.title ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'} bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all`}
+                  placeholder={t('address.titlePlaceholder')}
                 />
                 {formErrors.title && (
-                  <p className="text-red-500 text-sm mt-1">{formErrors.title}</p>
+                  <p className="text-red-500 dark:text-red-400 text-sm mt-1">{formErrors.title}</p>
                 )}
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-bold text-slate-800 dark:text-white mb-2">
-                    Ad Soyad *
+                    {t('address.fullName')} *
                   </label>
                   <input
                     type="text"
                     value={formData.full_name}
                     onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-                    className={`w-full px-4 py-3 rounded-xl border-2 ${formErrors.full_name ? 'border-red-500' : 'border-slate-300 dark:border-slate-700'} bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all`}
+                    className={`w-full px-4 py-3 rounded-xl border-2 ${formErrors.full_name ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'} bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all`}
                   />
                   {formErrors.full_name && (
-                    <p className="text-red-500 text-sm mt-1 font-medium">{formErrors.full_name}</p>
+                    <p className="text-red-500 dark:text-red-400 text-sm mt-1 font-medium">{formErrors.full_name}</p>
                   )}
                 </div>
 
                 <div>
                   <label className="block text-sm font-bold text-slate-800 dark:text-white mb-2">
-                    Telefon *
+                    {t('address.phone')} *
                   </label>
                   <input
                     type="tel"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className={`w-full px-4 py-3 rounded-xl border-2 ${formErrors.phone ? 'border-red-500' : 'border-slate-300 dark:border-slate-700'} bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all`}
-                    placeholder="+90 555 123 4567"
+                    className={`w-full px-4 py-3 rounded-xl border-2 ${formErrors.phone ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'} bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all`}
+                    placeholder={t('address.phonePlaceholder')}
                   />
                   {formErrors.phone && (
-                    <p className="text-red-500 text-sm mt-1 font-medium">{formErrors.phone}</p>
+                    <p className="text-red-500 dark:text-red-400 text-sm mt-1 font-medium">{formErrors.phone}</p>
                   )}
                 </div>
               </div>
 
               <div>
                 <label className="block text-sm font-bold text-slate-800 dark:text-white mb-2">
-                  Adres *
+                  {t('address.addressLine')} *
                 </label>
                 <textarea
                   value={formData.address}
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                  className={`w-full px-4 py-3 rounded-xl border-2 ${formErrors.address ? 'border-red-500' : 'border-slate-300 dark:border-slate-700'} bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all`}
+                  className={`w-full px-4 py-3 rounded-xl border-2 ${formErrors.address ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'} bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all`}
                   rows={3}
-                  placeholder="Mahalle, Cadde, No, Daire"
+                  placeholder={t('address.addressPlaceholder')}
                 />
                 {formErrors.address && (
-                  <p className="text-red-500 text-sm mt-1 font-medium">{formErrors.address}</p>
+                  <p className="text-red-500 dark:text-red-400 text-sm mt-1 font-medium">{formErrors.address}</p>
                 )}
               </div>
 
               <div className="grid grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-bold text-slate-800 dark:text-white mb-2">
-                    İlçe *
+                    {t('address.district')} *
                   </label>
                   <input
                     type="text"
                     value={formData.district}
                     onChange={(e) => setFormData({ ...formData, district: e.target.value })}
-                    className={`w-full px-4 py-3 rounded-xl border-2 ${formErrors.district ? 'border-red-500' : 'border-slate-300 dark:border-slate-700'} bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all`}
+                    className={`w-full px-4 py-3 rounded-xl border-2 ${formErrors.district ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'} bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all`}
                   />
                   {formErrors.district && (
-                    <p className="text-red-500 text-sm mt-1 font-medium">{formErrors.district}</p>
+                    <p className="text-red-500 dark:text-red-400 text-sm mt-1 font-medium">{formErrors.district}</p>
                   )}
                 </div>
 
                 <div>
                   <label className="block text-sm font-bold text-slate-800 dark:text-white mb-2">
-                    Şehir *
+                    {t('address.city')} *
                   </label>
                   <input
                     type="text"
                     value={formData.city}
                     onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                    className={`w-full px-4 py-3 rounded-xl border-2 ${formErrors.city ? 'border-red-500' : 'border-slate-300 dark:border-slate-700'} bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all`}
+                    className={`w-full px-4 py-3 rounded-xl border-2 ${formErrors.city ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'} bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all`}
                   />
                   {formErrors.city && (
-                    <p className="text-red-500 text-sm mt-1 font-medium">{formErrors.city}</p>
+                    <p className="text-red-500 dark:text-red-400 text-sm mt-1 font-medium">{formErrors.city}</p>
                   )}
                 </div>
 
                 <div>
                   <label className="block text-sm font-bold text-slate-800 dark:text-white mb-2">
-                    Posta Kodu *
+                    {t('address.postalCode')} *
                   </label>
                   <input
                     type="text"
                     value={formData.postal_code}
                     onChange={(e) => setFormData({ ...formData, postal_code: e.target.value })}
-                    className={`w-full px-4 py-3 rounded-xl border-2 ${formErrors.postal_code ? 'border-red-500' : 'border-slate-300 dark:border-slate-700'} bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all`}
-                    placeholder="34000"
+                    className={`w-full px-4 py-3 rounded-xl border-2 ${formErrors.postal_code ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'} bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all`}
+                    placeholder={t('address.postalCodePlaceholder')}
                   />
                   {formErrors.postal_code && (
-                    <p className="text-red-500 text-sm mt-1 font-medium">{formErrors.postal_code}</p>
+                    <p className="text-red-500 dark:text-red-400 text-sm mt-1 font-medium">{formErrors.postal_code}</p>
                   )}
                 </div>
               </div>
@@ -424,15 +426,15 @@ export default function AddressesPage() {
                     setShowModal(false)
                     setFormErrors({})
                   }}
-                  className="px-6 py-3 border-2 border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 font-medium transition-all"
+                  className="px-6 py-3 border-2 border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 font-medium transition-all"
                 >
-                  İptal
+                  {t('address.cancel')}
                 </button>
                 <button
                   type="submit"
                   className="btn-primary px-8 py-3 rounded-xl font-bold shadow-soft hover:shadow-lg transition-all"
                 >
-                  Adresi Kaydet
+                  {t('address.save')}
                 </button>
               </div>
             </form>

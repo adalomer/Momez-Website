@@ -6,9 +6,11 @@ import { useState } from 'react'
 import { authAPI } from '@/lib/api'
 import toast, { Toaster } from 'react-hot-toast'
 import AuthTransition from '@/components/AuthTransition'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
 
 export default function SignupPage() {
   const router = useRouter()
+  const { t, isRTL } = useLanguage()
   
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -26,27 +28,27 @@ export default function SignupPage() {
     e.preventDefault()
     
     if (!name || !email || !password) {
-      toast.error('Lütfen gerekli alanları doldurun')
+      toast.error(t('register.fillAllFields'))
       return
     }
     
     if (password.length < 6) {
-      toast.error('Şifre en az 6 karakter olmalı')
+      toast.error(t('signup.passwordMinLength'))
       return
     }
     
     if (password !== passwordConfirm) {
-      toast.error('Şifreler eşleşmiyor')
+      toast.error(t('register.passwordMismatch'))
       return
     }
     
     if (!acceptTerms) {
-      toast.error('Kullanım koşullarını kabul etmelisiniz')
+      toast.error(t('signup.acceptTermsRequired'))
       return
     }
     
     if (!acceptKVKK) {
-      toast.error('KVKK Aydınlatma Metnini kabul etmelisiniz')
+      toast.error(t('signup.acceptKVKKRequired'))
       return
     }
     
@@ -56,17 +58,17 @@ export default function SignupPage() {
       const result = await authAPI.register(email, password, name, phone) as { success: boolean; user?: any; error?: string }
       
       if (result.success) {
-        toast.success('Kayıt başarılı! Giriş sayfasına yönlendiriliyorsunuz...')
+        toast.success(t('register.success'))
         
         // Giriş sayfasına yönlendir - kullanıcı oradan giriş yapsın
         setTimeout(() => {
           window.location.href = '/auth/login?registered=true'
         }, 1000)
       } else {
-        toast.error(result.error || 'Kayıt başarısız')
+        toast.error(result.error || t('signup.registrationFailed'))
       }
     } catch (error) {
-      toast.error('Kayıt olurken hata oluştu')
+      toast.error(t('signup.registrationError'))
     } finally {
       setLoading(false)
     }
@@ -74,7 +76,7 @@ export default function SignupPage() {
 
   return (
     <AuthTransition type="login">
-      <div className="min-h-screen flex items-center justify-center py-12 px-4 bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center py-12 px-4 bg-gray-50" dir={isRTL ? 'rtl' : 'ltr'}>
         <Toaster position="top-center" />
       
       <div className="w-full max-w-md">
@@ -88,10 +90,10 @@ export default function SignupPage() {
             <span className="text-2xl font-bold text-[#ee2b2b]">momez</span>
           </Link>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Hesap Oluşturun
+            {t('register.title')}
           </h1>
           <p className="text-gray-600">
-            Alışverişe başlamak için kayıt olun
+            {t('register.subtitle')}
           </p>
         </div>
 
@@ -99,7 +101,7 @@ export default function SignupPage() {
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-900 mb-2">
-                Ad Soyad *
+                {t('register.fullName')} *
               </label>
               <input
                 id="name"
@@ -115,7 +117,7 @@ export default function SignupPage() {
 
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-900 mb-2">
-                E-posta *
+                {t('register.email')} *
               </label>
               <input
                 id="email"
@@ -131,7 +133,7 @@ export default function SignupPage() {
 
             <div>
               <label htmlFor="phone" className="block text-sm font-medium text-gray-900 mb-2">
-                Telefon
+                {t('register.phone')}
               </label>
               <input
                 id="phone"
@@ -146,7 +148,7 @@ export default function SignupPage() {
 
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-900 mb-2">
-                Şifre *
+                {t('register.password')} *
               </label>
               <input
                 id="password"
@@ -158,12 +160,12 @@ export default function SignupPage() {
                 placeholder="••••••••"
                 disabled={loading}
               />
-              <p className="text-xs text-gray-500 mt-1">En az 6 karakter</p>
+              <p className="text-xs text-gray-500 mt-1">{t('signup.passwordHint')}</p>
             </div>
 
             <div>
               <label htmlFor="passwordConfirm" className="block text-sm font-medium text-gray-900 mb-2">
-                Şifre Tekrar *
+                {t('register.confirmPassword')} *
               </label>
               <input
                 id="passwordConfirm"
@@ -179,7 +181,7 @@ export default function SignupPage() {
 
             {/* Sözleşme Onayları */}
             <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-              <p className="text-sm font-medium text-gray-900">Yasal Onaylar</p>
+              <p className="text-sm font-medium text-gray-900">{t('signup.legalApprovals')}</p>
               
               {/* Kullanım Koşulları ve Gizlilik */}
               <div className="flex items-start gap-3">
@@ -192,13 +194,13 @@ export default function SignupPage() {
                 />
                 <label htmlFor="acceptTerms" className="text-sm text-gray-700">
                   <Link href="/kullanim-kosullari" target="_blank" className="text-[#ee2b2b] hover:underline font-medium">
-                    Kullanım Koşulları
+                    {t('terms.title')}
                   </Link>
-                  {' '}ve{' '}
+                  {' '}{t('signup.and')}{' '}
                   <Link href="/gizlilik-politikasi" target="_blank" className="text-[#ee2b2b] hover:underline font-medium">
-                    Gizlilik Politikası
+                    {t('privacy.title')}
                   </Link>
-                  &apos;nı okudum ve kabul ediyorum. <span className="text-red-500">*</span>
+                  {' '}{t('signup.readAndAccept')} <span className="text-red-500">*</span>
                 </label>
               </div>
               
@@ -213,9 +215,9 @@ export default function SignupPage() {
                 />
                 <label htmlFor="acceptKVKK" className="text-sm text-gray-700">
                   <Link href="/kvkk" target="_blank" className="text-[#ee2b2b] hover:underline font-medium">
-                    KVKK Aydınlatma Metni
+                    {t('kvkk.title')}
                   </Link>
-                  &apos;ni okudum, kişisel verilerimin işlenmesini kabul ediyorum. <span className="text-red-500">*</span>
+                  {' '}{t('signup.kvkkAccept')} <span className="text-red-500">*</span>
                 </label>
               </div>
               
@@ -229,7 +231,7 @@ export default function SignupPage() {
                   className="mt-1 h-4 w-4 rounded border-gray-300 text-[#ee2b2b] focus:ring-[#ee2b2b]" 
                 />
                 <label htmlFor="acceptMarketing" className="text-sm text-gray-700">
-                  Kampanya, indirim ve yeni ürünlerden haberdar olmak için e-posta ve SMS almak istiyorum. (İsteğe bağlı)
+                  {t('signup.marketingConsent')}
                 </label>
               </div>
             </div>
@@ -239,14 +241,14 @@ export default function SignupPage() {
               disabled={loading}
               className="w-full px-6 py-4 bg-[#ee2b2b] hover:bg-red-700 text-white font-bold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Kayıt olunuyor...' : 'Kayıt Ol'}
+              {loading ? t('register.registering') : t('register.submit')}
             </button>
           </form>
 
           <div className="mt-6 text-center text-sm text-gray-600">
-            Zaten hesabınız var mı?{' '}
+            {t('register.hasAccount')}{' '}
             <Link href="/auth/login" className="text-[#ee2b2b] hover:underline font-medium">
-              Giriş Yapın
+              {t('auth.login')}
             </Link>
           </div>
         </div>

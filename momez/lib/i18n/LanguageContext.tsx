@@ -9,6 +9,7 @@ interface LanguageContextType {
   setLanguage: (lang: Language) => void
   t: (key: string) => string
   dir: 'ltr' | 'rtl'
+  isRTL: boolean
   languages: typeof languages
 }
 
@@ -60,9 +61,10 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   const currentLang = languages.find(l => l.code === language)
   const dir = currentLang?.dir || 'ltr'
+  const isRTL = dir === 'rtl'
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t, dir, languages }}>
+    <LanguageContext.Provider value={{ language, setLanguage, t, dir, isRTL, languages }}>
       {children}
     </LanguageContext.Provider>
   )
@@ -77,6 +79,7 @@ export function useLanguage() {
       setLanguage: () => {},
       t: (key: string) => getTranslation('tr', key),
       dir: 'ltr' as const,
+      isRTL: false,
       languages
     }
   }

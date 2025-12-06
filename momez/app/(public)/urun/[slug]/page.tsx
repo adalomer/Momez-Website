@@ -46,7 +46,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
 
   const handleAddToCart = async () => {
     if (!selectedSize) {
-      toast.error(t('product.pleaseSelectSize'))
+      toast.error(t('product.pleaseSelectSize'), { id: 'select-size' })
       return
     }
 
@@ -54,23 +54,24 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
       const result = await cartAPI.add(product.id, selectedSize, quantity) as { success: boolean; error?: string }
       
       if (result.success) {
-        toast.success(t('product.addedToCart'))
+        toast.success(t('product.addedToCart'), { id: 'cart-add-success' })
       } else {
         // Giriş gerekiyor
         if (result.error?.includes('Giriş')) {
           toast.error(t('product.loginRequired'), {
             duration: 3000,
-            icon: '🔒'
+            icon: '🔒',
+            id: 'login-required'
           })
           setTimeout(() => {
             router.push(`/auth/login?redirect=/urun/${product.slug}`)
           }, 1500)
         } else {
-          toast.error(result.error || t('common.error'))
+          toast.error(result.error || t('common.error'), { id: 'cart-error' })
         }
       }
     } catch (error) {
-      toast.error(t('common.error'))
+      toast.error(t('common.error'), { id: 'cart-error' })
     }
   }
 

@@ -203,27 +203,55 @@ export default function Header() {
           </nav>
 
           {/* Right Side Icons */}
-          <div className="flex items-center gap-3">
-            <Link
-              href="/sepet"
-              className="relative flex items-center justify-center rounded-xl h-11 w-11 text-red-500 hover:bg-red-500 hover:text-white transition-all duration-300 hover:scale-110"
-              aria-label={t('nav.cart')}
-            >
-              <ShoppingCart className="h-5 w-5 transition-all duration-300" />
-              {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold shadow-soft">
-                  {cartCount}
-                </span>
-              )}
-            </Link>
+          <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0">
+            {/* Cart Button */}
+            {user ? (
+              <Link
+                href="/sepet"
+                className="relative flex items-center justify-center rounded-xl h-11 w-11 text-red-500 hover:bg-red-500 hover:text-white transition-all duration-300 hover:scale-110"
+                aria-label={t('nav.cart')}
+              >
+                <ShoppingCart className="h-5 w-5 transition-all duration-300" />
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold shadow-soft">
+                    {cartCount}
+                  </span>
+                )}
+              </Link>
+            ) : (
+              <button
+                onClick={() => {
+                  toast.error(t('auth.loginRequired'), { id: 'login-required' })
+                  router.push('/auth/login?redirect=/sepet')
+                }}
+                className="relative flex items-center justify-center rounded-xl h-11 w-11 text-red-500 hover:bg-red-500 hover:text-white transition-all duration-300 hover:scale-110"
+                aria-label={t('nav.cart')}
+              >
+                <ShoppingCart className="h-5 w-5 transition-all duration-300" />
+              </button>
+            )}
             
-            <Link
-              href="/favoriler"
-              className="flex items-center justify-center rounded-xl h-11 w-11 text-red-500 hover:bg-red-500 hover:text-white transition-all duration-300 hover:scale-110 group"
-              aria-label={t('nav.favorites')}
-            >
-              <Heart className="h-5 w-5 transition-all duration-300 group-hover:fill-current" />
-            </Link>
+            {/* Favorites Button */}
+            {user ? (
+              <Link
+                href="/favoriler"
+                className="flex items-center justify-center rounded-xl h-11 w-11 text-red-500 hover:bg-red-500 hover:text-white transition-all duration-300 hover:scale-110 group"
+                aria-label={t('nav.favorites')}
+              >
+                <Heart className="h-5 w-5 transition-all duration-300 group-hover:fill-current" />
+              </Link>
+            ) : (
+              <button
+                onClick={() => {
+                  toast.error(t('auth.loginRequired'), { id: 'login-required' })
+                  router.push('/auth/login?redirect=/favoriler')
+                }}
+                className="flex items-center justify-center rounded-xl h-11 w-11 text-red-500 hover:bg-red-500 hover:text-white transition-all duration-300 hover:scale-110 group"
+                aria-label={t('nav.favorites')}
+              >
+                <Heart className="h-5 w-5 transition-all duration-300 group-hover:fill-current" />
+              </button>
+            )}
             
             {/* User Menu */}
             {loading ? (
@@ -231,7 +259,7 @@ export default function Header() {
                 <div className="animate-spin rounded-full h-5 w-5 border-2 border-primary-400 border-t-transparent"></div>
               </div>
             ) : user ? (
-              <div className="relative group">
+              <div className="relative group z-50">
                 <Link 
                   href="/profil"
                   className="flex items-center gap-3 px-4 py-2 rounded-xl hover:bg-accent-lighter transition-all hover:scale-105"
@@ -245,7 +273,7 @@ export default function Header() {
                 </Link>
                 
                 {/* Dropdown Menu */}
-                <div className="absolute right-0 mt-2 w-48 glass rounded-xl shadow-soft-lg border border-border-light dark:border-border-dark opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 animate-scaleIn z-50">
+                <div className="absolute right-0 top-full mt-1 w-48 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[100]">
                   <div className="p-2">
                     {user.role === 'admin' && (
                       <Link
@@ -300,12 +328,12 @@ export default function Header() {
               )}
             </button>
 
-            {/* Language Switcher */}
+            {/* Language Switcher - Desktop */}
             <LanguageSwitcher />
 
             {/* Mobile Menu Button */}
             <button
-              className="lg:hidden flex items-center justify-center rounded-xl h-11 w-11 hover:bg-accent-lighter hover:text-primary-600 transition-all hover:scale-105 ml-2"
+              className="lg:hidden flex items-center justify-center rounded-xl h-11 w-11 hover:bg-accent-lighter hover:text-primary-600 transition-all hover:scale-105 ml-1 sm:ml-2 flex-shrink-0"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label="Menü"
             >

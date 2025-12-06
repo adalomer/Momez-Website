@@ -38,11 +38,11 @@ export async function GET(
         a.phone as shipping_phone,
         a.city,
         a.district,
-        a.address_line,
+        a.address_line1 as address_line,
         a.postal_code
       FROM orders o
       LEFT JOIN users u ON o.user_id = u.id
-      LEFT JOIN user_addresses a ON o.address_id = a.id
+      LEFT JOIN addresses a ON o.address_id = a.id
       WHERE o.id = ?
     `
     

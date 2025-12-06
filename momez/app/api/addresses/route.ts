@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
       )
     }
     
-    const addresses = await db.findMany('user_addresses', 
+    const addresses = await db.findMany('addresses', 
       { user_id: user.id },
       { orderBy: 'is_default DESC, created_at DESC' }
     )
@@ -61,25 +61,42 @@ export async function POST(request: NextRequest) {
       )
     }
     
-    const { title, full_name, phone, city, district, address_line, postal_code, is_default } = await request.json()
-    
+    const body = await request.json()
+    const title = body.title || null
+    const full_name = body.full_name || null
+    const phone = body.phone || null
+    const city = body.city || null
+    const district = body.district || null
+    // Frontend'den "address" veya "address_line" olarak gelebilir
+    const address_line = body.address_line || body.address || null
+    const postal_code = body.postal_code || null
+    const is_default = body.is_default || false
+
+    // Zorunlu alan kontrolü
+    if (!title || !full_name || !phone || !city || !district || !address_line) {
+      return NextResponse.json(
+        { success: false, error: 'Zorunlu alanlar eksik' },
+        { status: 400 }
+      )
+    }
+
     // Eğer bu adres varsayılan olarak işaretlendiyse, diğerlerini varsayılandan çıkar
     if (is_default) {
       await db.query(
-        'UPDATE user_addresses SET is_default = FALSE WHERE user_id = ?',
+        'UPDATE addresses SET is_default = FALSE WHERE user_id = ?',
         [user.id]
       )
     }
-    
+
     const addressId = uuidv4()
     await db.query(
-      `INSERT INTO user_addresses 
-        (id, user_id, title, full_name, phone, city, district, address_line, postal_code, is_default) 
+      `INSERT INTO addresses 
+        (id, user_id, title, full_name, phone, city, district, address_line1, postal_code, is_default) 
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [addressId, user.id, title, full_name, phone, city, district, address_line, postal_code || null, is_default || false]
+      [addressId, user.id, title, full_name, phone, city, district, address_line, postal_code, is_default]
     )
-    
-    const newAddress = await db.findOne('user_addresses', { id: addressId })
+
+    const newAddress = await db.findOne('addresses', { id: addressId })
     
     return NextResponse.json({
       success: true,
@@ -115,32 +132,42 @@ export async function PUT(request: NextRequest) {
       )
     }
     
-    const { id, title, full_name, phone, city, district, address_line, postal_code, is_default } = await request.json()
-    
+    const body = await request.json()
+    const id = body.id
+    const title = body.title
+    const full_name = body.full_name
+    const phone = body.phone
+    const city = body.city
+    const district = body.district
+    // Frontend'den "address" veya "address_line" olarak gelebilir
+    const address_line = body.address_line || body.address
+    const postal_code = body.postal_code || null
+    const is_default = body.is_default || false
+
     // Bu adres bu kullanıcıya ait mi kontrol et
-    const address = await db.findOne('user_addresses', { id, user_id: user.id })
+    const address = await db.findOne('addresses', { id, user_id: user.id })
     if (!address) {
       return NextResponse.json(
         { success: false, error: 'Adres bulunamadı' },
         { status: 404 }
       )
     }
-    
+
     // Eğer bu adres varsayılan olarak işaretlendiyse, diğerlerini varsayılandan çıkar
     if (is_default) {
       await db.query(
-        'UPDATE user_addresses SET is_default = FALSE WHERE user_id = ? AND id != ?',
+        'UPDATE addresses SET is_default = FALSE WHERE user_id = ? AND id != ?',
         [user.id, id]
       )
     }
-    
+
     await db.update(
-      'user_addresses',
-      { title, full_name, phone, city, district, address_line, postal_code, is_default },
+      'addresses',
+      { title, full_name, phone, city, district, address_line1: address_line, postal_code, is_default },
       { id }
     )
-    
-    const updatedAddress = await db.findOne('user_addresses', { id })
+
+    const updatedAddress = await db.findOne('addresses', { id })
     
     return NextResponse.json({
       success: true,
@@ -187,15 +214,15 @@ export async function DELETE(request: NextRequest) {
     }
     
     // Bu adres bu kullanıcıya ait mi kontrol et
-    const address = await db.findOne('user_addresses', { id: addressId, user_id: user.id })
+    const address = await db.findOne('addresses', { id: addressId, user_id: user.id })
     if (!address) {
       return NextResponse.json(
         { success: false, error: 'Adres bulunamadı' },
         { status: 404 }
       )
     }
-    
-    await db.delete('user_addresses', { id: addressId })
+
+    await db.delete('addresses', { id: addressId })
     
     return NextResponse.json({
       success: true,

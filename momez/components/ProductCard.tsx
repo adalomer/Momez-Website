@@ -36,13 +36,14 @@ export default function ProductCard({ product, user }: ProductCardProps) {
     if (!user) {
       toast.error(t('product.loginRequired'), {
         duration: 2000,
-        icon: '🔒'
+        icon: '🔒',
+        id: 'login-required'
       })
       return
     }
 
     if (!product.in_stock) {
-      toast.error(t('product.outOfStock'))
+      toast.error(t('product.outOfStock'), { id: 'out-of-stock' })
       return
     }
 
@@ -53,7 +54,8 @@ export default function ProductCard({ product, user }: ProductCardProps) {
     if (!user) {
       toast.error(t('product.loginRequired'), {
         duration: 2000,
-        icon: '🔒'
+        icon: '🔒',
+        id: 'login-required'
       })
       return
     }
@@ -61,18 +63,18 @@ export default function ProductCard({ product, user }: ProductCardProps) {
     try {
       const result = await favoritesAPI.add(product.id)
       if (result.success) {
-        toast.success(t('product.addedToFavorites'))
+        toast.success(t('product.addedToFavorites'), { id: 'fav-add-success' })
       } else {
-        toast.error(result.error || t('common.error'))
+        toast.error(result.error || t('common.error'), { id: 'fav-add-error' })
       }
     } catch (error) {
-      toast.error(t('common.error'))
+      toast.error(t('common.error'), { id: 'fav-add-error' })
     }
   }
 
   const confirmAddToCart = async () => {
     if (!selectedSize) {
-      toast.error(t('product.pleaseSelectSize'))
+      toast.error(t('product.pleaseSelectSize'), { id: 'select-size' })
       return
     }
 
@@ -80,14 +82,14 @@ export default function ProductCard({ product, user }: ProductCardProps) {
     try {
       const result = await cartAPI.add(product.id, selectedSize, 1)
       if (result.success) {
-        toast.success(t('product.addedToCart'))
+        toast.success(t('product.addedToCart'), { id: 'cart-add-success' })
         setShowSizeModal(false)
         setSelectedSize('')
       } else {
-        toast.error(result.error || t('common.error'))
+        toast.error(result.error || t('common.error'), { id: 'cart-add-error' })
       }
     } catch (error) {
-      toast.error(t('common.error'))
+      toast.error(t('common.error'), { id: 'cart-add-error' })
     } finally {
       setAdding(false)
     }
