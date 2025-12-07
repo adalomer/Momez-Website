@@ -3,7 +3,10 @@
  * Frontend'den API çağrıları için yardımcı fonksiyonlar
  */
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || ''
+// Production'da relative path kullan, development'ta localhost
+const API_URL = typeof window !== 'undefined' 
+  ? '' // Client-side: relative path (same origin)
+  : process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000' // Server-side
 
 // API hata yönetimi için yardımcı fonksiyon
 async function handleResponse<T>(response: Response): Promise<T> {

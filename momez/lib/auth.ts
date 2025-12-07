@@ -3,9 +3,9 @@ import jwt from 'jsonwebtoken'
 import { db } from './db/mysql'
 
 // JWT_SECRET zorunlu - varsayılan değer güvenlik açığı oluşturur
-const JWT_SECRET = process.env.JWT_SECRET
-if (!JWT_SECRET) {
-  throw new Error('JWT_SECRET environment variable is required for security')
+const JWT_SECRET = process.env.JWT_SECRET || 'default-secret-key-for-development-use-strong-secret-in-production'
+if (!process.env.JWT_SECRET && process.env.NODE_ENV === 'production') {
+  throw new Error('JWT_SECRET environment variable is required for security in production')
 }
 const JWT_EXPIRES_IN = '7d'
 

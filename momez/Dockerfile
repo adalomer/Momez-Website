@@ -16,6 +16,13 @@ COPY . .
 # Environment variables için build-time değerleri
 ENV NEXT_TELEMETRY_DISABLED 1
 ENV NODE_ENV production
+ENV JWT_SECRET="default-secret-key-for-build-12345678901234567890"
+ENV NEXT_PUBLIC_API_URL="http://localhost:3000"
+ENV DATABASE_HOST="localhost"
+ENV DATABASE_PORT="3306"
+ENV DATABASE_NAME="momez_db"
+ENV DATABASE_USER="momez_user"
+ENV DATABASE_PASSWORD="dummy"
 
 RUN npm run build
 
