@@ -166,7 +166,6 @@ export default function Header() {
     { href: '/kategori/erkek', label: t('nav.men') },
     { href: '/kategori/kadin', label: t('nav.women') },
     { href: '/kategori/cocuk', label: t('nav.kids') },
-    { href: '/kampanyalar', label: t('nav.campaigns') },
   ]
 
   return (

@@ -7,6 +7,7 @@ import Link from 'next/link'
 import toast, { Toaster } from 'react-hot-toast'
 import { categoriesAPI, productsAPI, uploadAPI } from '@/lib/api'
 import { useRouter } from 'next/navigation'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
 
 interface Category {
   id: string
@@ -16,6 +17,7 @@ interface Category {
 
 export default function AdminProductFormPage() {
   const router = useRouter()
+  const { t } = useLanguage()
   const [selectedSizes, setSelectedSizes] = useState<string[]>(['40', '41', '42'])
   const [images, setImages] = useState<string[]>([])
   const [categories, setCategories] = useState<Category[]>([])
@@ -27,11 +29,7 @@ export default function AdminProductFormPage() {
     description: '',
     category_id: '',
     price: '',
-    sku: '',
-    is_active: true,
-    is_featured: false,
-    is_new: false,
-    tags: ''
+    sku: ''
   })
   
   const [sizeStocks, setSizeStocks] = useState<Record<string, string>>({})
@@ -86,14 +84,14 @@ export default function AdminProductFormPage() {
       
       if (validUrls.length > 0) {
         setImages(prev => [...prev, ...validUrls])
-        toast.success(validUrls.length + ' görsel yüklendi')
+        toast.success(t('admin.imagesUploaded').replace('{count}', validUrls.length.toString()))
       }
       
       // Input'u temizle
       e.target.value = ''
     } catch (error) {
       console.error('Image upload error:', error)
-      toast.error('Görsel yüklenirken hata oluştu')
+      toast.error(t('admin.imageUploadError'))
     } finally {
       setUploadingImage(false)
     }
@@ -101,7 +99,7 @@ export default function AdminProductFormPage() {
   
   const removeImage = (index: number) => {
     setImages(prev => prev.filter((_, i) => i !== index))
-    toast.success('Görsel kaldırıldı')
+    toast.success(t('admin.imageRemoved'))
   }
   
   const handleSubmit = async (e: React.FormEvent) => {
@@ -113,17 +111,17 @@ export default function AdminProductFormPage() {
     console.log('Selected Sizes:', selectedSizes)
     
     if (!formData.name || !formData.description || !formData.category_id || !formData.price) {
-      toast.error('Lütfen zorunlu alanları doldurun')
+      toast.error(t('admin.fillRequiredFields'))
       return
     }
     
     if (selectedSizes.length === 0) {
-      toast.error('En az bir beden seçmelisiniz')
+      toast.error(t('admin.selectAtLeastOneSize'))
       return
     }
     
     if (images.length === 0) {
-      toast.error('En az bir görsel yüklemelisiniz')
+      toast.error(t('admin.uploadAtLeastOneImage'))
       return
     }
     
@@ -148,26 +146,25 @@ export default function AdminProductFormPage() {
         images,
         stock: stockData,
         sku: formData.sku || null,
-        is_active: formData.is_active,
-        is_featured: formData.is_featured,
-        is_new: formData.is_new,
-        tags: formData.tags ? formData.tags.split(',').map(t => t.trim()).filter(t => t) : []
+        is_active: true,
+        is_featured: false,
+        is_new: false
       })
       
       console.log('API yanıtı:', result)
       
       const apiResult = result as { success: boolean; error?: string; data?: any }
       if (apiResult.success) {
-        toast.success('Ürün başarıyla eklendi!')
+        toast.success(t('admin.productAddedSuccessfully'))
         setTimeout(() => {
           router.push('/admin/urunler')
         }, 1000)
       } else {
-        toast.error(apiResult.error || 'Ürün eklenirken hata oluştu')
+        toast.error(apiResult.error || t('admin.productAddError'))
       }
     } catch (error) {
       console.error('Submit error:', error)
-      toast.error('Bir hata oluştu: ' + (error instanceof Error ? error.message : 'Bilinmeyen hata'))
+      toast.error(t('common.error') + ': ' + (error instanceof Error ? error.message : t('common.error')))
     } finally {
       setLoading(false)
     }
@@ -186,10 +183,10 @@ export default function AdminProductFormPage() {
         </Link>
         <div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-            Yeni Ürün Ekle
+            {t('admin.addNewProduct')}
           </h1>
           <p className="text-slate-600 dark:text-slate-400 mt-1">
-            MySQL veritabanına kaydedilecek
+            {t('admin.savedToMySQL')}
           </p>
         </div>
       </div>
@@ -199,32 +196,32 @@ export default function AdminProductFormPage() {
           <div className="lg:col-span-2 space-y-6">
             <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
               <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
-                Temel Bilgiler
+                {t('admin.basicInfo')}
               </h2>
               
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
-                    Ürün Adı *
+                    {t('admin.productNameLabel')}
                   </label>
                   <input
                     type="text"
                     value={formData.name}
                     onChange={e => setFormData(prev => ({...prev, name: e.target.value}))}
-                    placeholder="Örn: AeroGlide Pro"
+                    placeholder={t('admin.productNamePlaceholder')}
                     className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
-                    Açıklama *
+                    {t('admin.descriptionLabel')}
                   </label>
                   <textarea
                     rows={5}
                     value={formData.description}
                     onChange={e => setFormData(prev => ({...prev, description: e.target.value}))}
-                    placeholder="Ürün hakkında detaylı açıklama"
+                    placeholder={t('admin.descriptionPlaceholder')}
                     className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary resize-none"
                   />
                 </div>
@@ -232,14 +229,14 @@ export default function AdminProductFormPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
-                      Kategori *
+                      {t('admin.categoryLabel')}
                     </label>
                     <select
                       value={formData.category_id}
                       onChange={e => setFormData(prev => ({...prev, category_id: e.target.value}))}
                       className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
                     >
-                      <option value="">Kategori Seçin</option>
+                      <option value="">{t('admin.selectCategoryPlaceholder')}</option>
                       {categories.map(cat => (
                         <option key={cat.id} value={cat.id}>{cat.name}</option>
                       ))}
@@ -248,7 +245,7 @@ export default function AdminProductFormPage() {
 
                   <div>
                     <label className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
-                      Fiyat (₺) *
+                      {t('admin.priceLabel')}
                     </label>
                     <input
                       type="text"
@@ -260,7 +257,7 @@ export default function AdminProductFormPage() {
                           setFormData(prev => ({...prev, price: val}))
                         }
                       }}
-                      placeholder="1899.00"
+                      placeholder={t('admin.pricePlaceholder')}
                       className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
                     />
                   </div>
@@ -268,13 +265,13 @@ export default function AdminProductFormPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
-                    SKU (Stok Kodu)
+                    {t('admin.skuLabel')}
                   </label>
                   <input
                     type="text"
                     value={formData.sku}
                     onChange={e => setFormData(prev => ({...prev, sku: e.target.value}))}
-                    placeholder="AGLP-2024-001"
+                    placeholder={t('admin.skuPlaceholder')}
                     className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
@@ -283,13 +280,13 @@ export default function AdminProductFormPage() {
 
             <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
               <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
-                Beden ve Stok
+                {t('admin.sizeAndStock')}
               </h2>
 
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-900 dark:text-white mb-3">
-                    Bedenler *
+                    {t('admin.sizesLabel')}
                   </label>
                   <div className="flex flex-wrap gap-2">
                     {availableSizes.map((size) => (
@@ -312,7 +309,7 @@ export default function AdminProductFormPage() {
                 {selectedSizes.length > 0 && (
                   <div>
                     <label className="block text-sm font-medium text-slate-900 dark:text-white mb-3">
-                      Stok Miktarları
+                      {t('admin.stockQuantities')}
                     </label>
                     <div className="space-y-3">
                       {selectedSizes.sort((a, b) => Number(a) - Number(b)).map((size) => (
@@ -360,7 +357,7 @@ export default function AdminProductFormPage() {
 
             <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
               <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
-                Görseller
+                {t('admin.imagesLabel')}
               </h2>
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -388,7 +385,7 @@ export default function AdminProductFormPage() {
                   />
                   <Upload className="h-6 w-6" />
                   <span className="text-sm font-medium">
-                    {uploadingImage ? 'Yükleniyor...' : 'Yükle'}
+                    {uploadingImage ? t('admin.uploadingImages') : t('admin.uploadButton')}
                   </span>
                 </label>
               </div>
@@ -396,54 +393,6 @@ export default function AdminProductFormPage() {
           </div>
 
           <div className="space-y-6">
-            <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
-              <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
-                Durum
-              </h2>
-              <div className="space-y-3">
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <input 
-                    type="checkbox" 
-                    checked={formData.is_active}
-                    onChange={e => setFormData(prev => ({...prev, is_active: e.target.checked}))}
-                    className="w-5 h-5 rounded border-slate-300 text-primary focus:ring-primary" 
-                  />
-                  <span className="text-slate-700 dark:text-slate-300">Aktif</span>
-                </label>
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <input 
-                    type="checkbox"
-                    checked={formData.is_featured}
-                    onChange={e => setFormData(prev => ({...prev, is_featured: e.target.checked}))}
-                    className="w-5 h-5 rounded border-slate-300 text-primary focus:ring-primary" 
-                  />
-                  <span className="text-slate-700 dark:text-slate-300">Öne Çıkan</span>
-                </label>
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <input 
-                    type="checkbox"
-                    checked={formData.is_new}
-                    onChange={e => setFormData(prev => ({...prev, is_new: e.target.checked}))}
-                    className="w-5 h-5 rounded border-slate-300 text-primary focus:ring-primary" 
-                  />
-                  <span className="text-slate-700 dark:text-slate-300">Yeni</span>
-                </label>
-              </div>
-            </div>
-
-            <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
-              <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
-                Etiketler
-              </h2>
-              <input
-                type="text"
-                value={formData.tags}
-                onChange={e => setFormData(prev => ({...prev, tags: e.target.value}))}
-                placeholder="koşu, spor, hafif"
-                className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-            </div>
-
             <div className="space-y-3">
               <button
                 type="submit"
@@ -451,13 +400,13 @@ export default function AdminProductFormPage() {
                 className="w-full px-6 py-3 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 <Save className="h-5 w-5" />
-                {loading ? 'Kaydediliyor...' : 'Kaydet'}
+                {loading ? t('admin.savingButton') : t('admin.saveButton')}
               </button>
               <Link
                 href="/admin/urunler"
                 className="w-full px-6 py-3 bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white font-medium rounded-lg transition-colors flex items-center justify-center"
               >
-                İptal
+                {t('admin.cancelButton')}
               </Link>
             </div>
           </div>

@@ -9,7 +9,6 @@ import {
   Settings, 
   LogOut,
   Tag,
-  TrendingUp,
   Menu,
   X,
   Users,
@@ -66,7 +65,6 @@ export default function AdminSidebar() {
     { href: '/admin/siparisler', icon: ShoppingCart, label: t('admin.orders') },
     { href: '/admin/musteriler', icon: Users, label: t('admin.customers') },
     { href: '/admin/kategoriler', icon: Tag, label: t('admin.categories') },
-    { href: '/admin/kampanyalar', icon: TrendingUp, label: t('admin.campaigns') },
     { href: '/admin/ayarlar', icon: Settings, label: t('admin.settings') },
   ]
 
