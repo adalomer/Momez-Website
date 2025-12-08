@@ -169,31 +169,31 @@ export default function Header() {
   ]
 
   return (
-    <header className="sticky top-0 z-50 bg-white/90 dark:bg-surface-dark/90 backdrop-blur-md border-b border-border-light dark:border-border-dark shadow-soft transition-colors duration-300">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
+    <header className="sticky top-0 z-50 bg-white/95 dark:bg-surface-dark/95 backdrop-blur-md border-b border-border-light dark:border-border-dark shadow-sm transition-colors duration-300">
+      <div className="container mx-auto px-4">
+        <div className="flex h-16 md:h-20 items-center justify-between gap-4">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 text-red-500">
+          <Link href="/" className="flex items-center gap-2 md:gap-3 flex-shrink-0">
+            <div className="w-10 h-10 md:w-12 md:h-12 text-red-500 transition-transform hover:scale-110">
               <svg fill="currentColor" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
                 <path d="M44 4H30.6666V17.3334H17.3334V30.6666H4V44H44V4Z"></path>
               </svg>
             </div>
-            <span className="text-2xl font-bold hidden sm:block text-red-500">
+            <span className="text-2xl md:text-3xl font-bold hidden sm:block text-red-500">
               momez
             </span>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-1">
+          <nav className="hidden lg:flex items-center gap-2">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`px-4 py-2 text-sm font-bold rounded-xl transition-all duration-300 ${
+                className={`px-4 py-2.5 text-sm font-bold rounded-xl transition-all duration-300 ${
                   pathname === link.href
                     ? 'bg-red-500 text-white shadow-lg scale-105'
-                    : 'text-red-500 hover:bg-red-500 hover:text-white hover:scale-105 hover:shadow-md'
+                    : 'text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 hover:text-red-600 dark:hover:text-red-400 hover:scale-105'
                 }`}
               >
                 {link.label}
@@ -202,7 +202,7 @@ export default function Header() {
           </nav>
 
           {/* Right Side Icons */}
-          <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0">
+          <div className="flex items-center gap-1 md:gap-2 flex-shrink-0">
             {/* Cart Button */}
             {user ? (
               <Link

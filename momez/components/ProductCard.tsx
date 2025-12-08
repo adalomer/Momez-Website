@@ -101,37 +101,37 @@ export default function ProductCard({ product, user }: ProductCardProps) {
 
   return (
     <>
-      <div className="group">
+      <div className="group bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
         <Link href={`/urun/${product.slug}`}>
-          <div className="aspect-square rounded-xl overflow-hidden bg-gray-100 dark:bg-surface-dark mb-3 relative shadow-sm hover:shadow-md transition-all duration-300">
+          <div className="aspect-square overflow-hidden bg-gray-100 dark:bg-slate-700 relative">
             {product.images && product.images[0] ? (
               <Image
                 src={product.images[0].image_url}
                 alt={product.name}
                 fill
-                className="object-cover group-hover:scale-110 transition"
+                className="object-cover group-hover:scale-110 transition-transform duration-500"
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-gray-400">
+              <div className="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-500">
                 {t('product.noImage')}
               </div>
             )}
             {!product.in_stock && (
-              <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                <span className="text-white font-semibold">{t('product.outOfStock')}</span>
+              <div className="absolute inset-0 bg-black/60 flex items-center justify-center backdrop-blur-sm">
+                <span className="text-white font-bold text-lg">{t('product.outOfStock')}</span>
               </div>
             )}
             {product.discount_price && (
-              <div className="absolute top-2 right-2 bg-[#ee2b2b] text-white px-2 py-1 rounded text-sm font-bold">
+              <div className="absolute top-3 right-3 bg-red-500 text-white px-3 py-1.5 rounded-lg text-sm font-bold shadow-lg">
                 %{Math.round((1 - product.discount_price / product.price) * 100)} {t('product.discount')}
               </div>
             )}
           </div>
         </Link>
         
-        <div className="space-y-2">
+        <div className="p-4 space-y-3">
           <Link href={`/urun/${product.slug}`}>
-            <h3 className="font-semibold text-slate-900 dark:text-slate-50 group-hover:text-primary-500 transition-colors duration-300 line-clamp-2">
+            <h3 className="font-bold text-slate-900 dark:text-white group-hover:text-red-500 dark:group-hover:text-red-400 transition-colors duration-300 line-clamp-2 min-h-[3rem]">
               {product.name}
             </h3>
           </Link>
@@ -139,31 +139,31 @@ export default function ProductCard({ product, user }: ProductCardProps) {
           <div className="flex items-center gap-2">
             {product.discount_price ? (
               <>
-                <p className="text-lg font-bold text-[#ee2b2b]">
+                <p className="text-xl font-bold text-red-500">
                   ₺{Number(displayPrice).toFixed(2)}
                 </p>
-                <p className="text-sm text-gray-500 line-through">
+                <p className="text-sm text-gray-500 dark:text-gray-400 line-through">
                   ₺{Number(product.price).toFixed(2)}
                 </p>
               </>
             ) : (
-              <p className="text-lg font-bold text-[#ee2b2b]">
+              <p className="text-xl font-bold text-red-500">
                 ₺{Number(product.price).toFixed(2)}
               </p>
             )}
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 mt-auto">
             <button
               onClick={handleAddToFavorites}
-              className="group/fav flex-1 p-2.5 border-2 border-border-light dark:border-border-dark hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-all duration-300"
+              className="group/fav p-3 border-2 border-gray-200 dark:border-slate-600 hover:border-red-500 dark:hover:border-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-all duration-300"
               title={t('product.addToFavorites')}
             >
-              <Heart className="w-5 h-5 mx-auto text-slate-600 dark:text-slate-400 transition-all group-hover/fav:fill-primary-500 group-hover/fav:text-primary-500 group-hover/fav:scale-110" />
+              <Heart className="w-5 h-5 text-gray-600 dark:text-gray-400 transition-all group-hover/fav:fill-red-500 group-hover/fav:text-red-500 dark:group-hover/fav:text-red-400 group-hover/fav:scale-110" />
             </button>
             <button
               onClick={handleAddToCart}
-              className="flex-1 px-3 py-2.5 border-2 border-red-500 bg-white text-red-500 hover:bg-red-500 hover:text-white rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-bold"
+              className="flex-1 px-4 py-3 bg-red-500 text-white hover:bg-red-600 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-bold shadow-md hover:shadow-lg active:scale-95"
               disabled={!product.in_stock}
               title={t('product.addToCart')}
             >
@@ -176,10 +176,10 @@ export default function ProductCard({ product, user }: ProductCardProps) {
 
       {/* Beden Seçimi Modal */}
       {showSizeModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
-          <div className="bg-white dark:bg-surface-dark rounded-xl max-w-md w-full p-6 shadow-2xl border border-border-light dark:border-border-dark animate-scale-in">
-            <h3 className="text-xl font-bold mb-4 text-slate-900 dark:text-white">{t('product.selectSize')}</h3>
-            <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in" onClick={() => setShowSizeModal(false)}>
+          <div className="bg-white dark:bg-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl border border-gray-200 dark:border-slate-700 animate-scale-in" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-2xl font-bold mb-2 text-slate-900 dark:text-white">{t('product.selectSize')}</h3>
+            <p className="text-sm text-slate-600 dark:text-slate-400 mb-6">
               {product.name}
             </p>
             
@@ -194,12 +194,12 @@ export default function ProductCard({ product, user }: ProductCardProps) {
                     onClick={() => isAvailable && setSelectedSize(size)}
                     disabled={!isAvailable}
                     className={`
-                      p-3 rounded-lg border-2 font-medium transition
+                      p-3 rounded-xl border-2 font-bold transition-all duration-200
                       ${isSelected 
-                        ? 'border-[#ee2b2b] bg-[#ee2b2b] text-white' 
+                        ? 'border-red-500 bg-red-500 text-white shadow-lg scale-105' 
                         : isAvailable
-                          ? 'border-gray-300 hover:border-[#ee2b2b]'
-                          : 'border-gray-200 bg-gray-100 text-gray-400 line-through cursor-not-allowed'
+                          ? 'border-gray-300 dark:border-slate-600 hover:border-red-500 dark:hover:border-red-400 hover:scale-105 bg-white dark:bg-slate-700 text-slate-900 dark:text-white'
+                          : 'border-gray-200 dark:border-slate-700 bg-gray-100 dark:bg-slate-900 text-gray-400 dark:text-gray-600 line-through cursor-not-allowed'
                       }
                     `}
                   >
@@ -215,7 +215,7 @@ export default function ProductCard({ product, user }: ProductCardProps) {
                   setShowSizeModal(false)
                   setSelectedSize('')
                 }}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition"
+                className="flex-1 px-4 py-3 border-2 border-gray-300 dark:border-slate-600 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-700 transition-all font-semibold text-slate-700 dark:text-slate-300"
                 disabled={adding}
               >
                 {t('common.cancel')}
@@ -223,7 +223,7 @@ export default function ProductCard({ product, user }: ProductCardProps) {
               <button
                 onClick={confirmAddToCart}
                 disabled={!selectedSize || adding}
-                className="flex-1 px-4 py-2 bg-[#ee2b2b] text-white rounded-lg hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 px-4 py-3 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed font-bold shadow-lg hover:shadow-xl active:scale-95"
               >
                 {adding ? t('common.loading') : t('product.addToCart')}
               </button>
