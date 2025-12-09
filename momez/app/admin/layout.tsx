@@ -28,11 +28,13 @@ export default function AdminLayout({
   }, [language])
 
   return (
-    <div className="flex min-h-screen bg-slate-50 dark:bg-slate-900" dir="ltr">
+    <div className="flex min-h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800" dir="ltr">
       <AdminSidebar />
-      <main className="flex-1 p-6 lg:p-10 relative">
+      <main className="flex-1 p-4 md:p-6 lg:p-10 relative overflow-x-hidden">
         <PageTransition>
-          {children}
+          <div className="max-w-7xl mx-auto">
+            {children}
+          </div>
         </PageTransition>
       </main>
     </div>

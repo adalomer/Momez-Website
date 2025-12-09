@@ -16,11 +16,34 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
   const [selectedSize, setSelectedSize] = useState<string>('')
   const [quantity, setQuantity] = useState(1)
   const [selectedImage, setSelectedImage] = useState(0)
+  const [relatedProducts, setRelatedProducts] = useState<any[]>([])
+  const [activeTab, setActiveTab] = useState('description')
+  const [shippingSettings, setShippingSettings] = useState({ freeLimit: 500, fee: 50 })
   const { t, language } = useLanguage()
 
   useEffect(() => {
     loadProduct()
+    loadShippingSettings()
   }, [])
+
+  const loadShippingSettings = async () => {
+    try {
+      const response = await fetch('/api/settings')
+      const data = await response.json()
+      if (data.success && data.data) {
+        const settingsObj = data.data.reduce((acc: any, item: any) => {
+          acc[item.key] = item.value
+          return acc
+        }, {})
+        
+        const freeLimit = parseFloat(settingsObj.free_shipping_limit || 500)
+        const fee = parseFloat(settingsObj.standard_shipping_fee || 50)
+        setShippingSettings({ freeLimit, fee })
+      }
+    } catch (error) {
+      console.error('Settings load error:', error)
+    }
+  }
 
   const loadProduct = async () => {
     try {
@@ -30,7 +53,8 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
       
       if (result.success && result.data) {
         setProduct(result.data)
-        // Otomatik seçim kaldırıldı - Kullanıcı beden seçmeli
+        // Benzer ürünleri yükle
+        loadRelatedProducts(result.data.category?.slug)
       } else {
         toast.error(result.error || t('common.error'))
         router.push('/')
@@ -41,6 +65,26 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
       router.push('/')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const loadRelatedProducts = async (categorySlug?: string) => {
+    if (!categorySlug) return
+    
+    try {
+      const resolvedParams = await params
+      const result = await productsAPI.getAll({ 
+        category: categorySlug, 
+        limit: 8 
+      }) as { success: boolean; data?: any[]; error?: string }
+      
+      if (result.success && result.data) {
+        // Mevcut ürünü hariç tut
+        const filtered = result.data.filter((p: any) => p.slug !== resolvedParams.slug)
+        setRelatedProducts(filtered.slice(0, 6))
+      }
+    } catch (error) {
+      console.error('Related products load error:', error)
     }
   }
 
@@ -316,6 +360,178 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
             </div>
           </div>
         </div>
+
+        {/* Tabs: Açıklama, Özellikler, Yorumlar */}
+        <div className="mt-16">
+          <div className="border-b border-gray-200 dark:border-slate-700">
+            <nav className="flex gap-8" aria-label="Tabs">
+              <button
+                onClick={() => setActiveTab('description')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  activeTab === 'description'
+                    ? 'border-red-500 text-red-500'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 hover:border-gray-300'
+                }`}
+              >
+                {t('product.description')}
+              </button>
+              <button
+                onClick={() => setActiveTab('features')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  activeTab === 'features'
+                    ? 'border-red-500 text-red-500'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 hover:border-gray-300'
+                }`}
+              >
+                {t('product.features')}
+              </button>
+              <button
+                onClick={() => setActiveTab('shipping')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  activeTab === 'shipping'
+                    ? 'border-red-500 text-red-500'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 hover:border-gray-300'
+                }`}
+              >
+                {t('product.shipping')}
+              </button>
+            </nav>
+          </div>
+
+          <div className="mt-8 bg-white dark:bg-slate-800 rounded-2xl p-8 shadow-lg">
+            {activeTab === 'description' && (
+              <div>
+                <h3 className="text-2xl font-bold mb-4 text-slate-900 dark:text-white">{t('product.productDetails')}</h3>
+                <p className="text-slate-600 dark:text-slate-400 leading-relaxed whitespace-pre-line">
+                  {product.description || t('product.noDescription')}
+                </p>
+              </div>
+            )}
+
+            {activeTab === 'features' && (
+              <div>
+                <h3 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">{t('product.productFeatures')}</h3>
+                <ul className="space-y-3">
+                  <li className="flex items-start gap-3">
+                    <span className="text-red-500 mt-1">✓</span>
+                    <span className="text-slate-600 dark:text-slate-400">{t('product.feature1')}</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-red-500 mt-1">✓</span>
+                    <span className="text-slate-600 dark:text-slate-400">{t('product.feature2')}</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-red-500 mt-1">✓</span>
+                    <span className="text-slate-600 dark:text-slate-400">{t('product.feature3')}</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-red-500 mt-1">✓</span>
+                    <span className="text-slate-600 dark:text-slate-400">{t('product.feature4')}</span>
+                  </li>
+                </ul>
+              </div>
+            )}
+
+            {activeTab === 'shipping' && (
+              <div>
+                <h3 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">{t('product.shippingInfo')}</h3>
+                <div className="space-y-4">
+                  <div className="flex items-start gap-4 p-4 bg-green-50 dark:bg-green-900/20 rounded-xl">
+                    <Truck className="w-6 h-6 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <h4 className="font-semibold text-slate-900 dark:text-white mb-1">{t('product.freeShipping')}</h4>
+                      <p className="text-sm text-slate-600 dark:text-slate-400">
+                        {shippingSettings.freeLimit} TL {language === 'tr' ? 've üzeri alışverişlerde kargo bedava' : language === 'en' ? 'and above free shipping' : 'والأكثر شحن مجاني'}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
+                    <svg className="w-6 h-6 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div>
+                      <h4 className="font-semibold text-slate-900 dark:text-white mb-1">{t('product.returnPolicy')}</h4>
+                      <p className="text-sm text-slate-600 dark:text-slate-400">{t('product.returnPolicyDesc')}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Benzer Ürünler */}
+        {relatedProducts.length > 0 && (
+          <div className="mt-16">
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-3xl font-bold text-slate-900 dark:text-white">{t('product.similarProducts')}</h2>
+              {product.category && (
+                <Link 
+                  href={`/kategori/${product.category.slug}`}
+                  className="text-red-500 hover:text-red-600 dark:hover:text-red-400 font-semibold text-sm md:text-base hover:underline transition-all"
+                >
+                  {t('home.viewAll')} →
+                </Link>
+              )}
+            </div>
+            
+            <div className="relative">
+              <div className="overflow-x-auto scrollbar-thin pb-4">
+                <div className="flex gap-6 min-w-max">
+                  {relatedProducts.map((relatedProduct) => (
+                    <Link
+                      key={relatedProduct.id}
+                      href={`/urun/${relatedProduct.slug}`}
+                      className="group w-[280px] bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] flex-shrink-0"
+                    >
+                      <div className="aspect-square overflow-hidden bg-gray-100 dark:bg-slate-700 relative">
+                        {relatedProduct.images && relatedProduct.images[0] ? (
+                          <Image
+                            src={relatedProduct.images[0].image_url}
+                            alt={relatedProduct.name}
+                            width={280}
+                            height={280}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-gray-400">
+                            {t('product.noImage')}
+                          </div>
+                        )}
+                        {relatedProduct.discount_price && (
+                          <div className="absolute top-3 right-3 bg-red-500 text-white px-3 py-1.5 rounded-lg text-sm font-bold shadow-lg">
+                            %{Math.round((1 - relatedProduct.discount_price / relatedProduct.price) * 100)}
+                          </div>
+                        )}
+                      </div>
+                      <div className="p-4">
+                        <h3 className="font-bold text-slate-900 dark:text-white group-hover:text-red-500 dark:group-hover:text-red-400 transition-colors line-clamp-2 min-h-[3rem] mb-2">
+                          {relatedProduct.name}
+                        </h3>
+                        <div className="flex items-center gap-2">
+                          {relatedProduct.discount_price ? (
+                            <>
+                              <p className="text-xl font-bold text-red-500">
+                                ₺{Number(relatedProduct.discount_price).toFixed(2)}
+                              </p>
+                              <p className="text-sm text-gray-500 dark:text-gray-400 line-through">
+                                ₺{Number(relatedProduct.price).toFixed(2)}
+                              </p>
+                            </>
+                          ) : (
+                            <p className="text-xl font-bold text-red-500">
+                              ₺{Number(relatedProduct.price).toFixed(2)}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

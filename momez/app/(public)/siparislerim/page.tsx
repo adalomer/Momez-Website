@@ -53,17 +53,35 @@ export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState<any>(null)
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    checkAuthAndLoadOrders()
+    setMounted(true)
   }, [])
+
+  useEffect(() => {
+    if (!mounted) return
+    
+    // Client-side'da token kontrolü yap
+    const token = localStorage.getItem('token')
+    if (!token) {
+      router.push('/auth/login?redirect=/siparislerim')
+      setLoading(false)
+      return
+    }
+    
+    checkAuthAndLoadOrders()
+  }, [mounted])
 
   const checkAuthAndLoadOrders = async () => {
     try {
       // Kullanıcı kontrolü
       const userResult = await authAPI.me() as { success: boolean; data?: any; error?: string }
       if (!userResult || !userResult.success) {
+        // Token geçersiz, temizle ve login'e yönlendir
+        localStorage.removeItem('token')
         router.push('/auth/login?redirect=/siparislerim')
+        setLoading(false)
         return
       }
       

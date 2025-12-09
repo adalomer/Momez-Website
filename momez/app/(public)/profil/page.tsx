@@ -20,6 +20,7 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [user, setUser] = useState<UserData | null>(null)
+  const [mounted, setMounted] = useState(false)
   const [formData, setFormData] = useState({
     full_name: '',
     phone: ''
@@ -27,8 +28,22 @@ export default function ProfilePage() {
   const { t, language } = useLanguage()
 
   useEffect(() => {
-    fetchUser()
+    setMounted(true)
   }, [])
+
+  useEffect(() => {
+    if (!mounted) return
+    
+    // Client-side'da token kontrolü yap
+    const token = localStorage.getItem('token')
+    if (!token) {
+      router.push('/auth/login?redirect=/profil')
+      setLoading(false)
+      return
+    }
+    
+    fetchUser()
+  }, [mounted])
 
   const fetchUser = async () => {
     try {
@@ -48,11 +63,14 @@ export default function ProfilePage() {
           phone: data.data.user.phone || ''
         })
       } else {
-        router.push('/auth/login')
+        // Token geçersiz, temizle ve login'e yönlendir
+        localStorage.removeItem('token')
+        router.push('/auth/login?redirect=/profil')
       }
     } catch (error) {
-      toast.error(t('common.error'))
-      router.push('/auth/login')
+      // Hata durumunda token temizle ve login'e yönlendir
+      localStorage.removeItem('token')
+      router.push('/auth/login?redirect=/profil')
     } finally {
       setLoading(false)
     }

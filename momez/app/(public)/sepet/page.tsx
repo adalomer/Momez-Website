@@ -27,12 +27,27 @@ export default function CartPage() {
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState<any>(null)
   const [shippingSettings, setShippingSettings] = useState({ freeLimit: 500, fee: 50 })
+  const [mounted, setMounted] = useState(false)
   const { t, language } = useLanguage()
 
   useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  useEffect(() => {
+    if (!mounted) return
+    
+    // Client-side'da token kontrolü yap
+    const token = localStorage.getItem('token')
+    if (!token) {
+      router.push('/auth/login?redirect=/sepet')
+      setLoading(false)
+      return
+    }
+    
     checkAuthAndLoadCart()
     loadShippingSettings()
-  }, [])
+  }, [mounted])
 
   const loadShippingSettings = async () => {
     try {
@@ -60,7 +75,10 @@ export default function CartPage() {
       // Kullanıcı kontrolü
       const userResult = await authAPI.me() as { success: boolean; data?: any; error?: string }
       if (!userResult || !userResult.success) {
+        // Token geçersiz, temizle ve login'e yönlendir
+        localStorage.removeItem('token')
         router.push('/auth/login?redirect=/sepet')
+        setLoading(false)
         return
       }
       
@@ -72,8 +90,10 @@ export default function CartPage() {
         setCartItems(cartResult.data)
       }
     } catch (error) {
-      console.error('Cart load error:', error)
-      toast.error(t('common.error'))
+      // Hata durumunda da token temizle ve login'e yönlendir
+      console.log('Auth check failed, redirecting to login')
+      localStorage.removeItem('token')
+      router.push('/auth/login?redirect=/sepet')
     } finally {
       setLoading(false)
     }

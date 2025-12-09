@@ -110,7 +110,7 @@ export async function PATCH(request: NextRequest) {
       )
     }
 
-    const validStatuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled']
+    const validStatuses = ['pending', 'confirmed', 'preparing', 'processing', 'shipped', 'delivered', 'cancelled']
     if (!validStatuses.includes(status)) {
       return NextResponse.json(
         { success: false, error: 'Geçersiz durum' },

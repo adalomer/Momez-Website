@@ -24,17 +24,35 @@ export default function FavoritesPage() {
   const router = useRouter()
   const [favorites, setFavorites] = useState<FavoriteItem[]>([])
   const [loading, setLoading] = useState(true)
+  const [mounted, setMounted] = useState(false)
   const { t, language } = useLanguage()
 
   useEffect(() => {
-    checkAuthAndLoadFavorites()
+    setMounted(true)
   }, [])
+
+  useEffect(() => {
+    if (!mounted) return
+    
+    // Client-side'da token kontrolü yap
+    const token = localStorage.getItem('token')
+    if (!token) {
+      router.push('/auth/login?redirect=/favoriler')
+      setLoading(false)
+      return
+    }
+    
+    checkAuthAndLoadFavorites()
+  }, [mounted])
 
   const checkAuthAndLoadFavorites = async () => {
     try {
       const userResult = await authAPI.me() as { success: boolean; data?: any; error?: string }
       if (!userResult || !userResult.success) {
+        // Token geçersiz, temizle ve login'e yönlendir
+        localStorage.removeItem('token')
         router.push('/auth/login?redirect=/favoriler')
+        setLoading(false)
         return
       }
       
@@ -43,8 +61,10 @@ export default function FavoritesPage() {
         setFavorites(favResult.data)
       }
     } catch (error) {
-      console.error('Favorites load error:', error)
-      toast.error(t('common.error'))
+      // Hata durumunda da token temizle ve login'e yönlendir
+      console.log('Auth check failed, redirecting to login')
+      localStorage.removeItem('token')
+      router.push('/auth/login?redirect=/favoriler')
     } finally {
       setLoading(false)
     }

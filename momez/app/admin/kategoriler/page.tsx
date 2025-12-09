@@ -208,51 +208,56 @@ export default function AdminCategoriesPage() {
       {/* Categories Grid */}
       {loading ? (
         <div className="text-center py-12">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-slate-300 border-t-primary"></div>
+          <p className="mt-4 text-slate-500">{t('common.loading')}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {categories.map((category) => (
-            <div key={category.id} className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
-              <div className="relative h-48 bg-slate-200 dark:bg-slate-700">
+            <div key={category.id} className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden group hover:shadow-2xl hover:scale-[1.02] transition-all duration-300">
+              <div className="relative h-48 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800">
                 {category.image_url ? (
                   <img
                     src={category.image_url}
                     alt={category.name}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-slate-400">
-                    <Eye className="h-12 w-12" />
+                    <div className="text-center">
+                      <Eye className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                      <p className="text-sm">{t('admin.noImage')}</p>
+                    </div>
                   </div>
                 )}
+                <span className={`absolute top-3 right-3 inline-flex items-center px-3 py-1 rounded-full text-xs font-bold shadow-lg ${
+                  category.is_active
+                    ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white'
+                    : 'bg-gray-500/90 text-white'
+                }`}>
+                  {category.is_active ? t('admin.active') : t('admin.inactive')}
+                </span>
               </div>
               <div className="p-4">
-                <div className="flex items-start justify-between mb-3">
-                  <div>
-                    <h3 className="font-bold text-slate-900 dark:text-white text-lg mb-1">
-                      {category.name}
-                    </h3>
-                  </div>
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                    category.is_active
-                      ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400'
-                      : 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-400'
-                  }`}>
-                    {category.is_active ? t('admin.active') : t('admin.inactive')}
-                  </span>
+                <div className="mb-3">
+                  <h3 className="font-bold text-slate-900 dark:text-white text-lg">
+                    {category.name}
+                  </h3>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                    {category.slug}
+                  </p>
                 </div>
                 
                 <div className="flex items-center gap-2">
                   <button 
-                    className="flex-1 px-3 py-2 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors flex items-center justify-center gap-2"
+                    className="flex-1 px-3 py-2.5 text-sm bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg transition-all duration-300 flex items-center justify-center gap-2 font-medium shadow-md hover:shadow-xl transform hover:-translate-y-0.5"
                     onClick={() => openEditModal(category)}
                   >
                     <Edit className="h-4 w-4" />
                     {t('common.edit')}
                   </button>
                   <button 
-                    className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                    className="p-2.5 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-lg transition-all duration-300 shadow-md hover:shadow-xl transform hover:-translate-y-0.5"
                     onClick={() => handleDelete(category.id, category.name)}
                   >
                     <Trash2 className="h-4 w-4" />

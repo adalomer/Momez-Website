@@ -143,28 +143,32 @@ export default function AdminCampaignsPage() {
 
       {/* Campaigns List */}
       {loading ? (
-        <div className="p-12 text-center text-slate-500">
-          {t('common.loading')}
+        <div className="p-12 text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-slate-300 border-t-primary"></div>
+          <p className="mt-4 text-slate-500">{t('common.loading')}</p>
         </div>
       ) : campaigns.length === 0 ? (
-        <div className="p-12 text-center text-slate-500 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
-          {t('campaigns.noCampaigns')}
+        <div className="p-12 text-center bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-lg">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-700 mb-4">
+            <Plus className="h-8 w-8 text-slate-400" />
+          </div>
+          <p className="text-slate-500">{t('campaigns.noCampaigns')}</p>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-6">
           {campaigns.map((campaign) => (
-            <div key={campaign.id} className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+            <div key={campaign.id} className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 group">
               <div className="flex flex-col md:flex-row">
                 {campaign.image_url && (
-                  <div className="relative w-full md:w-64 h-48 md:h-auto bg-slate-200 dark:bg-slate-700 flex-shrink-0">
+                  <div className="relative w-full md:w-80 h-56 md:h-auto bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 flex-shrink-0">
                     <Image
                       src={campaign.image_url}
                       alt={campaign.title}
                       fill
-                      className="object-cover"
+                      className="object-cover group-hover:scale-110 transition-transform duration-500"
                     />
-                    <div className="absolute top-3 left-3 bg-primary text-white px-3 py-1 rounded-lg font-bold">
-                      {campaign.discount_type === 'percentage' ? `%${campaign.discount_value}` : `₺${campaign.discount_value}`}
+                    <div className="absolute top-4 left-4 bg-gradient-to-r from-red-600 to-pink-600 text-white px-4 py-2 rounded-lg font-bold text-lg shadow-xl">
+                      {campaign.discount_type === 'percentage' ? `%${campaign.discount_value} İNDİRİM` : `₺${campaign.discount_value} İNDİRİM`}
                     </div>
                   </div>
                 )}
@@ -172,31 +176,37 @@ export default function AdminCampaignsPage() {
                 <div className="flex-1 p-6">
                   <div className="flex items-start justify-between mb-4">
                     <div>
-                      <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
+                      <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
                         {campaign.title}
                       </h3>
-                      <p className="text-slate-600 dark:text-slate-400">
+                      <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
                         {campaign.description}
                       </p>
                     </div>
-                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                    <span className={`px-4 py-2 rounded-full text-sm font-bold shadow-md ${
                       campaign.is_active
-                        ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400'
-                        : 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-400'
+                        ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white'
+                        : 'bg-gray-500/90 text-white'
                     }`}>
                       {campaign.is_active ? t('admin.active') : t('admin.inactive')}
                     </span>
                   </div>
                   
-                  <div className="flex items-center gap-6 text-sm text-slate-600 dark:text-slate-400 mb-4">
-                    <span>{t('campaigns.startDate')}: {new Date(campaign.start_date).toLocaleDateString('tr-TR')}</span>
-                    <span>{t('campaigns.endDate')}: {new Date(campaign.end_date).toLocaleDateString('tr-TR')}</span>
+                  <div className="flex items-center gap-6 text-sm mb-6 p-3 rounded-lg bg-slate-50 dark:bg-slate-900/50">
+                    <div className="flex items-center gap-2">
+                      <span className="text-slate-500 dark:text-slate-400">{t('campaigns.startDate')}:</span>
+                      <span className="font-semibold text-slate-900 dark:text-white">{new Date(campaign.start_date).toLocaleDateString('tr-TR')}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-slate-500 dark:text-slate-400">{t('campaigns.endDate')}:</span>
+                      <span className="font-semibold text-slate-900 dark:text-white">{new Date(campaign.end_date).toLocaleDateString('tr-TR')}</span>
+                    </div>
                   </div>
                   
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleDelete(campaign.id, campaign.title)}
-                      className="px-3 py-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors flex items-center gap-2"
+                      className="px-4 py-2.5 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-lg transition-all duration-300 flex items-center gap-2 font-medium shadow-md hover:shadow-xl transform hover:-translate-y-0.5"
                     >
                       <Trash2 className="h-4 w-4" />
                       {t('common.delete')}

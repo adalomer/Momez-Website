@@ -147,57 +147,61 @@ export default function AdminOrdersPage() {
       </div>
 
       {/* Orders Table */}
-      <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+      <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-lg">
         {loading ? (
-          <div className="p-12 text-center text-slate-500">
-            {t('common.loading')}
+          <div className="p-12 text-center">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-slate-300 border-t-primary"></div>
+            <p className="mt-4 text-slate-500">{t('common.loading')}</p>
           </div>
         ) : filteredOrders.length === 0 ? (
-          <div className="p-12 text-center text-slate-500">
-            {searchTerm ? t('orders.notFound') : t('admin.noOrders')}
+          <div className="p-12 text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 mb-4">
+              <Search className="h-8 w-8 text-slate-400" />
+            </div>
+            <p className="text-slate-500">{searchTerm ? t('orders.notFound') : t('admin.noOrders')}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-slate-50 dark:bg-slate-900">
+              <thead className="bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 border-b-2 border-slate-200 dark:border-slate-700">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">
+                  <th className="px-6 py-4 text-left text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
                     {t('admin.orderNo')}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">
+                  <th className="px-6 py-4 text-left text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
                     {t('admin.customer')}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">
+                  <th className="px-6 py-4 text-left text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
                     {t('admin.date')}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">
+                  <th className="px-6 py-4 text-left text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
                     {t('orders.productCount')}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">
+                  <th className="px-6 py-4 text-left text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
                     {t('order.total')}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">
+                  <th className="px-6 py-4 text-left text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
                     {t('admin.status')}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">
+                  <th className="px-6 py-4 text-left text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
                     {t('common.actions')}
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
                 {filteredOrders.map((order) => (
-                  <tr key={order.id} className="hover:bg-slate-50 dark:hover:bg-slate-900/50">
+                  <tr key={order.id} className="hover:bg-gradient-to-r hover:from-slate-50 hover:to-transparent dark:hover:from-slate-900/50 dark:hover:to-transparent transition-all duration-200">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <a
                         href={`/admin/siparisler/${order.id}`}
-                        className="font-medium text-slate-900 dark:text-white hover:text-primary underline"
+                        className="font-bold text-primary hover:text-primary/80 underline decoration-2 underline-offset-2"
                       >
                         {order.order_number}
                       </a>
                     </td>
                     <td className="px-6 py-4">
                       <div>
-                        <div className="font-medium text-slate-900 dark:text-white">
+                        <div className="font-semibold text-slate-900 dark:text-white">
                           {order.customer_name || '-'}
                         </div>
                         <div className="text-sm text-slate-500 dark:text-slate-400">
@@ -205,17 +209,21 @@ export default function AdminOrdersPage() {
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-slate-700 dark:text-slate-300">
+                    <td className="px-6 py-4 whitespace-nowrap text-slate-700 dark:text-slate-300 font-medium">
                       {new Date(order.created_at).toLocaleDateString('tr-TR')}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-slate-700 dark:text-slate-300">
-                      {order.item_count} {t('orders.products')}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap font-medium text-slate-900 dark:text-white">
-                      ₺{(Number(order.total) || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400">
+                        {order.item_count} {t('orders.products')}
+                      </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      <span className="text-lg font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                        ₺{(Number(order.total) || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold shadow-sm ${
                         statusColors[order.status as keyof typeof statusColors] || statusColors.pending
                       }`}>
                         {statusLabels[order.status] || order.status}
@@ -225,7 +233,7 @@ export default function AdminOrdersPage() {
                       <div className="flex items-center gap-2">
                         <a
                           href={`/admin/siparisler/${order.id}`}
-                          className="p-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                          className="p-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all duration-200 hover:scale-110"
                           title="Siparişi İncele"
                         >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -236,18 +244,18 @@ export default function AdminOrdersPage() {
                         <select
                           value={order.status}
                           onChange={(e) => updateOrderStatus(order.id, e.target.value)}
-                          className="text-sm border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 cursor-pointer transition-all"
+                          className="text-sm border-2 border-slate-300 dark:border-slate-600 rounded-xl px-4 py-2.5 bg-gradient-to-r from-white to-slate-50 dark:from-slate-700 dark:to-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-4 focus:ring-primary/20 focus:border-primary cursor-pointer transition-all hover:border-primary hover:shadow-lg font-semibold hover:scale-105 transform duration-200"
                         >
-                          <option value="pending">{t('admin.pending')}</option>
-                          <option value="confirmed">{t('admin.confirmed')}</option>
-                          <option value="preparing">{t('admin.processing')}</option>
-                          <option value="shipped">{t('admin.shipped')}</option>
-                          <option value="delivered">{t('admin.delivered')}</option>
-                          <option value="cancelled">{t('admin.cancelled')}</option>
+                          <option value="pending">🕒 {t('admin.pending')}</option>
+                          <option value="confirmed">✅ {t('admin.confirmed')}</option>
+                          <option value="preparing">📦 {t('admin.processing')}</option>
+                          <option value="shipped">🚚 {t('admin.shipped')}</option>
+                          <option value="delivered">✨ {t('admin.delivered')}</option>
+                          <option value="cancelled">❌ {t('admin.cancelled')}</option>
                         </select>
                         <button
                           onClick={() => deleteOrder(order.id, order.order_number)}
-                          className="p-2 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                          className="p-2 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-200 hover:scale-110"
                           title="Siparişi Sil"
                         >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -83,22 +83,22 @@ export default function AdminSidebar() {
       {/* Sidebar */}
       <aside
         dir="ltr"
-        className={`fixed lg:sticky top-0 left-0 z-40 w-64 h-screen transition-transform ${
+        className={`fixed lg:sticky top-0 left-0 z-40 w-72 h-screen transition-transform ${
           mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-        } bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-700`}
+        } bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-700 shadow-xl`}
         style={{ left: 0, right: 'auto', textAlign: 'left' }}
       >
-        <div className="flex flex-col h-full p-4">
-          {/* Logo */}
-          <div className="flex items-center gap-3 mb-8">
-            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-              <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+        <div className="flex flex-col h-full p-6">
+          {/* Logo with gradient */}
+          <div className="flex items-center gap-3 mb-10 p-4 bg-gradient-to-r from-red-500 to-red-600 rounded-2xl shadow-lg">
+            <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+              <svg className="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
                 <path d="M44 4H30.6666V17.3334H17.3334V30.6666H4V44H44V4Z"></path>
               </svg>
             </div>
             <div className="flex flex-col">
-              <h1 className="text-slate-900 dark:text-white text-base font-bold leading-tight">{t('admin.title')}</h1>
-              <p className="text-slate-500 dark:text-slate-400 text-xs">{t('admin.subtitle')}</p>
+              <h1 className="text-white text-lg font-bold leading-tight">{t('admin.title')}</h1>
+              <p className="text-red-100 text-xs font-medium">{t('admin.subtitle')}</p>
             </div>
           </div>
 
@@ -113,14 +113,14 @@ export default function AdminSidebar() {
                   key={link.href}
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
                     isActive
-                      ? 'bg-primary/10 text-primary font-medium'
-                      : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                      ? 'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg scale-105'
+                      : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:scale-105'
                   }`}
                 >
-                  <Icon className="h-5 w-5" />
-                  <span className="text-sm">{link.label}</span>
+                  <Icon className="h-5 w-5 flex-shrink-0" />
+                  <span className="text-sm font-semibold">{link.label}</span>
                 </Link>
               )
             })}
