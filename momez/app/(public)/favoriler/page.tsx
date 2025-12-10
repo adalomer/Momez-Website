@@ -34,14 +34,6 @@ export default function FavoritesPage() {
   useEffect(() => {
     if (!mounted) return
     
-    // Client-side'da token kontrolü yap
-    const token = localStorage.getItem('token')
-    if (!token) {
-      router.push('/auth/login?redirect=/favoriler')
-      setLoading(false)
-      return
-    }
-    
     checkAuthAndLoadFavorites()
   }, [mounted])
 
@@ -51,7 +43,10 @@ export default function FavoritesPage() {
       if (!userResult || !userResult.success) {
         // Token geçersiz, temizle ve login'e yönlendir
         localStorage.removeItem('token')
-        router.push('/auth/login?redirect=/favoriler')
+        toast.error(t('auth.loginRequired'), { id: 'auth-required', duration: 2000 })
+        setTimeout(() => {
+          router.push('/auth/login?redirect=/favoriler')
+        }, 500)
         setLoading(false)
         return
       }
@@ -64,7 +59,10 @@ export default function FavoritesPage() {
       // Hata durumunda da token temizle ve login'e yönlendir
       console.log('Auth check failed, redirecting to login')
       localStorage.removeItem('token')
-      router.push('/auth/login?redirect=/favoriler')
+      toast.error(t('auth.loginRequired'), { id: 'auth-required', duration: 2000 })
+      setTimeout(() => {
+        router.push('/auth/login?redirect=/favoriler')
+      }, 500)
     } finally {
       setLoading(false)
     }

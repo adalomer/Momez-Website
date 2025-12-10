@@ -37,14 +37,6 @@ export default function CartPage() {
   useEffect(() => {
     if (!mounted) return
     
-    // Client-side'da token kontrolü yap
-    const token = localStorage.getItem('token')
-    if (!token) {
-      router.push('/auth/login?redirect=/sepet')
-      setLoading(false)
-      return
-    }
-    
     checkAuthAndLoadCart()
     loadShippingSettings()
   }, [mounted])
@@ -77,7 +69,10 @@ export default function CartPage() {
       if (!userResult || !userResult.success) {
         // Token geçersiz, temizle ve login'e yönlendir
         localStorage.removeItem('token')
-        router.push('/auth/login?redirect=/sepet')
+        toast.error(t('auth.loginRequired'), { id: 'auth-required', duration: 2000 })
+        setTimeout(() => {
+          router.push('/auth/login?redirect=/sepet')
+        }, 500)
         setLoading(false)
         return
       }
@@ -93,7 +88,10 @@ export default function CartPage() {
       // Hata durumunda da token temizle ve login'e yönlendir
       console.log('Auth check failed, redirecting to login')
       localStorage.removeItem('token')
-      router.push('/auth/login?redirect=/sepet')
+      toast.error(t('auth.loginRequired'), { id: 'auth-required', duration: 2000 })
+      setTimeout(() => {
+        router.push('/auth/login?redirect=/sepet')
+      }, 500)
     } finally {
       setLoading(false)
     }

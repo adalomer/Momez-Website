@@ -204,7 +204,7 @@ export default function Header() {
           {/* Right Side Icons */}
           <div className="flex items-center gap-1 md:gap-2 flex-shrink-0">
             {/* Cart Button */}
-            {user ? (
+            {!loading && (user ? (
               <Link
                 href="/sepet"
                 className="relative flex items-center justify-center rounded-xl h-11 w-11 text-red-500 hover:bg-red-500 hover:text-white transition-all duration-300 hover:scale-110"
@@ -219,19 +219,25 @@ export default function Header() {
               </Link>
             ) : (
               <button
-                onClick={() => {
-                  toast.error(t('auth.loginRequired'), { id: 'login-required' })
-                  router.push('/auth/login?redirect=/sepet')
+                onClick={(e) => {
+                  e.preventDefault()
+                  toast.error(t('auth.loginRequired'), {
+                    id: 'cart-login-required',
+                    duration: 2000,
+                  })
+                  setTimeout(() => {
+                    router.push('/auth/login?redirect=/sepet')
+                  }, 300)
                 }}
                 className="relative flex items-center justify-center rounded-xl h-11 w-11 text-red-500 hover:bg-red-500 hover:text-white transition-all duration-300 hover:scale-110"
                 aria-label={t('nav.cart')}
               >
                 <ShoppingCart className="h-5 w-5 transition-all duration-300" />
               </button>
-            )}
+            ))}
             
             {/* Favorites Button */}
-            {user ? (
+            {!loading && (user ? (
               <Link
                 href="/favoriler"
                 className="flex items-center justify-center rounded-xl h-11 w-11 text-red-500 hover:bg-red-500 hover:text-white transition-all duration-300 hover:scale-110 group"
@@ -241,16 +247,22 @@ export default function Header() {
               </Link>
             ) : (
               <button
-                onClick={() => {
-                  toast.error(t('auth.loginRequired'), { id: 'login-required' })
-                  router.push('/auth/login?redirect=/favoriler')
+                onClick={(e) => {
+                  e.preventDefault()
+                  toast.error(t('auth.loginRequired'), {
+                    id: 'favorites-login-required',
+                    duration: 2000,
+                  })
+                  setTimeout(() => {
+                    router.push('/auth/login?redirect=/favoriler')
+                  }, 300)
                 }}
                 className="flex items-center justify-center rounded-xl h-11 w-11 text-red-500 hover:bg-red-500 hover:text-white transition-all duration-300 hover:scale-110 group"
                 aria-label={t('nav.favorites')}
               >
                 <Heart className="h-5 w-5 transition-all duration-300 group-hover:fill-current" />
               </button>
-            )}
+            ))}
             
             {/* User Menu */}
             {loading ? (
