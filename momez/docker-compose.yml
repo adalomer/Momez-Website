@@ -124,21 +124,8 @@ services:
     networks:
       - momez-network
 
-  # Watchtower - Container'ları izle ve çökerse yeniden başlat
-  watchtower:
-    image: containrrr/watchtower:latest
-    container_name: momez-watchtower
-    restart: always
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    environment:
-      - WATCHTOWER_CLEANUP=true
-      - WATCHTOWER_POLL_INTERVAL=300
-      - WATCHTOWER_INCLUDE_RESTARTING=true
-      - WATCHTOWER_INCLUDE_STOPPED=true
-      - WATCHTOWER_REVIVE_STOPPED=true
-      - WATCHTOWER_LABEL_ENABLE=false
-    command: --interval 300 momez-mysql momez-app momez-nginx
+  # Watchtower kaldırıldı - lokal build için gereksiz
+  # Container restart için Docker'ın kendi restart: always politikası yeterli
 
 volumes:
   mysql_data:
