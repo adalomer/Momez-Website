@@ -94,6 +94,12 @@ export default function Header() {
           'Expires': '0'
         }
       })
+      
+      // 401 hatası normaldir (giriş yapılmamış), konsola yazdırma
+      if (!response.ok && response.status !== 401) {
+        console.error('User fetch error:', response.status)
+      }
+      
       const data = await response.json()
       
       if (data.success && data.data?.user) {
@@ -102,7 +108,7 @@ export default function Header() {
         setUser(null)
       }
     } catch (error) {
-      console.error('User load error:', error)
+      // Network hatası vs. - sessizce yakala
       setUser(null)
     } finally {
       setLoading(false)
@@ -122,14 +128,19 @@ export default function Header() {
           'Expires': '0'
         }
       })
-      const data = await response.json()
       
-      if (data.success && data.data) {
-        const total = data.data.reduce((sum: number, item: any) => sum + item.quantity, 0)
-        setCartCount(total)
+      // 401 hatası normaldir (giriş yapılmamış), konsola yazdırma
+      if (response.ok) {
+        const data = await response.json()
+        if (data.success && data.data) {
+          const total = data.data.reduce((sum: number, item: any) => sum + item.quantity, 0)
+          setCartCount(total)
+        }
+      } else {
+        setCartCount(0)
       }
     } catch (error) {
-      // Giriş yapılmamışsa sepet 0
+      // Giriş yapılmamışsa veya network hatası - sessizce yakala
       setCartCount(0)
     }
   }

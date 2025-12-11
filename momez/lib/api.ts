@@ -85,10 +85,14 @@ export const authAPI = {
           'Cache-Control': 'no-cache, no-store, must-revalidate'
         }
       })
+      // 401 hatası normal (kullanıcı giriş yapmamış), sessizce yakalıyoruz
+      if (res.status === 401) {
+        return { success: false, user: null }
+      }
       return handleResponse(res)
     } catch (error: any) {
-      console.error('Me error:', error)
-      throw error
+      // Network hatalarını sessizce yakala
+      return { success: false, user: null }
     }
   }
 }
@@ -209,26 +213,49 @@ export const categoriesAPI = {
 export const cartAPI = {
   // Sepeti getir
   async get() {
-    const res = await fetch(`${API_URL}/api/cart`)
-    return res.json()
+    try {
+      const res = await fetch(`${API_URL}/api/cart`)
+      // 401 hatası normal (kullanıcı giriş yapmamış)
+      if (res.status === 401) {
+        return { success: true, items: [] }
+      }
+      return res.json()
+    } catch (error) {
+      // Network hatalarını sessizce yakala
+      return { success: true, items: [] }
+    }
   },
 
   // Sepete ekle
   async add(product_id: string, size: string, quantity: number) {
-    const res = await fetch(`${API_URL}/api/cart`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ product_id, size, quantity })
-    })
-    return res.json()
+    try {
+      const res = await fetch(`${API_URL}/api/cart`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ product_id, size, quantity })
+      })
+      if (res.status === 401) {
+        return { success: false, error: 'Lütfen giriş yapın' }
+      }
+      return res.json()
+    } catch (error) {
+      return { success: false, error: 'Bir hata oluştu' }
+    }
   },
 
   // Sepetten çıkar
   async remove(itemId: string) {
-    const res = await fetch(`${API_URL}/api/cart?id=${itemId}`, {
-      method: 'DELETE'
-    })
-    return res.json()
+    try {
+      const res = await fetch(`${API_URL}/api/cart?id=${itemId}`, {
+        method: 'DELETE'
+      })
+      if (res.status === 401) {
+        return { success: false, error: 'Lütfen giriş yapın' }
+      }
+      return res.json()
+    } catch (error) {
+      return { success: false, error: 'Bir hata oluştu' }
+    }
   }
 }
 

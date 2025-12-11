@@ -62,14 +62,6 @@ export default function OrdersPage() {
   useEffect(() => {
     if (!mounted) return
     
-    // Client-side'da token kontrolü yap
-    const token = localStorage.getItem('token')
-    if (!token) {
-      router.push('/auth/login?redirect=/siparislerim')
-      setLoading(false)
-      return
-    }
-    
     checkAuthAndLoadOrders()
   }, [mounted])
 
@@ -78,8 +70,7 @@ export default function OrdersPage() {
       // Kullanıcı kontrolü
       const userResult = await authAPI.me() as { success: boolean; data?: any; error?: string }
       if (!userResult || !userResult.success) {
-        // Token geçersiz, temizle ve login'e yönlendir
-        localStorage.removeItem('token')
+        // Cookie geçersiz, login'e yönlendir
         router.push('/auth/login?redirect=/siparislerim')
         setLoading(false)
         return

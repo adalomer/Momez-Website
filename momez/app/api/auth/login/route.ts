@@ -38,10 +38,11 @@ export async function POST(request: NextRequest) {
 
     response.cookies.set('auth_token', result.token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: true, // HTTPS için her zaman true
       sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 7, // 7 gün
-      path: '/'
+      path: '/',
+      domain: process.env.NODE_ENV === 'production' ? '.momez.co' : undefined
     })
 
     // Cache'lemeyi önle

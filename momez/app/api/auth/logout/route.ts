@@ -13,10 +13,11 @@ export async function POST() {
   // Cookie'yi sil - path belirterek tüm sitedan sil
   response.cookies.set('auth_token', '', {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: true, // HTTPS için her zaman true
     sameSite: 'lax',
     maxAge: 0,
     path: '/',
+    domain: process.env.NODE_ENV === 'production' ? '.momez.co' : undefined,
     expires: new Date(0)
   })
 

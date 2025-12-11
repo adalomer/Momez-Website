@@ -34,14 +34,8 @@ export default function ProfilePage() {
   useEffect(() => {
     if (!mounted) return
     
-    // Client-side'da token kontrolü yap
-    const token = localStorage.getItem('token')
-    if (!token) {
-      router.push('/auth/login?redirect=/profil')
-      setLoading(false)
-      return
-    }
-    
+    // Cookie-based auth kullanıyoruz, middleware zaten kontrol ediyor
+    // Direkt kullanıcı bilgisini çek
     fetchUser()
   }, [mounted])
 
@@ -63,13 +57,11 @@ export default function ProfilePage() {
           phone: data.data.user.phone || ''
         })
       } else {
-        // Token geçersiz, temizle ve login'e yönlendir
-        localStorage.removeItem('token')
+        // Cookie geçersiz, login'e yönlendir
         router.push('/auth/login?redirect=/profil')
       }
     } catch (error) {
-      // Hata durumunda token temizle ve login'e yönlendir
-      localStorage.removeItem('token')
+      // Hata durumunda login'e yönlendir
       router.push('/auth/login?redirect=/profil')
     } finally {
       setLoading(false)
