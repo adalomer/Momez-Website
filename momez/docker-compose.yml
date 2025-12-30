@@ -125,25 +125,36 @@ services:
     networks:
       - momez-network
 
-  # Watchtower - Otomatik Container Monitoring & Restart
-  # Container'lar unhealthy olduğunda otomatik yeniden başlatır
+  # Certbot - SSL sertifikası yenileme
+  # Gerektiğinde: docker compose --profile ssl up certbot -d
+  certbot:
+    image: certbot/certbot:latest
+    container_name: momez-certbot
+    restart: unless-stopped
+    profiles:
+      - ssl  # Sadece açıkça çağrıldığında başlar
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt
+      - /var/www/certbot:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    networks:
+      - momez-network
+
+  # Watchtower - Container'ları izle ve çökerse yeniden başlat
   watchtower:
-    image: containrrr/watchtower
+    image: containrrr/watchtower:latest
     container_name: momez-watchtower
     restart: always
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_POLL_INTERVAL=300
+      - WATCHTOWER_INCLUDE_RESTARTING=true
       - WATCHTOWER_INCLUDE_STOPPED=true
       - WATCHTOWER_REVIVE_STOPPED=true
-      - WATCHTOWER_POLL_INTERVAL=300  # 5 dakikada bir kontrol
-      - WATCHTOWER_MONITOR_ONLY=false
-      - WATCHTOWER_NOTIFICATIONS=shoutrrr
-      - WATCHTOWER_NOTIFICATION_URL=${WATCHTOWER_WEBHOOK_URL:-}
-    command: momez-app momez-mysql momez-nginx
-    networks:
-      - momez-network
+      - WATCHTOWER_LABEL_ENABLE=false
+    command: --interval 300 momez-mysql momez-app momez-nginx
 
 volumes:
   mysql_data:
