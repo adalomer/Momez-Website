@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 // Çoklu dil desteği için çeviri dosyası
 
 export type Language = 'tr' | 'en' | 'ar'
@@ -1860,5 +1859,3 @@ export const translations: Record<Language, Record<string, string>> = {
 export function getTranslation(lang: Language, key: string): string {
   return translations[lang]?.[key] || translations['tr'][key] || key
 }
-=======
->>>>>>> 9d61ceb842e925688da1d382761fcf50ec9e34a8

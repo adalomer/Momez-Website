@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import mysql from 'mysql2/promise'
 
 // Environment değişkenlerini kontrol et
@@ -280,5 +279,3 @@ export const db = {
 }
 
 export default pool
-=======
->>>>>>> 9d61ceb842e925688da1d382761fcf50ec9e34a8
