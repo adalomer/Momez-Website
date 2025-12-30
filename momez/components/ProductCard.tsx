@@ -16,6 +16,13 @@ interface Product {
   discount_price?: number
   in_stock: boolean
   images?: { image_url: string }[]
+  colors?: Array<{
+    id: string
+    color_name: string
+    color_hex: string
+    is_default: number
+    images: Array<string | { image_url: string }>
+  }>
   stock?: { size: string; quantity: number }[]
 }
 
@@ -27,10 +34,39 @@ interface ProductCardProps {
 export default function ProductCard({ product, user }: ProductCardProps) {
   const [showSizeModal, setShowSizeModal] = useState(false)
   const [selectedSize, setSelectedSize] = useState<string>('')
+  const [selectedColorId, setSelectedColorId] = useState<string>('')
   const [adding, setAdding] = useState(false)
   const { t } = useLanguage()
 
   const displayPrice = product.discount_price || product.price
+
+  // Renklere göre görsel al
+  const getDisplayImage = () => {
+    if (product.colors && product.colors.length > 0) {
+      // Seçili renk varsa onun görselini göster
+      if (selectedColorId) {
+        const selectedColor = product.colors.find(c => c.id === selectedColorId)
+        if (selectedColor && selectedColor.images && selectedColor.images.length > 0) {
+          const img = selectedColor.images[0]
+          // images array obje veya string olabilir
+          return typeof img === 'string' ? img : (img as any).image_url
+        }
+      }
+      // Varsayılan rengin görselini göster
+      const defaultColor = product.colors.find(c => c.is_default === 1) || product.colors[0]
+      if (defaultColor && defaultColor.images && defaultColor.images.length > 0) {
+        const img = defaultColor.images[0]
+        return typeof img === 'string' ? img : (img as any).image_url
+      }
+    }
+    // Eski sistem - images array
+    if (product.images && product.images[0]) {
+      return product.images[0].image_url
+    }
+    return null
+  }
+
+  const displayImage = getDisplayImage()
 
   const handleAddToCart = async () => {
     if (!user) {
@@ -104,9 +140,9 @@ export default function ProductCard({ product, user }: ProductCardProps) {
       <div className="group bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
         <Link href={`/urun/${product.slug}`}>
           <div className="aspect-square overflow-hidden bg-gray-100 dark:bg-slate-700 relative">
-            {product.images && product.images[0] ? (
+            {displayImage ? (
               <Image
-                src={product.images[0].image_url}
+                src={displayImage}
                 alt={product.name}
                 fill
                 className="object-cover group-hover:scale-110 transition-transform duration-500"
@@ -135,6 +171,33 @@ export default function ProductCard({ product, user }: ProductCardProps) {
               {product.name}
             </h3>
           </Link>
+
+          {/* Renk Swatches */}
+          {product.colors && product.colors.length > 0 && (
+            <div className="flex items-center gap-1.5">
+              {product.colors.slice(0, 5).map((color) => (
+                <button
+                  key={color.id}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    setSelectedColorId(color.id)
+                  }}
+                  className={`w-5 h-5 rounded-full border-2 transition-all hover:scale-110 ${
+                    selectedColorId === color.id || (!selectedColorId && color.is_default === 1)
+                      ? 'border-slate-900 dark:border-white ring-1 ring-offset-1 ring-slate-400'
+                      : 'border-slate-300 dark:border-slate-600'
+                  }`}
+                  style={{ backgroundColor: color.color_hex }}
+                  title={color.color_name}
+                />
+              ))}
+              {product.colors.length > 5 && (
+                <span className="text-xs text-slate-500 dark:text-slate-400 ml-1">
+                  +{product.colors.length - 5}
+                </span>
+              )}
+            </div>
+          )}
           
           <div className="flex items-center gap-2">
             {product.discount_price ? (

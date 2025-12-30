@@ -168,6 +168,11 @@ export const db = {
       throw new Error(`Invalid table name: ${table}`)
     }
     
+    // Eğer id yoksa UUID oluştur
+    if (!data.id) {
+      data.id = crypto.randomUUID()
+    }
+    
     const keys = Object.keys(data)
     const values = Object.values(data)
     
@@ -182,10 +187,10 @@ export const db = {
     const columns = keys.map(k => `\`${k}\``).join(', ')
     
     const sql = `INSERT INTO \`${table}\` (${columns}) VALUES (${placeholders})`
-    const [result] = await pool.execute(sql, values) as any
+    await pool.execute(sql, values)
     
     // Eklenen kaydı geri döndür
-    return this.findOne(table, { id: result.insertId })
+    return this.findOne(table, { id: data.id })
   },
   
   // UPDATE

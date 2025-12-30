@@ -55,6 +55,23 @@ services:
       - momez-network
     volumes:
       - uploads:/app/uploads
+    # GÜVENLİK: Resource limitleri
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'      # Max 2 CPU core
+          memory: 2G       # Max 2GB RAM
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    # GÜVENLİK: Privilege escalation engelle
+    security_opt:
+      - no-new-privileges:true
+    # GÜVENLİK: Root olarak çalışma
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
     healthcheck:
       test: ["CMD", "node", "-e", "require('http').get({hostname: 'localhost', port: 3000, path: '/', timeout: 5000}, (r) => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"]
       interval: 30s
@@ -74,7 +91,6 @@ services:
       - ./nginx/momez.conf:/etc/nginx/conf.d/default.conf:ro
       - ./nginx/ssl:/etc/nginx/ssl:ro
       - ./public:/app/public:ro
-      - /var/www/certbot:/var/www/certbot:ro
       - /etc/letsencrypt:/etc/letsencrypt:ro
     depends_on:
       app:
@@ -109,36 +125,25 @@ services:
     networks:
       - momez-network
 
-  # Certbot - SSL sertifikası yenileme
-  # Gerektiğinde: docker compose --profile ssl up certbot -d
-  certbot:
-    image: certbot/certbot:latest
-    container_name: momez-certbot
-    restart: unless-stopped
-    profiles:
-      - ssl  # Sadece açıkça çağrıldığında başlar
-    volumes:
-      - /etc/letsencrypt:/etc/letsencrypt
-      - /var/www/certbot:/var/www/certbot
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
-    networks:
-      - momez-network
-
-  # Watchtower - Container'ları izle ve çökerse yeniden başlat
+  # Watchtower - Otomatik Container Monitoring & Restart
+  # Container'lar unhealthy olduğunda otomatik yeniden başlatır
   watchtower:
-    image: containrrr/watchtower:latest
+    image: containrrr/watchtower
     container_name: momez-watchtower
     restart: always
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - WATCHTOWER_CLEANUP=true
-      - WATCHTOWER_POLL_INTERVAL=300
-      - WATCHTOWER_INCLUDE_RESTARTING=true
       - WATCHTOWER_INCLUDE_STOPPED=true
       - WATCHTOWER_REVIVE_STOPPED=true
-      - WATCHTOWER_LABEL_ENABLE=false
-    command: --interval 300 momez-mysql momez-app momez-nginx
+      - WATCHTOWER_POLL_INTERVAL=300  # 5 dakikada bir kontrol
+      - WATCHTOWER_MONITOR_ONLY=false
+      - WATCHTOWER_NOTIFICATIONS=shoutrrr
+      - WATCHTOWER_NOTIFICATION_URL=${WATCHTOWER_WEBHOOK_URL:-}
+    command: momez-app momez-mysql momez-nginx
+    networks:
+      - momez-network
 
 volumes:
   mysql_data:

@@ -2,10 +2,18 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Search, Plus, Edit, Trash2, Upload, X, Save } from 'lucide-react'
+import { Search, Plus, Edit, Trash2, Upload, X, Save, Palette } from 'lucide-react'
 import toast, { Toaster } from 'react-hot-toast'
 import { uploadAPI } from '@/lib/api'
 import { useLanguage } from '@/lib/i18n/LanguageContext'
+
+interface ColorVariant {
+  id: string
+  color_name: string
+  color_hex: string
+  is_default: number
+  images: string[]
+}
 
 interface Product {
   id: string
@@ -15,9 +23,37 @@ interface Product {
   price: number
   discount_price?: number
   images?: Array<{ image_url: string; display_order: number }>
+  colors?: ColorVariant[]
   is_active: boolean
   category?: { name: string }
+  category_id?: string
   stock?: Array<{ size: string; quantity: number }>
+}
+
+const PRESET_COLORS = [
+  { name: 'Siyah', hex: '#000000' },
+  { name: 'Beyaz', hex: '#FFFFFF' },
+  { name: 'Kırmızı', hex: '#EF4444' },
+  { name: 'Mavi', hex: '#3B82F6' },
+  { name: 'Lacivert', hex: '#1E3A5F' },
+  { name: 'Yeşil', hex: '#22C55E' },
+  { name: 'Gri', hex: '#6B7280' },
+  { name: 'Kahverengi', hex: '#92400E' },
+  { name: 'Pembe', hex: '#EC4899' },
+  { name: 'Mor', hex: '#8B5CF6' },
+  { name: 'Turuncu', hex: '#F97316' },
+  { name: 'Sarı', hex: '#EAB308' },
+  { name: 'Bej', hex: '#D4B896' },
+  { name: 'Bordo', hex: '#881337' },
+  { name: 'Haki', hex: '#4B5320' },
+]
+
+interface EditColorVariant {
+  id: string
+  name: string
+  hex: string
+  images: string[]
+  isDefault: boolean
 }
 
 export default function AdminProductsPage() {
@@ -27,8 +63,10 @@ export default function AdminProductsPage() {
   const [loading, setLoading] = useState(true)
   const [showEditModal, setShowEditModal] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
-  const [uploadingImage, setUploadingImage] = useState(false)
+  const [uploadingImage, setUploadingImage] = useState<string | null>(null)
   const [categories, setCategories] = useState<Array<{ id: string; name: string }>>([])
+  const [showColorPicker, setShowColorPicker] = useState(false)
+  const [customColor, setCustomColor] = useState({ name: '', hex: '#000000' })
   
   const [editForm, setEditForm] = useState({
     name: '',
@@ -36,8 +74,8 @@ export default function AdminProductsPage() {
     category_id: '',
     price: '',
     discount_price: '',
-    images: [] as string[],
-    stock: {} as Record<string, string> // store stock as strings so inputs can be cleared by user
+    colors: [] as EditColorVariant[],
+    stock: {} as Record<string, string>
   })
 
   useEffect(() => {
@@ -77,7 +115,6 @@ export default function AdminProductsPage() {
   const openEditModal = (product: Product) => {
     setSelectedProduct(product)
     
-    // Tüm bedenler için stok objesi hazırla (36-46)
     const allSizesStock: Record<string, string> = {}
     for (let i = 36; i <= 46; i++) {
       const sizeStr = i.toString()
@@ -85,66 +122,111 @@ export default function AdminProductsPage() {
       allSizesStock[sizeStr] = existingStock?.quantity?.toString() || ''
     }
     
+    const editColors: EditColorVariant[] = (product.colors || []).map((c, idx) => ({
+      id: c.id || `color-${idx}`,
+      name: c.color_name,
+      hex: c.color_hex,
+      images: c.images || [],
+      isDefault: c.is_default === 1
+    }))
+    
+    if (editColors.length === 0 && product.images && product.images.length > 0) {
+      editColors.push({
+        id: 'default-color',
+        name: 'Varsayılan',
+        hex: '#000000',
+        images: product.images.map(img => img.image_url),
+        isDefault: true
+      })
+    }
+    
     setEditForm({
       name: product.name,
       description: product.description || '',
-      category_id: (product as any).category_id || '',
+      category_id: product.category_id || '',
       price: product.price.toString(),
       discount_price: product.discount_price?.toString() || '',
-      images: product.images?.sort((a, b) => a.display_order - b.display_order).map(img => img.image_url) || [],
+      colors: editColors,
       stock: allSizesStock
     })
     setShowEditModal(true)
   }
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-
-    if (!file.type.startsWith('image/')) {
-      toast.error(t('common.error'))
-      return
+  const addColor = (name: string, hex: string) => {
+    const newColor: EditColorVariant = {
+      id: Date.now().toString(),
+      name,
+      hex,
+      images: [],
+      isDefault: editForm.colors.length === 0
     }
+    setEditForm(prev => ({ ...prev, colors: [...prev.colors, newColor] }))
+    setShowColorPicker(false)
+    setCustomColor({ name: '', hex: '#000000' })
+    toast.success(`${name} rengi eklendi`)
+  }
 
-    setUploadingImage(true)
+  const removeColor = (colorId: string) => {
+    setEditForm(prev => {
+      const filtered = prev.colors.filter(c => c.id !== colorId)
+      if (filtered.length > 0 && !filtered.some(c => c.isDefault)) {
+        filtered[0].isDefault = true
+      }
+      return { ...prev, colors: filtered }
+    })
+  }
+
+  const setDefaultColor = (colorId: string) => {
+    setEditForm(prev => ({
+      ...prev,
+      colors: prev.colors.map(c => ({ ...c, isDefault: c.id === colorId }))
+    }))
+  }
+
+  const handleColorImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, colorId: string) => {
+    const files = e.target.files
+    if (!files || files.length === 0) return
+    
+    setUploadingImage(colorId)
+    
     try {
-      const result = await uploadAPI.uploadImage(file) as { success: boolean; url?: string; error?: string }
-      if (result.success && result.url) {
-        const imageUrl = result.url
+      const uploadPromises = Array.from(files).map(async (file) => {
+        const result = await uploadAPI.uploadImage(file) as { success: boolean; url?: string }
+        return result.success && result.url ? result.url : null
+      })
+      
+      const uploadedUrls = (await Promise.all(uploadPromises)).filter(url => url !== null) as string[]
+      
+      if (uploadedUrls.length > 0) {
         setEditForm(prev => ({
           ...prev,
-          images: [...prev.images, imageUrl]
+          colors: prev.colors.map(c => c.id === colorId ? { ...c, images: [...c.images, ...uploadedUrls] } : c)
         }))
-        toast.success(t('common.success'))
-      } else {
-        toast.error(result.error || t('common.error'))
+        toast.success(`${uploadedUrls.length} görsel yüklendi`)
       }
-    } catch (error) {
-      console.error('Upload error:', error)
-      toast.error(t('common.error'))
-    } finally {
-      setUploadingImage(false)
       e.target.value = ''
+    } catch (error) {
+      toast.error('Görsel yüklenirken hata oluştu')
+    } finally {
+      setUploadingImage(null)
     }
   }
 
-  const removeImage = (index: number) => {
+  const removeColorImage = (colorId: string, imageIndex: number) => {
     setEditForm(prev => ({
       ...prev,
-      images: prev.images.filter((_, i) => i !== index)
+      colors: prev.colors.map(c => c.id === colorId ? { ...c, images: c.images.filter((_, i) => i !== imageIndex) } : c)
     }))
   }
 
   const handleUpdateProduct = async () => {
     if (!selectedProduct) return
-
     if (!editForm.price || parseFloat(editForm.price) <= 0) {
-      toast.error(t('common.error'))
+      toast.error('Geçerli bir fiyat girin')
       return
     }
-
-    if (editForm.images.length === 0) {
-      toast.error(t('common.error'))
+    if (!editForm.colors.some(c => c.images.length > 0)) {
+      toast.error('En az bir renk için görsel yüklemelisiniz')
       return
     }
 
@@ -158,201 +240,114 @@ export default function AdminProductsPage() {
           category_id: editForm.category_id,
           price: parseFloat(editForm.price),
           discount_price: editForm.discount_price ? parseFloat(editForm.discount_price) : null,
-          images: editForm.images,
-          stock: Object.entries(editForm.stock).map(([size, quantity]) => ({
-            size,
-            quantity: parseInt(quantity as string) || 0
-          }))
+          colors: editForm.colors.map(c => ({ name: c.name, hex: c.hex, images: c.images, isDefault: c.isDefault })),
+          stock: Object.entries(editForm.stock).map(([size, quantity]) => ({ size, quantity: parseInt(quantity) || 0 }))
         })
       })
-
       const data = await response.json()
-
       if (data.success) {
-        toast.success(t('admin.updateSuccess'))
+        toast.success('Ürün güncellendi')
         setShowEditModal(false)
         fetchProducts()
       } else {
-        toast.error(data.error || t('common.error'))
+        toast.error(data.error || 'Hata oluştu')
       }
     } catch (error) {
-      toast.error(t('common.error'))
+      toast.error('Hata oluştu')
     }
   }
 
-  const handleDelete = async (id: string, name: string) => {
-    if (!confirm(t('admin.deleteConfirm'))) {
-      return
-    }
+  const handleDelete = async (id: string) => {
+    if (!confirm('Bu ürünü silmek istediğinizden emin misiniz?')) return
+    const product = products.find(p => p.id === id)
+    if (!product) return
 
     try {
-      const product = products.find(p => p.id === id)
-      if (!product) return
-
-      const response = await fetch(`/api/products/${product.slug}`, {
-        method: 'DELETE',
-      })
-      
+      const response = await fetch(`/api/products/${product.slug}`, { method: 'DELETE' })
       const data = await response.json()
-      
       if (data.success) {
-        toast.success(t('admin.deleteSuccess'))
+        toast.success('Ürün silindi')
         fetchProducts()
       } else {
-        toast.error(data.error || t('common.error'))
+        toast.error(data.error || 'Hata oluştu')
       }
     } catch (error) {
-      toast.error(t('common.error'))
+      toast.error('Hata oluştu')
     }
   }
 
-  const filteredProducts = products.filter(product =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  const filteredProducts = products.filter(product => product.name.toLowerCase().includes(searchTerm.toLowerCase()))
 
-  const calculateFinalPrice = (price: number, discount?: number) => {
-    return discount && discount > 0 ? discount : price
+  const getProductMainImage = (product: Product) => {
+    if (product.colors && product.colors.length > 0) {
+      const defaultColor = product.colors.find(c => c.is_default === 1) || product.colors[0]
+      if (defaultColor.images && defaultColor.images.length > 0) {
+        const img = defaultColor.images[0]
+        return typeof img === 'string' ? img : (img as any).image_url
+      }
+    }
+    if (product.images && product.images.length > 0) {
+      return product.images.sort((a, b) => a.display_order - b.display_order)[0]?.image_url
+    }
+    return null
   }
 
   return (
     <div className="space-y-6">
       <Toaster position="top-right" />
       
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-            {t('admin.productManagement')}
-          </h1>
-          <p className="text-slate-600 dark:text-slate-400 mt-1">
-            {filteredProducts.length} {t('admin.products')}
-          </p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Ürün Yönetimi</h1>
+          <p className="text-slate-600 dark:text-slate-400 mt-1">{filteredProducts.length} ürün</p>
         </div>
-        <Link 
-          href="/admin/urunler/yeni"
-          className="px-4 py-2 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors flex items-center gap-2"
-        >
-          <Plus className="h-5 w-5" />
-          {t('admin.newProduct')}
+        <Link href="/admin/urunler/yeni" className="px-4 py-2 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg flex items-center gap-2">
+          <Plus className="h-5 w-5" />Yeni Ürün
         </Link>
       </div>
 
-      {/* Search */}
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
-        <input
-          type="text"
-          placeholder={t('admin.searchProduct')}
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
-        />
+        <input type="text" placeholder="Ürün ara..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
       </div>
 
-      {/* Products Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {loading ? (
-          <div className="col-span-full p-12 text-center text-slate-500">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-slate-300 border-t-primary"></div>
-            <p className="mt-4">{t('common.loading')}</p>
-          </div>
+          <div className="col-span-full p-12 text-center"><div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-slate-300 border-t-primary"></div></div>
         ) : filteredProducts.length === 0 ? (
-          <div className="col-span-full p-12 text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 mb-4">
-              <Search className="h-8 w-8 text-slate-400" />
-            </div>
-            <p className="text-slate-500">{searchTerm ? t('admin.productNotFound') : t('admin.noProducts')}</p>
-          </div>
+          <div className="col-span-full p-12 text-center text-slate-500">Ürün bulunamadı</div>
         ) : (
           filteredProducts.map((product) => {
-            const mainImage = product.images?.sort((a, b) => a.display_order - b.display_order)[0]?.image_url
+            const mainImage = getProductMainImage(product)
             const totalStock = product.stock?.reduce((sum, s) => sum + s.quantity, 0) || 0
-            const hasDiscount = product.discount_price && product.discount_price > 0
-
             return (
-              <div key={product.id} className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden group hover:shadow-2xl hover:scale-[1.02] transition-all duration-300">
-                <div className="relative aspect-square bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800">
-                  {mainImage ? (
-                    <img
-                      src={mainImage}
-                      alt={product.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-slate-400">
-                      <div className="text-center">
-                        <Upload className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                        <p className="text-sm">{t('admin.noImage')}</p>
-                      </div>
-                    </div>
-                  )}
-                  {hasDiscount && (
-                    <div className="absolute top-3 right-3 bg-gradient-to-r from-red-500 to-pink-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg animate-pulse">
-                      {t('admin.discount')}
-                    </div>
-                  )}
-                  {!product.is_active && (
-                    <div className="absolute top-3 left-3 bg-gray-500/90 text-white px-3 py-1 rounded-full text-xs font-medium">
-                      Pasif
+              <div key={product.id} className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden group hover:shadow-xl transition-all">
+                <div className="relative aspect-square bg-slate-100 dark:bg-slate-700">
+                  {mainImage ? <img src={mainImage} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" /> : <div className="w-full h-full flex items-center justify-center text-slate-400"><Upload className="h-12 w-12 opacity-50" /></div>}
+                  {product.discount_price && product.discount_price > 0 && <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-xs font-bold">İNDİRİM</div>}
+                  {product.colors && product.colors.length > 0 && (
+                    <div className="absolute bottom-2 left-2 flex gap-1">
+                      {product.colors.slice(0, 4).map((color, idx) => <div key={idx} className="w-5 h-5 rounded-full border-2 border-white shadow" style={{ backgroundColor: color.color_hex }} title={color.color_name} />)}
+                      {product.colors.length > 4 && <div className="w-5 h-5 rounded-full bg-slate-800 text-white text-[10px] flex items-center justify-center border-2 border-white">+{product.colors.length - 4}</div>}
                     </div>
                   )}
                 </div>
-                
                 <div className="p-4">
-                  <h3 className="font-bold text-slate-900 dark:text-white mb-2 line-clamp-2 min-h-[3rem]">
-                    {product.name}
-                  </h3>
-                  
+                  <h3 className="font-bold text-slate-900 dark:text-white mb-2 line-clamp-2">{product.name}</h3>
                   <div className="flex items-center gap-2 mb-3">
-                    {hasDiscount ? (
-                      <>
-                        <span className="text-xl font-bold bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent">
-                          ₺{product.discount_price?.toLocaleString('tr-TR')}
-                        </span>
-                        <span className="text-sm text-slate-500 line-through">
-                          ₺{product.price.toLocaleString('tr-TR')}
-                        </span>
-                      </>
+                    {product.discount_price && product.discount_price > 0 ? (
+                      <><span className="text-lg font-bold text-red-600">₺{product.discount_price.toLocaleString('tr-TR')}</span><span className="text-sm text-slate-500 line-through">₺{product.price.toLocaleString('tr-TR')}</span></>
                     ) : (
-                      <span className="text-xl font-bold text-slate-900 dark:text-white">
-                        ₺{product.price.toLocaleString('tr-TR')}
-                      </span>
+                      <span className="text-lg font-bold text-slate-900 dark:text-white">₺{product.price.toLocaleString('tr-TR')}</span>
                     )}
                   </div>
-
-                  <div className="flex items-center justify-between text-xs mb-4 p-2 rounded-lg bg-slate-50 dark:bg-slate-900/50">
-                    <div className="flex items-center gap-1.5">
-                      <div className={`w-2 h-2 rounded-full ${
-                        totalStock === 0 ? 'bg-red-500' :
-                        totalStock < 20 ? 'bg-orange-500' : 'bg-green-500'
-                      } animate-pulse`}></div>
-                      <span className={`font-semibold ${
-                        totalStock === 0 ? 'text-red-600 dark:text-red-400' :
-                        totalStock < 20 ? 'text-orange-600 dark:text-orange-400' :
-                        'text-green-600 dark:text-green-400'
-                      }`}>
-                        {t('admin.stock')}: {totalStock}
-                      </span>
-                    </div>
-                    <span className="text-slate-600 dark:text-slate-400 font-medium">
-                      {product.category?.name || t('admin.noCategory')}
-                    </span>
+                  <div className="flex items-center justify-between text-xs mb-3">
+                    <span className={`font-medium ${totalStock === 0 ? 'text-red-500' : totalStock < 20 ? 'text-orange-500' : 'text-green-500'}`}>Stok: {totalStock}</span>
+                    {product.colors && product.colors.length > 0 && <span className="text-slate-500">{product.colors.length} renk</span>}
                   </div>
-
                   <div className="flex gap-2">
-                    <button
-                      onClick={() => openEditModal(product)}
-                      className="flex-1 px-3 py-2.5 text-sm bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg transition-all duration-300 flex items-center justify-center gap-2 font-medium shadow-md hover:shadow-xl transform hover:-translate-y-0.5"
-                    >
-                      <Edit className="h-4 w-4" />
-                      {t('common.edit')}
-                    </button>
-                    <button
-                      onClick={() => handleDelete(product.id, product.name)}
-                      className="px-3 py-2.5 text-sm bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-lg transition-all duration-300 shadow-md hover:shadow-xl transform hover:-translate-y-0.5"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
+                    <button onClick={() => openEditModal(product)} className="flex-1 px-3 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center gap-1"><Edit className="h-4 w-4" />Düzenle</button>
+                    <button onClick={() => handleDelete(product.id)} className="px-3 py-2 text-sm bg-red-600 hover:bg-red-700 text-white rounded-lg"><Trash2 className="h-4 w-4" /></button>
                   </div>
                 </div>
               </div>
@@ -361,245 +356,117 @@ export default function AdminProductsPage() {
         )}
       </div>
 
-      {/* Edit Modal */}
       {showEditModal && selectedProduct && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto animate-in fade-in duration-200">
-          <div className="bg-gradient-to-br from-white to-slate-50 dark:from-slate-800 dark:to-slate-900 rounded-2xl max-w-5xl w-full p-8 my-8 shadow-2xl border border-slate-200 dark:border-slate-700 animate-in slide-in-from-bottom-4 duration-300">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-8 pb-6 border-b-2 border-slate-200 dark:border-slate-700">
-              <div>
-                <h2 className="text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-300 bg-clip-text text-transparent mb-2">
-                  {t('admin.productEdit')}
-                </h2>
-                <p className="text-sm text-slate-600 dark:text-slate-400">{selectedProduct.name}</p>
-              </div>
-              <button
-                onClick={() => {
-                  setShowEditModal(false)
-                  setSelectedProduct(null)
-                }}
-                className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 text-slate-400 hover:text-red-600 dark:hover:text-red-400 rounded-lg transition-all duration-200"
-              >
-                <X className="h-6 w-6" />
-              </button>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-start justify-center z-50 p-4 overflow-y-auto">
+          <div className="bg-white dark:bg-slate-800 rounded-xl max-w-4xl w-full p-6 my-8 shadow-2xl">
+            <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-200 dark:border-slate-700">
+              <h2 className="text-xl font-bold text-slate-900 dark:text-white">Ürün Düzenle</h2>
+              <button onClick={() => setShowEditModal(false)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg"><X className="h-5 w-5" /></button>
             </div>
 
-            <div className="space-y-6">
-              {/* Ürün Adı */}
-              <div className="group">
-                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 flex items-center gap-2">
-                  <span className="w-1 h-4 bg-gradient-to-b from-blue-500 to-blue-600 rounded-full"></span>
-                  {t('admin.productNameLabel')}
-                </label>
-                <input
-                  type="text"
-                  value={editForm.name}
-                  onChange={(e) => setEditForm(prev => ({ ...prev, name: e.target.value }))}
-                  className="w-full px-4 py-3 border-2 border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:border-blue-500 dark:focus:border-blue-400 focus:ring-4 focus:ring-blue-500/10 transition-all duration-200 font-medium"
-                  placeholder="Ürün adını girin"
-                  required
-                />
-              </div>
-
-              {/* Açıklama */}
-              <div className="group">
-                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 flex items-center gap-2">
-                  <span className="w-1 h-4 bg-gradient-to-b from-purple-500 to-purple-600 rounded-full"></span>
-                  {t('admin.descriptionLabel')}
-                </label>
-                <textarea
-                  rows={4}
-                  value={editForm.description}
-                  onChange={(e) => setEditForm(prev => ({ ...prev, description: e.target.value }))}
-                  className="w-full px-4 py-3 border-2 border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:border-purple-500 dark:focus:border-purple-400 focus:ring-4 focus:ring-purple-500/10 transition-all duration-200 resize-none"
-                  placeholder="Ürün açıklamasını girin"
-                  required
-                />
-              </div>
-
-              {/* Kategori */}
-              <div className="group">
-                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 flex items-center gap-2">
-                  <span className="w-1 h-4 bg-gradient-to-b from-green-500 to-green-600 rounded-full"></span>
-                  {t('admin.categoryLabel')}
-                </label>
-                <select
-                  value={editForm.category_id}
-                  onChange={(e) => setEditForm(prev => ({ ...prev, category_id: e.target.value }))}
-                  className="w-full px-4 py-3 border-2 border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:border-green-500 dark:focus:border-green-400 focus:ring-4 focus:ring-green-500/10 transition-all duration-200 cursor-pointer font-medium"
-                  required
-                >
-                  <option value="">{t('admin.selectCategory')}</option>
-                  {categories.map((cat) => (
-                    <option key={cat.id} value={cat.id}>
-                      {cat.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Fiyat ve İndirimli Fiyat */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Fiyat */}
-                <div className="group">
-                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 flex items-center gap-2">
-                    <span className="w-1 h-4 bg-gradient-to-b from-orange-500 to-orange-600 rounded-full"></span>
-                    {t('admin.priceLabel')}
-                  </label>
-                  <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 font-bold">₺</span>
-                    <input
-                      type="number"
-                      step="0.01"
-                      value={editForm.price}
-                      onChange={(e) => setEditForm(prev => ({ ...prev, price: e.target.value }))}
-                      className="w-full pl-10 pr-4 py-3 border-2 border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:border-orange-500 dark:focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10 transition-all duration-200 font-bold"
-                      placeholder="0.00"
-                      required
-                    />
-                  </div>
+            <div className="space-y-6 max-h-[70vh] overflow-y-auto pr-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Ürün Adı</label>
+                  <input type="text" value={editForm.name} onChange={(e) => setEditForm(prev => ({ ...prev, name: e.target.value }))} className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-900" />
                 </div>
-
-                {/* İndirimli Fiyat */}
-                <div className="group">
-                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 flex items-center gap-2">
-                    <span className="w-1 h-4 bg-gradient-to-b from-red-500 to-red-600 rounded-full"></span>
-                    {t('admin.discountPriceLabel')}
-                  </label>
-                  <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 font-bold">₺</span>
-                    <input
-                      type="number"
-                      step="0.01"
-                      value={editForm.discount_price}
-                      onChange={(e) => setEditForm(prev => ({ ...prev, discount_price: e.target.value }))}
-                      className="w-full pl-10 pr-4 py-3 border-2 border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:border-red-500 dark:focus:border-red-400 focus:ring-4 focus:ring-red-500/10 transition-all duration-200 font-bold"
-                      placeholder="0.00"
-                    />
-                  </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Kategori</label>
+                  <select value={editForm.category_id} onChange={(e) => setEditForm(prev => ({ ...prev, category_id: e.target.value }))} className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-900">
+                    <option value="">Kategori seçin</option>
+                    {categories.map((cat) => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
+                  </select>
                 </div>
               </div>
 
-              {/* Görseller */}
-              <div className="mt-6 bg-slate-50 dark:bg-slate-900/50 rounded-xl p-6 border-2 border-dashed border-slate-200 dark:border-slate-700">
-                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4 flex items-center gap-2">
-                  <span className="w-1 h-4 bg-gradient-to-b from-pink-500 to-pink-600 rounded-full"></span>
-                  {t('admin.productImages')}
-                </label>
-                
-                {editForm.images.length > 0 && (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4">
-                    {editForm.images.map((img, idx) => (
-                      <div key={idx} className="relative aspect-square rounded-xl overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 group shadow-md hover:shadow-xl transition-all duration-300">
-                        <img src={img} alt={`${t('admin.images')} ${idx + 1}`} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                        <button
-                          onClick={() => removeImage(idx)}
-                          className="absolute top-2 right-2 p-1.5 bg-red-500 hover:bg-red-600 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200 shadow-lg transform hover:scale-110"
-                        >
-                          <X className="h-4 w-4" />
-                        </button>
-                        {idx === 0 && (
-                          <div className="absolute bottom-2 left-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs px-3 py-1 rounded-lg font-bold shadow-lg">
-                            {t('admin.mainImage')}
+              <div>
+                <label className="block text-sm font-medium mb-1">Açıklama</label>
+                <textarea rows={3} value={editForm.description} onChange={(e) => setEditForm(prev => ({ ...prev, description: e.target.value }))} className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-900 resize-none" />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Fiyat (₺)</label>
+                  <input type="number" step="0.01" value={editForm.price} onChange={(e) => setEditForm(prev => ({ ...prev, price: e.target.value }))} className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-900" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">İndirimli Fiyat (₺)</label>
+                  <input type="number" step="0.01" value={editForm.discount_price} onChange={(e) => setEditForm(prev => ({ ...prev, discount_price: e.target.value }))} className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-900" />
+                </div>
+              </div>
+
+              <div className="border border-slate-200 dark:border-slate-700 rounded-lg p-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-semibold flex items-center gap-2"><Palette className="w-5 h-5 text-primary" />Renk Varyantları</h3>
+                  <button type="button" onClick={() => setShowColorPicker(true)} className="px-3 py-1.5 bg-primary text-white text-sm rounded-lg flex items-center gap-1"><Plus className="w-4 h-4" />Renk Ekle</button>
+                </div>
+
+                {showColorPicker && (
+                  <div className="mb-4 p-4 bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700">
+                    <h4 className="font-medium mb-3">Renk Seç</h4>
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {PRESET_COLORS.map(color => <button key={color.hex} type="button" onClick={() => addColor(color.name, color.hex)} className="w-8 h-8 rounded-full border-2 border-slate-200 hover:scale-110 transition-transform" style={{ backgroundColor: color.hex }} title={color.name} />)}
+                    </div>
+                    <div className="flex items-center gap-2 pt-3 border-t border-slate-200 dark:border-slate-700">
+                      <input type="color" value={customColor.hex} onChange={e => setCustomColor(prev => ({...prev, hex: e.target.value}))} className="w-8 h-8 rounded cursor-pointer" />
+                      <input type="text" value={customColor.name} onChange={e => setCustomColor(prev => ({...prev, name: e.target.value}))} placeholder="Renk adı" className="flex-1 px-2 py-1 text-sm rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800" />
+                      <button type="button" onClick={() => customColor.name && addColor(customColor.name, customColor.hex)} className="px-3 py-1 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-sm rounded">Ekle</button>
+                      <button type="button" onClick={() => setShowColorPicker(false)} className="px-3 py-1 text-slate-500 text-sm">İptal</button>
+                    </div>
+                  </div>
+                )}
+
+                {editForm.colors.length === 0 ? (
+                  <div className="text-center py-6 text-slate-500"><Palette className="w-10 h-10 mx-auto mb-2 opacity-50" /><p>Henüz renk eklenmedi</p></div>
+                ) : (
+                  <div className="space-y-4">
+                    {editForm.colors.map(color => (
+                      <div key={color.id} className="border border-slate-200 dark:border-slate-700 rounded-lg p-3">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-2">
+                            <div className="w-6 h-6 rounded-full border border-slate-300" style={{ backgroundColor: color.hex }} />
+                            <span className="font-medium">{color.name}</span>
+                            {color.isDefault && <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded">Varsayılan</span>}
                           </div>
-                        )}
+                          <div className="flex items-center gap-2">
+                            {!color.isDefault && <button type="button" onClick={() => setDefaultColor(color.id)} className="text-xs text-slate-500 hover:text-primary">Varsayılan yap</button>}
+                            <button type="button" onClick={() => removeColor(color.id)} className="p-1 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"><Trash2 className="w-4 h-4" /></button>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
+                          {color.images.map((img, idx) => (
+                            <div key={idx} className="relative aspect-square rounded overflow-hidden bg-slate-100 dark:bg-slate-700 group/img">
+                              <img src={img} alt={`${color.name} ${idx + 1}`} className="w-full h-full object-cover" />
+                              <button type="button" onClick={() => removeColorImage(color.id, idx)} className="absolute top-1 right-1 p-0.5 bg-red-600 text-white rounded-full opacity-0 group-hover/img:opacity-100"><X className="h-3 w-3" /></button>
+                            </div>
+                          ))}
+                          <label className="aspect-square rounded border-2 border-dashed border-slate-300 dark:border-slate-600 hover:border-primary flex flex-col items-center justify-center text-slate-400 hover:text-primary cursor-pointer">
+                            <input type="file" multiple accept="image/*" onChange={(e) => handleColorImageUpload(e, color.id)} disabled={uploadingImage !== null} className="hidden" />
+                            <Upload className="h-4 w-4" /><span className="text-[10px] mt-1">{uploadingImage === color.id ? '...' : 'Ekle'}</span>
+                          </label>
+                        </div>
                       </div>
                     ))}
                   </div>
                 )}
-
-                <label className="flex flex-col items-center justify-center gap-3 px-6 py-8 border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-xl cursor-pointer hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-all duration-200 group">
-                  <div className="p-3 rounded-full bg-blue-100 dark:bg-blue-900/30 group-hover:scale-110 transition-transform duration-200">
-                    <Upload className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-                  </div>
-                  <div className="text-center">
-                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 block mb-1">
-                      {uploadingImage ? t('admin.uploading') : t('admin.addNewImage')}
-                    </span>
-                    <span className="text-xs text-slate-500 dark:text-slate-400">
-                      PNG, JPG, GIF (maks. 5MB)
-                    </span>
-                  </div>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="hidden"
-                    disabled={uploadingImage}
-                  />
-                </label>
               </div>
 
-              {/* Stok Yönetimi */}
-              <div className="mt-6 bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-950/30 dark:to-blue-950/30 rounded-xl p-6 border-2 border-indigo-100 dark:border-indigo-900/50 shadow-lg">
-              <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4 flex items-center gap-2">
-                <span className="w-1 h-4 bg-gradient-to-b from-indigo-500 to-indigo-600 rounded-full"></span>
-                <span className="flex items-center gap-2">
-                  <svg className="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                  </svg>
-                  {t('admin.updateStock')}
-                </span>
-              </label>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-                {Array.from({ length: 11 }, (_, i) => (36 + i).toString()).map((size) => {
-                  const currentStock = selectedProduct.stock?.find((s: any) => s.size === size)?.quantity || 0
-                  const stockValue = editForm.stock[size] ?? currentStock.toString()
-                  const stockNum = parseInt(stockValue) || 0
-                  return (
-                    <div key={size} className="group">
-                      <div className="flex flex-col gap-2 p-3 bg-white dark:bg-slate-800 rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 transition-all duration-200 hover:shadow-xl transform hover:-translate-y-1">
-                        <div className="flex items-center justify-between">
-                          <span className="px-3 py-1.5 bg-gradient-to-r from-indigo-500 to-indigo-600 text-white rounded-lg text-center font-bold text-sm shadow-md">
-                            {size}
-                          </span>
-                          <div className={`w-2 h-2 rounded-full ${
-                            stockNum === 0 ? 'bg-red-500' :
-                            stockNum < 10 ? 'bg-orange-500' : 'bg-green-500'
-                          } animate-pulse shadow-lg`}></div>
-                        </div>
-                        <input
-                          type="number"
-                          min="0"
-                          value={stockValue}
-                          onChange={(e) => {
-                            // keep raw string so user can delete, but remove leading zeros when typing numbers
-                            const raw = e.target.value
-                            const normalized = raw === '' ? '' : raw.replace(/^0+(?=\d)/, '')
-                            setEditForm(prev => ({
-                              ...prev,
-                              stock: { ...prev.stock, [size]: normalized }
-                            }))
-                          }}
-                          className="w-full px-3 py-2 border-2 border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white text-center text-base font-bold focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/20 transition-all duration-200"
-                          placeholder="0"
-                        />
-                      </div>
+              <div className="border border-slate-200 dark:border-slate-700 rounded-lg p-4">
+                <h3 className="font-semibold mb-3">Beden Stokları</h3>
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
+                  {Array.from({ length: 11 }, (_, i) => (36 + i).toString()).map((size) => (
+                    <div key={size} className="flex flex-col">
+                      <span className="text-xs font-medium text-slate-600 dark:text-slate-400 mb-1 text-center">{size}</span>
+                      <input type="number" min="0" value={editForm.stock[size] || ''} onChange={(e) => setEditForm(prev => ({ ...prev, stock: { ...prev.stock, [size]: e.target.value } }))} className="w-full px-2 py-1.5 border border-slate-300 dark:border-slate-600 rounded text-center text-sm bg-white dark:bg-slate-900" placeholder="0" />
                     </div>
-                  )
-                })}
+                  ))}
+                </div>
               </div>
             </div>
-            </div>
 
-            {/* Buttons */}
-            <div className="flex gap-3 mt-8 pt-6 border-t-2 border-slate-200 dark:border-slate-700">
-              <button
-                onClick={() => {
-                  setShowEditModal(false)
-                  setSelectedProduct(null)
-                }}
-                className="flex-1 px-6 py-3.5 border-2 border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 font-semibold transition-all duration-200 hover:shadow-lg hover:scale-105 transform"
-              >
-                {t('common.cancel')}
-              </button>
-              <button
-                onClick={handleUpdateProduct}
-                className="flex-1 px-6 py-3.5 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 hover:scale-105 transform"
-              >
-                <Save className="h-5 w-5" />
-                {t('common.save')}
-              </button>
+            <div className="flex gap-3 mt-6 pt-4 border-t border-slate-200 dark:border-slate-700">
+              <button onClick={() => setShowEditModal(false)} className="flex-1 px-4 py-2.5 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700">İptal</button>
+              <button onClick={handleUpdateProduct} className="flex-1 px-4 py-2.5 bg-primary hover:bg-primary/90 text-white rounded-lg font-medium flex items-center justify-center gap-2"><Save className="h-5 w-5" />Kaydet</button>
             </div>
           </div>
         </div>

@@ -37,10 +37,10 @@ export async function GET(request: NextRequest) {
     
     const products = await query<any>(sql, params)
     
-    // Her ürün için görsel ve stok bilgisi ekle
+    // Her ürün için görsel, stok ve renk bilgisi ekle
     const productsWithDetails = await Promise.all(
       products.map(async (product: any) => {
-        // Görselleri çek
+        // Görselleri çek (eski sistem)
         const images = await db.findMany('product_images', 
           { product_id: product.id },
           { orderBy: 'display_order ASC' }
@@ -49,10 +49,31 @@ export async function GET(request: NextRequest) {
         // Stok bilgisi
         const stock = await db.findMany('product_stock', { product_id: product.id })
         
+        // Renk varyantları ve renk görselleri
+        const colors = await db.findMany('product_colors', 
+          { product_id: product.id },
+          { orderBy: 'display_order ASC' }
+        )
+        
+        // Her renk için görselleri çek
+        const colorsWithImages = await Promise.all(
+          (colors as any[]).map(async (color: any) => {
+            const colorImages = await db.findMany('product_color_images',
+              { product_color_id: color.id },
+              { orderBy: 'display_order ASC' }
+            )
+            return {
+              ...color,
+              images: colorImages
+            }
+          })
+        )
+        
         return {
           ...product,
           images,
           stock,
+          colors: colorsWithImages,
           in_stock: stock.some((s: any) => s.quantity > 0)
         }
       })
@@ -97,7 +118,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { name, description, price, category_id, images, stock } = body
+    const { name, description, price, category_id, images, stock, colors } = body
     
     // Validasyon
     if (!name || !description || !price || !category_id) {
@@ -175,6 +196,42 @@ export async function POST(request: NextRequest) {
           })
         } catch (stockError) {
           console.error('Stock insert error:', stockError)
+        }
+      }
+    }
+    
+    // Renk varyantları ekle
+    if (colors && Array.isArray(colors) && colors.length > 0) {
+      for (let i = 0; i < colors.length; i++) {
+        try {
+          const colorData = colors[i]
+          const colorResult = await db.insert('product_colors', {
+            product_id: productId,
+            color_name: colorData.name,
+            color_hex: colorData.hex,
+            display_order: i,
+            is_default: colorData.isDefault ? 1 : 0
+          })
+          
+          const colorId = (colorResult as any).id
+          
+          // Renk görsellerini ekle
+          if (colorData.images && Array.isArray(colorData.images)) {
+            for (let j = 0; j < colorData.images.length; j++) {
+              try {
+                await db.insert('product_color_images', {
+                  product_color_id: colorId,
+                  image_url: colorData.images[j],
+                  display_order: j,
+                  is_primary: j === 0 ? 1 : 0
+                })
+              } catch (imgError) {
+                console.error('Color image insert error:', imgError)
+              }
+            }
+          }
+        } catch (colorError) {
+          console.error('Color insert error:', colorError)
         }
       }
     }

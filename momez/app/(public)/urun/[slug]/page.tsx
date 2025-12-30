@@ -14,6 +14,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
   const [product, setProduct] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [selectedSize, setSelectedSize] = useState<string>('')
+  const [selectedColor, setSelectedColor] = useState<string>('')
   const [quantity, setQuantity] = useState(1)
   const [selectedImage, setSelectedImage] = useState(0)
   const [relatedProducts, setRelatedProducts] = useState<any[]>([])
@@ -53,6 +54,11 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
       
       if (result.success && result.data) {
         setProduct(result.data)
+        // Varsayılan rengi seç
+        if (result.data.colors && result.data.colors.length > 0) {
+          const defaultColor = result.data.colors.find((c: any) => c.is_default) || result.data.colors[0]
+          setSelectedColor(defaultColor.id?.toString() || defaultColor.color_hex)
+        }
         // Benzer ürünleri yükle
         loadRelatedProducts(result.data.category?.slug)
       } else {
@@ -162,6 +168,42 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
 
   const availableStock = product.stock?.find((s: any) => s.size === selectedSize)?.quantity || 0
 
+  // Seçilen rengin görsellerini al (yeni sistem)
+  const getDisplayImages = () => {
+    if (product.colors && product.colors.length > 0) {
+      const currentColor = product.colors.find((c: any) => 
+        c.id?.toString() === selectedColor || c.color_hex === selectedColor
+      )
+      if (currentColor && currentColor.images && currentColor.images.length > 0) {
+        // Renk görselleri varsa onları kullan
+        return currentColor.images.map((url: string, idx: number) => ({
+          image_url: url,
+          id: `color-img-${idx}`
+        }))
+      }
+    }
+    // Eski sistem veya renk görseli yoksa product.images kullan
+    return product.images || []
+  }
+  
+  const displayImages = getDisplayImages()
+
+  // Renk değiştiğinde görsel indeksini sıfırla
+  const handleColorChange = (colorId: string) => {
+    setSelectedColor(colorId)
+    setSelectedImage(0)
+  }
+
+  // Seçili rengin bilgisini al
+  const getSelectedColorInfo = () => {
+    if (!product.colors || product.colors.length === 0) return null
+    return product.colors.find((c: any) => 
+      c.id?.toString() === selectedColor || c.color_hex === selectedColor
+    )
+  }
+
+  const selectedColorInfo = getSelectedColorInfo()
+
   return (
     <div className="min-h-screen bg-background-light dark:bg-background-dark transition-colors duration-300">
       <Toaster position="top-center" />
@@ -186,19 +228,19 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
           {/* Görseller */}
           <div>
             <div className="aspect-square rounded-xl overflow-hidden bg-white dark:bg-surface-dark mb-4 relative group shadow-lg border border-border-light dark:border-border-dark transition-all duration-300">
-              {product.images && product.images[selectedImage] ? (
+              {displayImages && displayImages[selectedImage] ? (
                 <>
                   <Image
-                    src={product.images[selectedImage].image_url}
+                    src={displayImages[selectedImage].image_url}
                     alt={product.name}
                     width={600}
                     height={600}
                     className="w-full h-full object-cover"
                   />
-                  {product.images.length > 1 && (
+                  {displayImages.length > 1 && (
                     <>
                       <button
-                        onClick={() => setSelectedImage((selectedImage - 1 + product.images.length) % product.images.length)}
+                        onClick={() => setSelectedImage((selectedImage - 1 + displayImages.length) % displayImages.length)}
                         className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 dark:bg-slate-900/80 hover:bg-white dark:hover:bg-slate-900 text-slate-800 dark:text-white p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm"
                         aria-label="Önceki resim"
                       >
@@ -207,7 +249,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
                         </svg>
                       </button>
                       <button
-                        onClick={() => setSelectedImage((selectedImage + 1) % product.images.length)}
+                        onClick={() => setSelectedImage((selectedImage + 1) % displayImages.length)}
                         className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 dark:bg-slate-900/80 hover:bg-white dark:hover:bg-slate-900 text-slate-800 dark:text-white p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm"
                         aria-label="Sonraki resim"
                       >
@@ -225,9 +267,9 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
               )}
             </div>
             
-            {product.images && product.images.length > 1 && (
+            {displayImages && displayImages.length > 1 && (
               <div className="grid grid-cols-4 gap-4">
-                {product.images.map((img: any, idx: number) => (
+                {displayImages.map((img: any, idx: number) => (
                   <button
                     key={idx}
                     onClick={() => setSelectedImage(idx)}
@@ -258,10 +300,63 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
               </p>
             </div>
 
-            {/* Beden Seçimi */}
+            {/* Renk Seçimi - Alo Yoga Tarzı Swatch */}
+            {product.colors && product.colors.length > 0 && (
+              <div className="mb-6">
+                <div className="flex items-center justify-between mb-3">
+                  <label className="text-sm font-medium text-slate-900 dark:text-white">
+                    {t('product.color')}
+                  </label>
+                  <span className="text-sm text-slate-500 dark:text-slate-400">
+                    {selectedColorInfo?.color_name || ''}
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-3">
+                  {product.colors.map((color: any) => {
+                    const colorId = color.id?.toString() || color.color_hex
+                    const isSelected = selectedColor === colorId
+                    return (
+                      <button
+                        key={colorId}
+                        onClick={() => handleColorChange(colorId)}
+                        className={`group relative w-10 h-10 rounded-full transition-all duration-200 ${
+                          isSelected
+                            ? 'ring-2 ring-offset-2 ring-slate-900 dark:ring-white dark:ring-offset-slate-800'
+                            : 'hover:ring-2 hover:ring-offset-2 hover:ring-slate-300 dark:hover:ring-slate-600 dark:hover:ring-offset-slate-800'
+                        }`}
+                        style={{ backgroundColor: color.color_hex }}
+                        title={color.color_name}
+                      >
+                        {color.color_hex?.toUpperCase() === '#FFFFFF' && (
+                          <span className="absolute inset-0 rounded-full border border-slate-300 dark:border-slate-600" />
+                        )}
+                        {isSelected && (
+                          <span className="absolute inset-0 flex items-center justify-center">
+                            <svg className={`w-5 h-5 ${color.color_hex?.toUpperCase() === '#FFFFFF' ? 'text-slate-900' : 'text-white'}`} fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          </span>
+                        )}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Beden Seçimi - Alo Yoga Tarzı */}
             <div className="mb-6">
-              <label className="block text-sm font-medium mb-3 text-slate-900 dark:text-white">{t('product.selectSize')}</label>
-              <div className="grid grid-cols-6 gap-2">
+              <div className="flex items-center justify-between mb-3">
+                <label className="text-sm font-medium text-slate-900 dark:text-white">
+                  {t('product.selectSize')}
+                </label>
+                {selectedSize && (
+                  <span className="text-sm text-slate-500 dark:text-slate-400">
+                    EU {selectedSize}
+                  </span>
+                )}
+              </div>
+              <div className="flex flex-wrap gap-2">
                 {Array.from({ length: 11 }, (_, i) => 36 + i).map((size) => {
                   const sizeStr = size.toString()
                   const stockItem = product.stock?.find((s: any) => s.size === sizeStr)
@@ -269,37 +364,31 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
                   const hasStock = quantity > 0
 
                   return (
-                    <div key={size} className="flex flex-col">
-                      <button
-                        onClick={() => hasStock && setSelectedSize(sizeStr)}
-                        disabled={!hasStock}
-                        className={`py-3 rounded-lg border-2 font-medium transition-all duration-300 relative ${
-                          selectedSize === sizeStr
-                            ? 'border-primary-500 bg-primary-500 text-white shadow-md scale-105'
-                            : hasStock
-                            ? 'border-border-light dark:border-border-dark hover:border-primary-500 dark:hover:border-primary-500 text-slate-900 dark:text-white'
-                            : 'border-border-light dark:border-border-dark bg-slate-100 dark:bg-slate-900/50 text-slate-400 dark:text-slate-600 cursor-not-allowed'
-                        }`}
-                      >
-                        <span className={!hasStock ? 'line-through' : ''}>{size}</span>
-                      </button>
-                      {hasStock && (
-                        <span className="text-xs text-center mt-1 text-green-600 dark:text-green-400 font-medium">
-                          {quantity} {t('product.stockCount')}
-                        </span>
-                      )}
-                      {!hasStock && (
-                        <span className="text-xs text-center mt-1 text-slate-400 dark:text-slate-600">
-                          {t('product.notAvailable')}
-                        </span>
-                      )}
-                    </div>
+                    <button
+                      key={size}
+                      onClick={() => hasStock && setSelectedSize(sizeStr)}
+                      disabled={!hasStock}
+                      className={`relative min-w-[56px] h-12 px-4 rounded-md border text-sm font-medium transition-all duration-200 ${
+                        selectedSize === sizeStr
+                          ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 border-slate-900 dark:border-white'
+                          : hasStock
+                          ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white border-slate-200 dark:border-slate-600 hover:border-slate-900 dark:hover:border-white'
+                          : 'bg-slate-50 dark:bg-slate-900/50 text-slate-300 dark:text-slate-600 border-slate-100 dark:border-slate-700 cursor-not-allowed'
+                      }`}
+                    >
+                      <span className={!hasStock ? 'relative' : ''}>
+                        {size}
+                        {!hasStock && (
+                          <span className="absolute left-1/2 top-1/2 w-[120%] h-px bg-slate-300 dark:bg-slate-600 -translate-x-1/2 -translate-y-1/2 -rotate-45" />
+                        )}
+                      </span>
+                    </button>
                   )
                 })}
               </div>
-              {selectedSize && (
-                <p className="text-sm text-slate-600 dark:text-slate-400 mt-2">
-                  {t('product.stock')}: {availableStock} {t('product.stockCount')}
+              {selectedSize && availableStock > 0 && (
+                <p className="text-xs text-green-600 dark:text-green-400 mt-2">
+                  ✓ {availableStock} {t('product.stockCount')} {t('product.inStock')}
                 </p>
               )}
             </div>

@@ -22,7 +22,7 @@ export async function GET(
     
     const productId = (product as any).id
     
-    // Görseller
+    // Görseller (eski sistem)
     const images = await db.findMany('product_images', 
       { product_id: productId },
       { orderBy: 'display_order ASC' }
@@ -36,6 +36,26 @@ export async function GET(
       id: (product as any).category_id 
     })
     
+    // Renk varyantları
+    const colors = await db.findMany('product_colors', 
+      { product_id: productId },
+      { orderBy: 'display_order ASC' }
+    )
+    
+    // Her renk için görselleri çek
+    const colorsWithImages = await Promise.all(
+      (colors as any[]).map(async (color: any) => {
+        const colorImages = await db.findMany('product_color_images',
+          { product_color_id: color.id },
+          { orderBy: 'display_order ASC' }
+        )
+        return {
+          ...color,
+          images: (colorImages as any[]).map((img: any) => img.image_url)
+        }
+      })
+    )
+    
     return NextResponse.json({
       success: true,
       data: {
@@ -43,6 +63,7 @@ export async function GET(
         images,
         stock,
         category,
+        colors: colorsWithImages,
         in_stock: stock.some((s: any) => s.quantity > 0)
       }
     })
@@ -63,7 +84,7 @@ export async function PUT(
   try {
     const { slug } = await params
     const body = await request.json()
-    const { images, stock, ...productData } = body
+    const { images, stock, colors, ...productData } = body
     
     // Ürünü bul
     const product = await db.findOne('products', { slug })
@@ -81,7 +102,7 @@ export async function PUT(
       await db.update('products', productData, { slug })
     }
     
-    // Görselleri güncelle
+    // Görselleri güncelle (eski sistem - colors yoksa kullanılır)
     if (images && Array.isArray(images)) {
       // Mevcut görselleri sil
       await query('DELETE FROM product_images WHERE product_id = ?', [productId])
@@ -94,6 +115,51 @@ export async function PUT(
           display_order: i,
           is_primary: i === 0
         })
+      }
+    }
+    
+    // Renk varyantlarını güncelle
+    if (colors && Array.isArray(colors)) {
+      // Önce mevcut renklerin görsellerini sil
+      const existingColors = await db.findMany('product_colors', { product_id: productId })
+      for (const color of existingColors as any[]) {
+        await query('DELETE FROM product_color_images WHERE product_color_id = ?', [color.id])
+      }
+      // Mevcut renkleri sil
+      await query('DELETE FROM product_colors WHERE product_id = ?', [productId])
+      
+      // Yeni renkleri ekle
+      for (let i = 0; i < colors.length; i++) {
+        try {
+          const colorData = colors[i]
+          const colorResult = await db.insert('product_colors', {
+            product_id: productId,
+            color_name: colorData.name,
+            color_hex: colorData.hex,
+            display_order: i,
+            is_default: colorData.isDefault ? 1 : 0
+          })
+          
+          const colorId = (colorResult as any).id
+          
+          // Renk görsellerini ekle
+          if (colorData.images && Array.isArray(colorData.images)) {
+            for (let j = 0; j < colorData.images.length; j++) {
+              try {
+                await db.insert('product_color_images', {
+                  product_color_id: colorId,
+                  image_url: colorData.images[j],
+                  display_order: j,
+                  is_primary: j === 0 ? 1 : 0
+                })
+              } catch (imgError) {
+                console.error('Color image insert error:', imgError)
+              }
+            }
+          }
+        } catch (colorError) {
+          console.error('Color insert error:', colorError)
+        }
       }
     }
     
