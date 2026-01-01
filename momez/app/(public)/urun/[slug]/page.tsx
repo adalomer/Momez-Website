@@ -564,60 +564,75 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
               )}
             </div>
             
-            <div className="relative">
-              <div className="overflow-x-auto scrollbar-thin pb-4">
-                <div className="flex gap-6 min-w-max">
-                  {relatedProducts.map((relatedProduct) => (
-                    <Link
-                      key={relatedProduct.id}
-                      href={`/urun/${relatedProduct.slug}`}
-                      className="group w-[280px] bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] flex-shrink-0"
-                    >
-                      <div className="aspect-square overflow-hidden bg-gray-100 dark:bg-slate-700 relative">
-                        {relatedProduct.images && relatedProduct.images[0] ? (
-                          <Image
-                            src={relatedProduct.images[0].image_url}
-                            alt={relatedProduct.name}
-                            width={280}
-                            height={280}
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-gray-400">
-                            {t('product.noImage')}
-                          </div>
-                        )}
-                        {relatedProduct.discount_price && (
-                          <div className="absolute top-3 right-3 bg-red-500 text-white px-3 py-1.5 rounded-lg text-sm font-bold shadow-lg">
-                            %{Math.round((1 - relatedProduct.discount_price / relatedProduct.price) * 100)}
-                          </div>
-                        )}
-                      </div>
-                      <div className="p-4">
-                        <h3 className="font-bold text-slate-900 dark:text-white group-hover:text-red-500 dark:group-hover:text-red-400 transition-colors line-clamp-2 min-h-[3rem] mb-2">
-                          {relatedProduct.name}
-                        </h3>
-                        <div className="flex items-center gap-2">
-                          {relatedProduct.discount_price ? (
-                            <>
-                              <p className="text-xl font-bold text-red-500">
-                                ₺{Number(relatedProduct.discount_price).toFixed(2)}
-                              </p>
-                              <p className="text-sm text-gray-500 dark:text-gray-400 line-through">
-                                ₺{Number(relatedProduct.price).toFixed(2)}
-                              </p>
-                            </>
-                          ) : (
-                            <p className="text-xl font-bold text-red-500">
+            {/* Grid Layout - Kaydırma yerine grid */}
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6">
+              {relatedProducts.map((relatedProduct) => {
+                // Renk görsellerini destekle
+                const getRelatedImage = () => {
+                  if (relatedProduct.colors && relatedProduct.colors.length > 0) {
+                    const defaultColor = relatedProduct.colors.find((c: any) => c.is_default === 1) || relatedProduct.colors[0]
+                    if (defaultColor.images && defaultColor.images.length > 0) {
+                      const img = defaultColor.images[0]
+                      return typeof img === 'string' ? img : img?.image_url
+                    }
+                  }
+                  if (relatedProduct.images && relatedProduct.images[0]) {
+                    return relatedProduct.images[0].image_url
+                  }
+                  return null
+                }
+                const relatedImage = getRelatedImage()
+                
+                return (
+                  <Link
+                    key={relatedProduct.id}
+                    href={`/urun/${relatedProduct.slug}`}
+                    className="group bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-[1.02]"
+                  >
+                    <div className="aspect-square overflow-hidden bg-gray-100 dark:bg-slate-700 relative">
+                      {relatedImage ? (
+                        <Image
+                          src={relatedImage}
+                          alt={relatedProduct.name}
+                          width={280}
+                          height={280}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-gray-400">
+                          {t('product.noImage')}
+                        </div>
+                      )}
+                      {relatedProduct.discount_price && (
+                        <div className="absolute top-3 right-3 bg-red-500 text-white px-2 py-1 rounded-lg text-xs font-bold shadow-lg">
+                          %{Math.round((1 - relatedProduct.discount_price / relatedProduct.price) * 100)}
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-3 md:p-4">
+                      <h3 className="font-bold text-slate-900 dark:text-white group-hover:text-red-500 dark:group-hover:text-red-400 transition-colors line-clamp-2 text-sm md:text-base min-h-[2.5rem] md:min-h-[3rem] mb-2">
+                        {relatedProduct.name}
+                      </h3>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        {relatedProduct.discount_price ? (
+                          <>
+                            <p className="text-lg md:text-xl font-bold text-red-500">
+                              ₺{Number(relatedProduct.discount_price).toFixed(2)}
+                            </p>
+                            <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 line-through">
                               ₺{Number(relatedProduct.price).toFixed(2)}
                             </p>
-                          )}
-                        </div>
+                          </>
+                        ) : (
+                          <p className="text-lg md:text-xl font-bold text-red-500">
+                            ₺{Number(relatedProduct.price).toFixed(2)}
+                          </p>
+                        )}
                       </div>
-                    </Link>
-                  ))}
-                </div>
-              </div>
+                    </div>
+                  </Link>
+                )
+              })}
             </div>
           </div>
         )}

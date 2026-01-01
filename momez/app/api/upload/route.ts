@@ -41,8 +41,8 @@ export async function POST(request: NextRequest) {
     const originalName = file.name.replace(/[^a-zA-Z0-9.]/g, '_')
     const filename = `${timestamp}_${originalName}`
     
-    // Upload klasörü oluştur
-    const uploadDir = join(process.cwd(), 'uploads')
+    // Upload klasörü oluştur - public/uploads'a kaydet
+    const uploadDir = join(process.cwd(), 'public', 'uploads')
     if (!existsSync(uploadDir)) {
       await mkdir(uploadDir, { recursive: true })
     }

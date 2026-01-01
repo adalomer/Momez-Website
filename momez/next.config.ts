@@ -31,7 +31,19 @@ const nextConfig: NextConfig = {
         hostname: `www.${domain}`,
         pathname: '/uploads/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'momez.co',
+        pathname: '/uploads/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.momez.co',
+        pathname: '/uploads/**',
+      },
     ],
+    // Local uploads için unoptimized kullan
+    unoptimized: false,
   },
   output: 'standalone',
   experimental: {
