@@ -41,8 +41,8 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 
-# Upload klasörünü oluştur
-RUN mkdir -p /app/uploads && chown -R nextjs:nodejs /app/uploads
+# Upload klasörünü public içinde oluştur ve izinleri düzenle
+RUN mkdir -p /app/public/uploads && chown -R nextjs:nodejs /app/public/uploads
 
 # Cache klasörünü oluştur ve izinleri düzenle
 RUN mkdir -p /app/.next/cache && chown -R nextjs:nodejs /app/.next

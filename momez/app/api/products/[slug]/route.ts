@@ -64,7 +64,15 @@ export async function PUT(
   try {
     const { slug } = await params
     const body = await request.json()
-    const { images, stock, colors, ...productData } = body
+    const { images, stock, colors, discount_price, ...restProductData } = body
+    
+    // discount_price'ı compare_at_price'a dönüştür
+    const productData: any = { ...restProductData }
+    if (discount_price !== undefined) {
+      // Eğer discount_price varsa, mevcut fiyat eski fiyat olur, discount_price yeni fiyat olur
+      // Veya: discount_price boşsa compare_at_price'ı null yap
+      productData.compare_at_price = discount_price || null
+    }
     
     // Ürünü bul
     const product = await db.findOne('products', { slug })
@@ -82,16 +90,28 @@ export async function PUT(
       await db.update('products', productData, { slug })
     }
     
-    // Görselleri güncelle
-    if (images && Array.isArray(images)) {
+    // Görselleri güncelle - colors varsa onlardan al, yoksa images'dan
+    const allImages: string[] = []
+    if (colors && Array.isArray(colors) && colors.length > 0) {
+      // Tüm renklerin görsellerini topla
+      for (const color of colors) {
+        if (color.images && Array.isArray(color.images)) {
+          allImages.push(...color.images)
+        }
+      }
+    } else if (images && Array.isArray(images)) {
+      allImages.push(...images)
+    }
+    
+    if (allImages.length > 0) {
       // Mevcut görselleri sil
       await query('DELETE FROM product_images WHERE product_id = ?', [productId])
       
       // Yeni görselleri ekle
-      for (let i = 0; i < images.length; i++) {
+      for (let i = 0; i < allImages.length; i++) {
         await db.insert('product_images', {
           product_id: productId,
-          image_url: images[i],
+          image_url: allImages[i],
           display_order: i,
           is_primary: i === 0
         })
