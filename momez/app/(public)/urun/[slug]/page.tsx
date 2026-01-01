@@ -175,9 +175,9 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
         c.id?.toString() === selectedColor || c.color_hex === selectedColor
       )
       if (currentColor && currentColor.images && currentColor.images.length > 0) {
-        // Renk görselleri varsa onları kullan
-        return currentColor.images.map((url: string, idx: number) => ({
-          image_url: url,
+        // Renk görselleri varsa onları kullan - hem string hem obje formatını destekle
+        return currentColor.images.map((img: any, idx: number) => ({
+          image_url: typeof img === 'string' ? img : (img?.image_url || ''),
           id: `color-img-${idx}`
         }))
       }

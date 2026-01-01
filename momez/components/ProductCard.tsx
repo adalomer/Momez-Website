@@ -49,14 +49,18 @@ export default function ProductCard({ product, user }: ProductCardProps) {
         if (selectedColor && selectedColor.images && selectedColor.images.length > 0) {
           const img = selectedColor.images[0]
           // images array obje veya string olabilir
-          return typeof img === 'string' ? img : (img as any).image_url
+          if (typeof img === 'string') return img
+          if (img && typeof img === 'object' && 'image_url' in img) return img.image_url
+          return null
         }
       }
       // Varsayılan rengin görselini göster
       const defaultColor = product.colors.find(c => c.is_default === 1) || product.colors[0]
       if (defaultColor && defaultColor.images && defaultColor.images.length > 0) {
         const img = defaultColor.images[0]
-        return typeof img === 'string' ? img : (img as any).image_url
+        if (typeof img === 'string') return img
+        if (img && typeof img === 'object' && 'image_url' in img) return img.image_url
+        return null
       }
     }
     // Eski sistem - images array

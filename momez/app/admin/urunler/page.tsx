@@ -126,7 +126,8 @@ export default function AdminProductsPage() {
       id: c.id || `color-${idx}`,
       name: c.color_name,
       hex: c.color_hex,
-      images: c.images || [],
+      // images hem string hem obje formatında gelebilir
+      images: (c.images || []).map((img: any) => typeof img === 'string' ? img : (img?.image_url || '')).filter((url: string) => url),
       isDefault: c.is_default === 1
     }))
     
