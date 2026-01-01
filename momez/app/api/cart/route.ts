@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
     }
     
     // Sepet ürünlerini getir (JOIN ile)
-    const query = `
+    const cartQuery = `
       SELECT 
         ci.id,
         ci.product_id,
@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
         p.name as product_name,
         p.slug as product_slug,
         p.price,
-        p.discount_price,
+        p.compare_at_price,
         ps.quantity as stock,
         pi.image_url
       FROM cart_items ci
@@ -47,9 +47,9 @@ export async function GET(request: NextRequest) {
       ORDER BY ci.created_at DESC
     `
     
-    const cartItems = await db.query(query, [user.id])
+    const cartItems = await db.query(cartQuery, [user.id])
     
-    // Fiyat hesapla (indirimli varsa onu kullan)
+    // Fiyat hesapla (compare_at_price varsa indirimli fiyat price'dır)
     const formattedItems = cartItems.map((item: any) => ({
       id: item.id,
       product_id: item.product_id,
@@ -57,7 +57,8 @@ export async function GET(request: NextRequest) {
       product_slug: item.product_slug,
       size: item.size,
       quantity: item.quantity,
-      price: item.discount_price || item.price,
+      price: item.price,
+      compare_at_price: item.compare_at_price,
       image_url: item.image_url || '/placeholder.jpg',
       stock: item.stock || 0
     }))

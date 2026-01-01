@@ -42,7 +42,7 @@ export async function GET(
         a.postal_code
       FROM orders o
       LEFT JOIN users u ON o.user_id = u.id
-      LEFT JOIN addresses a ON o.address_id = a.id
+      LEFT JOIN addresses a ON o.shipping_address_id = a.id
       WHERE o.id = ?
     `
     

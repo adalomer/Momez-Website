@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
         p.name,
         p.slug,
         p.price,
-        p.discount_price,
+        p.compare_at_price,
         p.is_active,
         (
           SELECT image_url 

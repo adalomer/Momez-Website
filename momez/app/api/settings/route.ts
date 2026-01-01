@@ -5,11 +5,17 @@ import { getUserFromToken } from '@/lib/auth'
 // GET - Ayarları getir
 export async function GET(request: NextRequest) {
   try {
-    const settings = await query('SELECT * FROM settings')
+    const settings = await query('SELECT setting_key, setting_value, setting_type FROM site_settings')
     
+    // Key-value formatına çevir
+    const settingsMap: Record<string, any> = {}
+    for (const s of settings as any[]) {
+      settingsMap[s.setting_key] = s.setting_value
+    }
+
     return NextResponse.json({
       success: true,
-      data: settings
+      data: settingsMap
     })
   } catch (error) {
     console.error('Settings GET Error:', error)
@@ -18,9 +24,7 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     )
   }
-}
-
-// POST - Ayarları kaydet (Admin)
+}// POST - Ayarları kaydet (Admin)
 export async function POST(request: NextRequest) {
   try {
     const token = request.cookies.get('auth_token')?.value
@@ -46,8 +50,9 @@ export async function POST(request: NextRequest) {
     // Her ayarı güncelle veya ekle
     for (const [key, value] of Object.entries(settings)) {
       await query(
-        `INSERT INTO settings (\`key\`, value) VALUES (?, ?) 
-         ON DUPLICATE KEY UPDATE value = ?, updated_at = NOW()`,
+        `INSERT INTO site_settings (id, setting_key, setting_value, setting_type, created_at, updated_at) 
+         VALUES (UUID(), ?, ?, 'string', NOW(), NOW()) 
+         ON DUPLICATE KEY UPDATE setting_value = ?, updated_at = NOW()`,
         [key, value, value]
       )
     }
