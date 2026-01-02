@@ -8,6 +8,7 @@ import { productsAPI, cartAPI, favoritesAPI } from '@/lib/api'
 import toast, { Toaster } from 'react-hot-toast'
 import { useRouter } from 'next/navigation'
 import { useLanguage } from '@/lib/i18n'
+import { formatPrice } from '@/lib/currency'
 
 export default function ProductDetailPage({ params }: { params: Promise<{ slug: string }> }) {
 	const router = useRouter()
@@ -295,7 +296,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
 
 						<div className="flex items-baseline gap-4 mb-6">
 							<p className="text-4xl font-bold text-primary-500 dark:text-primary-400">
-								₺{Number(product.price).toFixed(2)}
+								{formatPrice(Number(product.price), language)}
 							</p>
 						</div>
 
@@ -602,22 +603,22 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
 											<h3 className="font-bold text-slate-900 dark:text-white group-hover:text-red-500 dark:group-hover:text-red-400 transition-colors line-clamp-2 text-sm md:text-base min-h-[2.5rem] md:min-h-[3rem] mb-2">
 												{relatedProduct.name}
 											</h3>
-											<div className="flex items-center gap-2 flex-wrap">
-												{relatedProduct.discount_price ? (
-													<>
+												<div className="flex items-center gap-2 flex-wrap">
+													{relatedProduct.discount_price ? (
+														<>
+															<p className="text-lg md:text-xl font-bold text-red-500">
+																{formatPrice(Number(relatedProduct.discount_price), language)}
+															</p>
+															<p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 line-through">
+																{formatPrice(Number(relatedProduct.price), language)}
+															</p>
+														</>
+													) : (
 														<p className="text-lg md:text-xl font-bold text-red-500">
-															₺{Number(relatedProduct.discount_price).toFixed(2)}
+															{formatPrice(Number(relatedProduct.price), language)}
 														</p>
-														<p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 line-through">
-															₺{Number(relatedProduct.price).toFixed(2)}
-														</p>
-													</>
-												) : (
-													<p className="text-lg md:text-xl font-bold text-red-500">
-														₺{Number(relatedProduct.price).toFixed(2)}
-													</p>
-												)}
-											</div>
+													)}
+												</div>
 										</div>
 									</Link>
 								)
