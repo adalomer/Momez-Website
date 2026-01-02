@@ -1,9 +1,9 @@
 'use client'
 
-import { Heart, ShoppingCart } from 'lucide-react'
+import { Heart, ShoppingCart, ChevronLeft, ChevronRight } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { productsAPI, categoriesAPI } from '@/lib/api'
 import toast, { Toaster } from 'react-hot-toast'
 import ProductCard from '@/components/ProductCard'
@@ -22,6 +22,7 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState<UserData | null>(null)
   const { t, language } = useLanguage()
+  const categoriesRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     loadData()
@@ -54,7 +55,7 @@ export default function HomePage() {
       // Kategorileri çek
       const categoriesRes = await categoriesAPI.getAll() as { success: boolean; data?: any[]; error?: string }
       if (categoriesRes.success && categoriesRes.data) {
-        setCategories(categoriesRes.data.slice(0, 6))
+        setCategories(categoriesRes.data.slice(0, 8))
       }
     } catch (error) {
       console.error('Data load error:', error)
@@ -64,12 +65,22 @@ export default function HomePage() {
     }
   }
 
+  const scrollCategories = (direction: 'left' | 'right') => {
+    if (categoriesRef.current) {
+      const scrollAmount = 300
+      categoriesRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth'
+      })
+    }
+  }
+
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-background-light dark:bg-background-dark">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#ee2b2b] mx-auto"></div>
-          <p className="mt-4 text-gray-600">{t('common.loading')}</p>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">{t('common.loading')}</p>
         </div>
       </div>
     )
@@ -119,41 +130,94 @@ export default function HomePage() {
               {t('home.noCategories')}
             </div>
           ) : (
-            <div className="relative">
-              <div className="overflow-x-auto overflow-y-hidden scrollbar-thin scrollbar-thumb-red-500 scrollbar-track-gray-100 dark:scrollbar-track-slate-800" style={{scrollbarWidth: 'thin', scrollbarColor: '#ef4444 #f3f4f6'}}>
-                <div className="flex gap-4 md:gap-6 pb-4">
-                  {categories.map((category) => (
-                    <Link
-                      key={category.id}
-                      href={`/kategori/${category.slug}`}
-                      className="group flex-shrink-0 w-[140px] md:w-[180px] lg:w-[200px]"
-                    >
-                      <div className="aspect-square rounded-2xl overflow-hidden bg-gray-100 dark:bg-slate-800 mb-3 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-                        {category.image_url ? (
-                          <Image
-                            src={category.image_url}
-                            alt={category.name}
-                            width={200}
-                            height={200}
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-600 font-medium">
-                            {category.name}
-                          </div>
-                        )}
-                      </div>
-                      <p className="text-center font-semibold group-hover:text-[#ee2b2b] dark:group-hover:text-red-400 transition-colors text-sm md:text-base">
-                        {category.name}
-                      </p>
-                      <p className="text-center text-xs md:text-sm text-gray-500 dark:text-gray-400">
-                        {category.product_count || 0} {t('home.products')}
-                      </p>
-                    </Link>
-                  ))}
+            <>
+              {/* Mobil görünüm - Yatay kaydırma */}
+              <div className="md:hidden relative">
+                <button 
+                  onClick={() => scrollCategories('left')}
+                  className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 shadow-lg rounded-full p-2 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
+                  aria-label="Önceki kategoriler"
+                >
+                  <ChevronLeft className="w-5 h-5 text-slate-700 dark:text-white" />
+                </button>
+                <div 
+                  ref={categoriesRef}
+                  className="overflow-x-auto overflow-y-hidden scrollbar-hide snap-x snap-mandatory"
+                  style={{scrollbarWidth: 'none', msOverflowStyle: 'none'}}
+                >
+                  <div className="flex gap-4 pb-4 px-8">
+                    {categories.map((category) => (
+                      <Link
+                        key={category.id}
+                        href={`/kategori/${category.slug}`}
+                        className="group flex-shrink-0 w-[140px] snap-start"
+                      >
+                        <div className="aspect-square rounded-2xl overflow-hidden bg-gray-100 dark:bg-slate-800 mb-3 shadow-lg hover:shadow-xl transition-all duration-300">
+                          {category.image_url ? (
+                            <Image
+                              src={category.image_url}
+                              alt={category.name}
+                              width={200}
+                              height={200}
+                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-600 font-medium bg-gradient-to-br from-gray-100 to-gray-200 dark:from-slate-700 dark:to-slate-800">
+                              {category.name?.charAt(0)}
+                            </div>
+                          )}
+                        </div>
+                        <p className="text-center font-semibold group-hover:text-[#ee2b2b] dark:group-hover:text-red-400 transition-colors text-sm">
+                          {category.name}
+                        </p>
+                        <p className="text-center text-xs text-gray-500 dark:text-gray-400">
+                          {category.product_count || 0} {t('home.products')}
+                        </p>
+                      </Link>
+                    ))}
+                  </div>
                 </div>
+                <button 
+                  onClick={() => scrollCategories('right')}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 shadow-lg rounded-full p-2 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
+                  aria-label="Sonraki kategoriler"
+                >
+                  <ChevronRight className="w-5 h-5 text-slate-700 dark:text-white" />
+                </button>
               </div>
-            </div>
+
+              {/* Masaüstü görünüm - Grid */}
+              <div className="hidden md:grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {categories.map((category) => (
+                  <Link
+                    key={category.id}
+                    href={`/kategori/${category.slug}`}
+                    className="group relative overflow-hidden rounded-2xl bg-white dark:bg-slate-800 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1"
+                  >
+                    <div className="aspect-[4/3] overflow-hidden">
+                      {category.image_url ? (
+                        <Image
+                          src={category.image_url}
+                          alt={category.name}
+                          width={400}
+                          height={300}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-red-500 to-red-600 text-white text-4xl font-bold">
+                          {category.name?.charAt(0)}
+                        </div>
+                      )}
+                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+                    <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+                      <h3 className="font-bold text-lg mb-1">{category.name}</h3>
+                      <p className="text-sm text-white/80">{category.product_count || 0} {t('home.products')}</p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </>
           )}
         </section>
 
@@ -170,7 +234,7 @@ export default function HomePage() {
           </div>
           
           {products.length === 0 ? (
-            <div className="text-center py-16 md:py-20">
+            <div className="text-center py-16 md:py-20 bg-gray-50 dark:bg-slate-800/50 rounded-2xl">
               <p className="text-gray-500 dark:text-gray-400 mb-6 text-base md:text-lg">{t('home.noProducts')}</p>
               {user?.role === 'admin' && (
                 <Link 
@@ -182,7 +246,7 @@ export default function HomePage() {
               )}
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">
               {products.map((product) => (
                 <ProductCard key={product.id} product={product} user={user} />
               ))}
