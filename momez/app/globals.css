@@ -351,34 +351,12 @@ body, .glass, .glass-dark, .btn-primary, .btn-secondary, input, select, textarea
 }
 
 /* RTL için yön belirten ikonları ayna görüntüsü yap */
-[dir="rtl"] .rtl-flip {
+/* rtl-mirror sınıfı ile işaretlenen her öğeyi RTL modunda yatay olarak ters çevir */
+[dir="rtl"] .rtl-mirror {
   transform: scaleX(-1);
 }
 
-/* Lucide ikonlar için otomatik RTL dönüşüm */
-[dir="rtl"] .lucide-chevron-right,
-[dir="rtl"] .lucide-chevron-left,
-[dir="rtl"] .lucide-arrow-right,
-[dir="rtl"] .lucide-arrow-left,
-[dir="rtl"] .lucide-arrow-left-circle,
-[dir="rtl"] .lucide-arrow-right-circle,
-[dir="rtl"] .lucide-chevrons-right,
-[dir="rtl"] .lucide-chevrons-left,
-[dir="rtl"] .lucide-move-right,
-[dir="rtl"] .lucide-move-left,
-[dir="rtl"] .lucide-corner-up-left,
-[dir="rtl"] .lucide-corner-up-right,
-[dir="rtl"] .lucide-corner-down-left,
-[dir="rtl"] .lucide-corner-down-right,
-[dir="rtl"] .lucide-reply,
-[dir="rtl"] .lucide-forward,
-[dir="rtl"] .lucide-undo,
-[dir="rtl"] .lucide-redo {
-  transform: scaleX(-1);
-}
-
-/* SVG path için genel ok ikonları */
-[dir="rtl"] svg[data-rtl-flip="true"],
-[dir="rtl"] .icon-rtl-flip {
+/* Inline SVG içindeki path'leri de ters çevirmek için */
+[dir="rtl"] .rtl-mirror svg {
   transform: scaleX(-1);
 }
