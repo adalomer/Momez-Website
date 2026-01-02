@@ -35,20 +35,18 @@ export default function AdminSettingsPage() {
       const data = await response.json()
       
       if (data.success && data.data) {
-        const settingsMap: Record<string, string> = {}
-        data.data.forEach((item: { key: string; value: string }) => {
-          settingsMap[item.key] = item.value
-        })
+        // API artık object döndürüyor (key: value formatında)
+        const settingsMap = data.data
         setSettings({
           site_name: settingsMap.site_name || 'Momez',
           site_tagline: settingsMap.site_tagline || 'Adımınıza Stil Katın',
           site_description: settingsMap.site_description || 'En trend ayakkabı modellerini keşfedin',
-          email: settingsMap.email || 'info@momez.com',
-          phone: settingsMap.phone || '+90 555 123 4567',
+          email: settingsMap.contact_email || settingsMap.email || 'info@momez.com',
+          phone: settingsMap.contact_phone || settingsMap.phone || '+90 555 123 4567',
           whatsapp: settingsMap.whatsapp || '+90 555 123 4567',
           address: settingsMap.address || 'İstanbul, Türkiye',
-          free_shipping_limit: settingsMap.free_shipping_limit || '500',
-          standard_shipping_fee: settingsMap.standard_shipping_fee || '50',
+          free_shipping_limit: settingsMap.free_shipping_threshold || settingsMap.free_shipping_limit || '500',
+          standard_shipping_fee: settingsMap.shipping_cost || settingsMap.standard_shipping_fee || '50',
           instagram: settingsMap.instagram || '@momez',
           facebook: settingsMap.facebook || 'momez',
           twitter: settingsMap.twitter || '@momez',
@@ -56,6 +54,7 @@ export default function AdminSettingsPage() {
         })
       }
     } catch (error) {
+      console.error('Settings load error:', error)
       toast.error(t('common.error'))
     } finally {
       setLoading(false)
