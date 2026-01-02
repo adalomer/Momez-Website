@@ -36,6 +36,26 @@ export async function GET(
       id: (product as any).category_id 
     })
     
+    // Renk varyantları
+    const colors = await db.findMany('product_colors', 
+      { product_id: productId },
+      { orderBy: 'display_order ASC' }
+    )
+    
+    // Her renk için görselleri çek
+    const colorsWithImages = await Promise.all(
+      (colors as any[]).map(async (color: any) => {
+        const colorImages = await db.findMany('product_color_images',
+          { product_color_id: color.id },
+          { orderBy: 'display_order ASC' }
+        )
+        return {
+          ...color,
+          images: (colorImages as any[]).map((img: any) => img.image_url)
+        }
+      })
+    )
+    
     return NextResponse.json({
       success: true,
       data: {
@@ -43,7 +63,7 @@ export async function GET(
         images,
         stock,
         category,
-        colors: [], // Renk tablosu mevcut değil
+        colors: colorsWithImages,
         in_stock: stock.some((s: any) => s.quantity > 0)
       }
     })
@@ -93,16 +113,45 @@ export async function PUT(
     // Görselleri güncelle - colors varsa onlardan al, yoksa images'dan
     const allImages: string[] = []
     if (colors && Array.isArray(colors) && colors.length > 0) {
-      // Tüm renklerin görsellerini topla
-      for (const color of colors) {
-        if (color.images && Array.isArray(color.images)) {
-          allImages.push(...color.images)
+      // Önce mevcut renklerin görsellerini sil
+      const existingColors = await db.findMany('product_colors', { product_id: productId })
+      for (const color of existingColors as any[]) {
+        await query('DELETE FROM product_color_images WHERE product_color_id = ?', [color.id])
+      }
+      // Mevcut renkleri sil
+      await query('DELETE FROM product_colors WHERE product_id = ?', [productId])
+      
+      // Yeni renkleri ekle
+      for (let i = 0; i < colors.length; i++) {
+        const colorData = colors[i]
+        const colorResult = await db.insert('product_colors', {
+          product_id: productId,
+          color_name: colorData.name,
+          color_hex: colorData.hex || '#000000',
+          display_order: i,
+          is_default: colorData.isDefault ? 1 : 0
+        })
+        
+        const colorId = (colorResult as any).id
+        
+        // Renk görsellerini ekle
+        if (colorData.images && Array.isArray(colorData.images)) {
+          for (let j = 0; j < colorData.images.length; j++) {
+            await db.insert('product_color_images', {
+              product_color_id: colorId,
+              image_url: colorData.images[j],
+              display_order: j,
+              is_primary: j === 0 ? 1 : 0
+            })
+            allImages.push(colorData.images[j])
+          }
         }
       }
     } else if (images && Array.isArray(images)) {
       allImages.push(...images)
     }
     
+    // Ana product_images tablosunu da güncelle (geriye uyumluluk için)
     if (allImages.length > 0) {
       // Mevcut görselleri sil
       await query('DELETE FROM product_images WHERE product_id = ?', [productId])

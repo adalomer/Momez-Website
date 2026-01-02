@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
     
     const products = await query<any>(sql, params)
     
-    // Her ürün için görsel, stok bilgisi ekle
+    // Her ürün için görsel, stok ve renk bilgisi ekle
     const productsWithDetails = await Promise.all(
       products.map(async (product: any) => {
         // Görselleri çek
@@ -49,11 +49,31 @@ export async function GET(request: NextRequest) {
         // Stok bilgisi
         const stock = await db.findMany('product_stock', { product_id: product.id })
         
+        // Renk varyantları
+        const colors = await db.findMany('product_colors', 
+          { product_id: product.id },
+          { orderBy: 'display_order ASC' }
+        )
+        
+        // Her renk için görselleri çek
+        const colorsWithImages = await Promise.all(
+          (colors as any[]).map(async (color: any) => {
+            const colorImages = await db.findMany('product_color_images',
+              { product_color_id: color.id },
+              { orderBy: 'display_order ASC' }
+            )
+            return {
+              ...color,
+              images: (colorImages as any[]).map((img: any) => img.image_url)
+            }
+          })
+        )
+        
         return {
           ...product,
           images,
           stock,
-          colors: [], // Renk tablosu mevcut değil
+          colors: colorsWithImages,
           in_stock: stock.some((s: any) => s.quantity > 0)
         }
       })
@@ -142,18 +162,61 @@ export async function POST(request: NextRequest) {
     const productId = (product as any).id
     
     // Görselleri ekle
-    if (images && Array.isArray(images) && images.length > 0) {
-      for (let i = 0; i < images.length; i++) {
+    const allImages: string[] = []
+    
+    // Renk varyantları varsa onları ekle
+    if (colors && Array.isArray(colors) && colors.length > 0) {
+      for (let i = 0; i < colors.length; i++) {
         try {
-          await db.insert('product_images', {
+          const colorData = colors[i]
+          const colorResult = await db.insert('product_colors', {
             product_id: productId,
-            image_url: images[i],
+            color_name: colorData.name,
+            color_hex: colorData.hex || '#000000',
             display_order: i,
-            is_primary: i === 0
+            is_default: colorData.isDefault ? 1 : 0
           })
-        } catch (imgError) {
-          console.error('Image insert error:', imgError)
+          
+          const colorId = (colorResult as any).id
+          
+          // Renk görsellerini ekle
+          if (colorData.images && Array.isArray(colorData.images)) {
+            for (let j = 0; j < colorData.images.length; j++) {
+              await db.insert('product_color_images', {
+                product_color_id: colorId,
+                image_url: colorData.images[j],
+                display_order: j,
+                is_primary: j === 0 ? 1 : 0
+              })
+              allImages.push(colorData.images[j])
+            }
+          }
+        } catch (colorError) {
+          console.error('Color insert error:', colorError)
         }
+      }
+    }
+    
+    // Eski tip images array'i varsa (geriye uyumluluk)
+    if (images && Array.isArray(images) && images.length > 0) {
+      for (const img of images) {
+        if (!allImages.includes(img)) {
+          allImages.push(img)
+        }
+      }
+    }
+    
+    // Ana product_images tablosuna ekle
+    for (let i = 0; i < allImages.length; i++) {
+      try {
+        await db.insert('product_images', {
+          product_id: productId,
+          image_url: allImages[i],
+          display_order: i,
+          is_primary: i === 0
+        })
+      } catch (imgError) {
+        console.error('Image insert error:', imgError)
       }
     }
     
