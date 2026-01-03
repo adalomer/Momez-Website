@@ -43,14 +43,14 @@ export default function CategoryPage({ params }: PageProps) {
 		try {
 			setLoading(true)
 
-			// Kategori bilgisi
+			// Category info
 			const categoriesRes = await categoriesAPI.getAll() as { success: boolean; data?: any[]; error?: string }
 			if (categoriesRes.success && categoriesRes.data) {
 				const foundCategory = categoriesRes.data.find((c: any) => c.slug === slug)
 				setCategory(foundCategory)
 			}
 
-			// Ürünleri çek
+			// Fetch products
 			const productsRes = await productsAPI.getAll({ category: slug }) as { success: boolean; data?: any[]; error?: string }
 			if (productsRes.success && productsRes.data) {
 				setProducts(productsRes.data)
