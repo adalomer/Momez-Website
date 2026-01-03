@@ -320,8 +320,8 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
 												key={colorId}
 												onClick={() => handleColorChange(colorId)}
 												className={`group relative w-10 h-10 rounded-full transition-all duration-200 ${isSelected
-														? 'ring-2 ring-offset-2 ring-slate-900 dark:ring-white dark:ring-offset-slate-800'
-														: 'hover:ring-2 hover:ring-offset-2 hover:ring-slate-300 dark:hover:ring-slate-600 dark:hover:ring-offset-slate-800'
+													? 'ring-2 ring-offset-2 ring-slate-900 dark:ring-white dark:ring-offset-slate-800'
+													: 'hover:ring-2 hover:ring-offset-2 hover:ring-slate-300 dark:hover:ring-slate-600 dark:hover:ring-offset-slate-800'
 													}`}
 												style={{ backgroundColor: color.color_hex }}
 												title={color.color_name}
@@ -368,10 +368,10 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
 											onClick={() => hasStock && setSelectedSize(sizeStr)}
 											disabled={!hasStock}
 											className={`relative min-w-[56px] h-12 px-4 rounded-md border text-sm font-medium transition-all duration-200 ${selectedSize === sizeStr
-													? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 border-slate-900 dark:border-white'
-													: hasStock
-														? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white border-slate-200 dark:border-slate-600 hover:border-slate-900 dark:hover:border-white'
-														: 'bg-slate-50 dark:bg-slate-900/50 text-slate-300 dark:text-slate-600 border-slate-100 dark:border-slate-700 cursor-not-allowed'
+												? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 border-slate-900 dark:border-white'
+												: hasStock
+													? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white border-slate-200 dark:border-slate-600 hover:border-slate-900 dark:hover:border-white'
+													: 'bg-slate-50 dark:bg-slate-900/50 text-slate-300 dark:text-slate-600 border-slate-100 dark:border-slate-700 cursor-not-allowed'
 												}`}
 										>
 											<span className={!hasStock ? 'relative' : ''}>
@@ -450,8 +450,8 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
 							<button
 								onClick={() => setActiveTab('description')}
 								className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${activeTab === 'description'
-										? 'border-red-500 text-red-500'
-										: 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 hover:border-gray-300'
+									? 'border-red-500 text-red-500'
+									: 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 hover:border-gray-300'
 									}`}
 							>
 								{t('product.description')}
@@ -459,8 +459,8 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
 							<button
 								onClick={() => setActiveTab('features')}
 								className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${activeTab === 'features'
-										? 'border-red-500 text-red-500'
-										: 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 hover:border-gray-300'
+									? 'border-red-500 text-red-500'
+									: 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 hover:border-gray-300'
 									}`}
 							>
 								{t('product.features')}
@@ -468,8 +468,8 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
 							<button
 								onClick={() => setActiveTab('shipping')}
 								className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${activeTab === 'shipping'
-										? 'border-red-500 text-red-500'
-										: 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 hover:border-gray-300'
+									? 'border-red-500 text-red-500'
+									: 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 hover:border-gray-300'
 									}`}
 							>
 								{t('product.shipping')}
@@ -520,7 +520,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
 										<div>
 											<h4 className="font-semibold text-slate-900 dark:text-white mb-1">{t('product.freeShipping')}</h4>
 											<p className="text-sm text-slate-600 dark:text-slate-400">
-												{shippingSettings.freeLimit} TL {language === 'tr' ? 've üzeri alışverişlerde kargo bedava' : language === 'en' ? 'and above free shipping' : 'والأكثر شحن مجاني'}
+												{shippingSettings.freeLimit} TL {language === 'en' ? 'and above free shipping' : 'والأكثر شحن مجاني'}
 											</p>
 										</div>
 									</div>
@@ -603,22 +603,22 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
 											<h3 className="font-bold text-slate-900 dark:text-white group-hover:text-red-500 dark:group-hover:text-red-400 transition-colors line-clamp-2 text-sm md:text-base min-h-[2.5rem] md:min-h-[3rem] mb-2">
 												{relatedProduct.name}
 											</h3>
-												<div className="flex items-center gap-2 flex-wrap">
-													{relatedProduct.discount_price ? (
-														<>
-															<p className="text-lg md:text-xl font-bold text-red-500">
-																{formatPrice(Number(relatedProduct.discount_price), language)}
-															</p>
-															<p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 line-through">
-																{formatPrice(Number(relatedProduct.price), language)}
-															</p>
-														</>
-													) : (
+											<div className="flex items-center gap-2 flex-wrap">
+												{relatedProduct.discount_price ? (
+													<>
 														<p className="text-lg md:text-xl font-bold text-red-500">
+															{formatPrice(Number(relatedProduct.discount_price), language)}
+														</p>
+														<p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 line-through">
 															{formatPrice(Number(relatedProduct.price), language)}
 														</p>
-													)}
-												</div>
+													</>
+												) : (
+													<p className="text-lg md:text-xl font-bold text-red-500">
+														{formatPrice(Number(relatedProduct.price), language)}
+													</p>
+												)}
+											</div>
 										</div>
 									</Link>
 								)

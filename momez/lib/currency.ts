@@ -1,5 +1,5 @@
 // Currency configuration for different languages/regions
-export type Language = 'tr' | 'en' | 'ar'
+export type Language = 'en' | 'ar'
 
 interface CurrencyConfig {
 	code: string
@@ -12,13 +12,6 @@ interface CurrencyConfig {
 // Exchange rates (base: TRY)
 // These should be updated periodically or fetched from an API
 export const currencyConfig: Record<Language, CurrencyConfig> = {
-	tr: {
-		code: 'TRY',
-		symbol: '₺',
-		symbolPosition: 'after',
-		rate: 1,
-		locale: 'tr-TR'
-	},
 	en: {
 		code: 'GBP',
 		symbol: '£',
@@ -39,7 +32,7 @@ export const currencyConfig: Record<Language, CurrencyConfig> = {
  * Convert price from TRY to target currency
  */
 export function convertPrice(amountTRY: number, language: Language): number {
-	const config = currencyConfig[language] || currencyConfig.tr
+	const config = currencyConfig[language] || currencyConfig.en
 	return amountTRY * config.rate
 }
 
@@ -47,7 +40,7 @@ export function convertPrice(amountTRY: number, language: Language): number {
  * Format price with currency symbol based on language
  */
 export function formatPrice(amountTRY: number, language: Language): string {
-	const config = currencyConfig[language] || currencyConfig.tr
+	const config = currencyConfig[language] || currencyConfig.en
 	const convertedAmount = convertPrice(amountTRY, language)
 
 	// Format number with appropriate locale
@@ -68,12 +61,12 @@ export function formatPrice(amountTRY: number, language: Language): string {
  * Get currency symbol for display
  */
 export function getCurrencySymbol(language: Language): string {
-	return currencyConfig[language]?.symbol || '₺'
+	return currencyConfig[language]?.symbol || '£'
 }
 
 /**
  * Get currency code for display
  */
 export function getCurrencyCode(language: Language): string {
-	return currencyConfig[language]?.code || 'TRY'
+	return currencyConfig[language]?.code || 'GBP'
 }
