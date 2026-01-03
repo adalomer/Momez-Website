@@ -5,22 +5,22 @@ import { LanguageProvider } from "@/lib/i18n";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "momez - Premium Ayakkabı Mağazası",
-  description: "Erkek, kadın ve spor ayakkabı koleksiyonları. Kaliteli ve uygun fiyatlı ayakkabılar için momez.",
-  keywords: ["ayakkabı", "erkek ayakkabı", "kadın ayakkabı", "spor ayakkabı", "momez"],
+	title: "momez - Premium Shoe Store",
+	description: "Men's, women's and sports shoe collections. Quality and affordable shoes at momez.",
+	keywords: ["shoes", "men shoes", "women shoes", "sports shoes", "momez"],
 };
 
 export default function RootLayout({
-  children,
+	children,
 }: Readonly<{
-  children: React.ReactNode;
+	children: React.ReactNode;
 }>) {
-  return (
-    <html lang="tr" suppressHydrationWarning>
-      <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
+	return (
+		<html lang="tr" suppressHydrationWarning>
+			<head>
+				<script
+					dangerouslySetInnerHTML={{
+						__html: `
               (function() {
                 try {
                   var theme = localStorage.getItem('theme');
@@ -38,16 +38,16 @@ export default function RootLayout({
                 } catch (e) {}
               })();
             `,
-          }}
-        />
-      </head>
-      <body className="font-sans antialiased bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-50 transition-colors duration-300">
-        <LanguageProvider>
-          {children}
-          <CookieBanner />
-          <Toaster position="top-right" />
-        </LanguageProvider>
-      </body>
-    </html>
-  );
+					}}
+				/>
+			</head>
+			<body className="font-sans antialiased bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-50 transition-colors duration-300">
+				<LanguageProvider>
+					{children}
+					<CookieBanner />
+					<Toaster position="top-right" />
+				</LanguageProvider>
+			</body>
+		</html>
+	);
 }

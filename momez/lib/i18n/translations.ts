@@ -201,6 +201,11 @@ export const translations: Record<Language, Record<string, string>> = {
 		'product.returnPolicyDesc': 'You can return the product within 14 days for free',
 		'product.similarProducts': 'Similar Products',
 
+		// Products list
+		'products.title': 'Products',
+		'products.found': 'products found',
+		'products.noProductsInCategory': 'No products in this category yet.',
+
 		// Cart
 		'cart.title': 'My Cart',
 		'cart.empty': 'Your cart is empty',
@@ -1000,6 +1005,11 @@ export const translations: Record<Language, Record<string, string>> = {
 		'product.returnPolicy': 'المرتجعات خلال 14 يوم',
 		'product.returnPolicyDesc': 'يمكنك إرجاع المنتج خلال 14 يومًا مجانًا',
 		'product.similarProducts': 'منتجات مشابهة',
+
+		// Products list
+		'products.title': 'المنتجات',
+		'products.found': 'منتج موجود',
+		'products.noProductsInCategory': 'لا توجد منتجات في هذه الفئة حتى الآن.',
 
 		// Cart
 		'cart.title': 'سلتي',

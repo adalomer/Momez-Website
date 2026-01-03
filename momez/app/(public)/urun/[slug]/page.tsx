@@ -9,6 +9,7 @@ import toast, { Toaster } from 'react-hot-toast'
 import { useRouter } from 'next/navigation'
 import { useLanguage } from '@/lib/i18n'
 import { formatPrice } from '@/lib/currency'
+import { getColorNameByHex } from '@/lib/colors'
 
 export default function ProductDetailPage({ params }: { params: Promise<{ slug: string }> }) {
 	const router = useRouter()
@@ -308,7 +309,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
 										{t('product.color')}
 									</label>
 									<span className="text-sm text-slate-500 dark:text-slate-400">
-										{selectedColorInfo?.color_name || ''}
+										{selectedColorInfo ? getColorNameByHex(selectedColorInfo.color_hex, language) : ''}
 									</span>
 								</div>
 								<div className="flex flex-wrap gap-3">
@@ -324,7 +325,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
 													: 'hover:ring-2 hover:ring-offset-2 hover:ring-slate-300 dark:hover:ring-slate-600 dark:hover:ring-offset-slate-800'
 													}`}
 												style={{ backgroundColor: color.color_hex }}
-												title={color.color_name}
+												title={getColorNameByHex(color.color_hex, language)}
 											>
 												{color.color_hex?.toUpperCase() === '#FFFFFF' && (
 													<span className="absolute inset-0 rounded-full border border-slate-300 dark:border-slate-600" />

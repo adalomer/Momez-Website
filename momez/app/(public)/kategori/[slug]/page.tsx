@@ -57,7 +57,7 @@ export default function CategoryPage({ params }: PageProps) {
 			}
 		} catch (error) {
 			console.error('Data load error:', error)
-			toast.error('Veriler yüklenirken hata oluştu')
+			toast.error(t('common.error'))
 		} finally {
 			setLoading(false)
 		}
@@ -82,21 +82,21 @@ export default function CategoryPage({ params }: PageProps) {
 				{/* Breadcrumb */}
 				<nav className="flex items-center gap-2 text-sm mb-6">
 					<Link href="/" className="text-slate-600 dark:text-slate-400 hover:text-primary">
-						Ana Sayfa
+						{t('nav.home')}
 					</Link>
 					<span className="text-slate-400">/</span>
 					<span className="text-slate-900 dark:text-white font-medium">
-						{category?.name || 'Kategori'}
+						{category?.name || t('categories.title')}
 					</span>
 				</nav>
 
 				{/* Page Header */}
 				<div className="mb-8">
 					<h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
-						{category?.name || 'Ürünler'}
+						{category?.name || t('products.title')}
 					</h1>
 					<p className="text-slate-600 dark:text-slate-400">
-						{products.length} ürün bulundu
+						{products.length} {t('products.found')}
 					</p>
 				</div>
 
@@ -104,7 +104,7 @@ export default function CategoryPage({ params }: PageProps) {
 				{products.length === 0 ? (
 					<div className="text-center py-16">
 						<p className="text-slate-600 dark:text-slate-400 text-lg">
-							Bu kategoride henüz ürün bulunmuyor.
+							{t('products.noProductsInCategory')}
 						</p>
 					</div>
 				) : (
