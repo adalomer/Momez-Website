@@ -5,7 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { productsAPI, cartAPI, favoritesAPI } from '@/lib/api'
-import toast, { Toaster } from 'react-hot-toast'
+import toast from 'react-hot-toast'
 import { useRouter } from 'next/navigation'
 import { useLanguage } from '@/lib/i18n'
 import { formatPrice } from '@/lib/currency'
@@ -155,7 +155,6 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
 	if (loading) {
 		return (
 			<div className="min-h-screen flex items-center justify-center">
-				<Toaster position="top-center" />
 				<div className="text-center">
 					<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#ee2b2b] mx-auto"></div>
 					<p className="mt-4 text-gray-600">{t('common.loading')}</p>
@@ -208,7 +207,6 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
 
 	return (
 		<div className="min-h-screen bg-background-light dark:bg-background-dark transition-colors duration-300">
-			<Toaster position="top-center" />
 
 			<div className="container mx-auto px-4 py-8">
 				{/* Breadcrumb */}

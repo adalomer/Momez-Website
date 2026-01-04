@@ -5,7 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState, useRef } from 'react'
 import { productsAPI, categoriesAPI } from '@/lib/api'
-import toast, { Toaster } from 'react-hot-toast'
+import toast from 'react-hot-toast'
 import ProductCard from '@/components/ProductCard'
 import { useLanguage } from '@/lib/i18n'
 
@@ -88,7 +88,6 @@ export default function HomePage() {
 
 	return (
 		<div className="min-h-screen bg-background-light dark:bg-background-dark">
-			<Toaster position="top-center" />
 
 			{/* Hero Banner */}
 			<section className="relative h-[400px] md:h-[500px] bg-gradient-to-br from-[#ee2b2b] via-red-600 to-red-700 mb-12 md:mb-16 overflow-hidden">

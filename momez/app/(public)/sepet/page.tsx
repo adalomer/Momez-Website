@@ -5,286 +5,284 @@ import Image from 'next/image'
 import { Trash2, Plus, Minus } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import toast, { Toaster } from 'react-hot-toast'
+import toast from 'react-hot-toast'
 import { cartAPI, authAPI } from '@/lib/api'
 import { useLanguage } from '@/lib/i18n'
 
 interface CartItem {
-  id: string
-  product_id: string
-  product_name: string
-  product_slug: string
-  size: string
-  quantity: number
-  price: number
-  image_url: string
-  stock: number
+	id: string
+	product_id: string
+	product_name: string
+	product_slug: string
+	size: string
+	quantity: number
+	price: number
+	image_url: string
+	stock: number
 }
 
 export default function CartPage() {
-  const router = useRouter()
-  const [cartItems, setCartItems] = useState<CartItem[]>([])
-  const [loading, setLoading] = useState(true)
-  const [user, setUser] = useState<any>(null)
-  const [shippingSettings, setShippingSettings] = useState({ freeLimit: 500, fee: 50 })
-  const [mounted, setMounted] = useState(false)
-  const { t, language } = useLanguage()
+	const router = useRouter()
+	const [cartItems, setCartItems] = useState<CartItem[]>([])
+	const [loading, setLoading] = useState(true)
+	const [user, setUser] = useState<any>(null)
+	const [shippingSettings, setShippingSettings] = useState({ freeLimit: 500, fee: 50 })
+	const [mounted, setMounted] = useState(false)
+	const { t, language } = useLanguage()
 
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+	useEffect(() => {
+		setMounted(true)
+	}, [])
 
-  useEffect(() => {
-    if (!mounted) return
-    
-    checkAuthAndLoadCart()
-    loadShippingSettings()
-  }, [mounted])
+	useEffect(() => {
+		if (!mounted) return
 
-  const loadShippingSettings = async () => {
-    try {
-      const response = await fetch('/api/settings')
-      const data = await response.json()
-      if (data.success && data.data) {
-        // Array'i object'e çevir
-        const settingsObj = data.data.reduce((acc: any, item: any) => {
-          acc[item.key] = item.value
-          return acc
-        }, {})
-        
-        const freeLimit = parseFloat(settingsObj.free_shipping_limit || 500)
-        const fee = parseFloat(settingsObj.standard_shipping_fee || 50)
-        setShippingSettings({ freeLimit, fee })
-        console.log('Kargo ayarları yüklendi:', { freeLimit, fee })
-      }
-    } catch (error) {
-      console.error('Settings load error:', error)
-    }
-  }
+		checkAuthAndLoadCart()
+		loadShippingSettings()
+	}, [mounted])
 
-  const checkAuthAndLoadCart = async () => {
-    try {
-      // Kullanıcı kontrolü
-      const userResult = await authAPI.me() as { success: boolean; data?: any; error?: string }
-      if (!userResult || !userResult.success) {
-        // Token geçersiz, temizle ve login'e yönlendir
-        localStorage.removeItem('token')
-        toast.error(t('auth.loginRequired'), { id: 'auth-required', duration: 2000 })
-        setTimeout(() => {
-          router.push('/auth/login?redirect=/sepet')
-        }, 500)
-        setLoading(false)
-        return
-      }
-      
-      setUser(userResult.data)
-      
-      // Sepeti yükle
-      const cartResult = await cartAPI.get() as { success: boolean; data?: any[]; error?: string }
-      if (cartResult.success && cartResult.data) {
-        setCartItems(cartResult.data)
-      }
-    } catch (error) {
-      // Hata durumunda da token temizle ve login'e yönlendir
-      console.log('Auth check failed, redirecting to login')
-      localStorage.removeItem('token')
-      toast.error(t('auth.loginRequired'), { id: 'auth-required', duration: 2000 })
-      setTimeout(() => {
-        router.push('/auth/login?redirect=/sepet')
-      }, 500)
-    } finally {
-      setLoading(false)
-    }
-  }
+	const loadShippingSettings = async () => {
+		try {
+			const response = await fetch('/api/settings')
+			const data = await response.json()
+			if (data.success && data.data) {
+				// Array'i object'e çevir
+				const settingsObj = data.data.reduce((acc: any, item: any) => {
+					acc[item.key] = item.value
+					return acc
+				}, {})
 
-  const updateQuantity = async (itemId: string, newQuantity: number) => {
-    if (newQuantity < 1) return
-    
-    const item = cartItems.find(i => i.id === itemId)
-    if (!item) return
-    
-    if (newQuantity > item.stock) {
-      toast.error(t('cart.stockExceeded'))
-      return
-    }
+				const freeLimit = parseFloat(settingsObj.free_shipping_limit || 500)
+				const fee = parseFloat(settingsObj.standard_shipping_fee || 50)
+				setShippingSettings({ freeLimit, fee })
+				console.log('Kargo ayarları yüklendi:', { freeLimit, fee })
+			}
+		} catch (error) {
+			console.error('Settings load error:', error)
+		}
+	}
 
-    try {
-      // Önce UI'ı güncelle
-      setCartItems(items =>
-        items.map(i => i.id === itemId ? { ...i, quantity: newQuantity } : i)
-      )
+	const checkAuthAndLoadCart = async () => {
+		try {
+			// Kullanıcı kontrolü
+			const userResult = await authAPI.me() as { success: boolean; data?: any; error?: string }
+			if (!userResult || !userResult.success) {
+				// Token geçersiz, temizle ve login'e yönlendir
+				localStorage.removeItem('token')
+				toast.error(t('auth.loginRequired'), { id: 'auth-required', duration: 2000 })
+				setTimeout(() => {
+					router.push('/auth/login?redirect=/sepet')
+				}, 500)
+				setLoading(false)
+				return
+			}
 
-      // Sonra API'ye gönder
-      const result = await cartAPI.add(item.product_id, item.size, newQuantity) as { success: boolean; error?: string }
-      if (!result.success) {
-        toast.error(result.error || t('common.error'))
-        // Hata durumunda geri al
-        await checkAuthAndLoadCart()
-      }
-    } catch (error) {
-      toast.error(t('common.error'))
-      await checkAuthAndLoadCart()
-    }
-  }
+			setUser(userResult.data)
 
-  const removeItem = async (itemId: string) => {
-    try {
-      const result = await cartAPI.remove(itemId) as { success: boolean; error?: string }
-      if (result.success) {
-        setCartItems(items => items.filter(i => i.id !== itemId))
-        toast.success(t('cart.itemRemoved'))
-      } else {
-        toast.error(result.error || t('common.error'))
-      }
-    } catch (error) {
-      toast.error(t('common.error'))
-    }
-  }
+			// Sepeti yükle
+			const cartResult = await cartAPI.get() as { success: boolean; data?: any[]; error?: string }
+			if (cartResult.success && cartResult.data) {
+				setCartItems(cartResult.data)
+			}
+		} catch (error) {
+			// Hata durumunda da token temizle ve login'e yönlendir
+			console.log('Auth check failed, redirecting to login')
+			localStorage.removeItem('token')
+			toast.error(t('auth.loginRequired'), { id: 'auth-required', duration: 2000 })
+			setTimeout(() => {
+				router.push('/auth/login?redirect=/sepet')
+			}, 500)
+		} finally {
+			setLoading(false)
+		}
+	}
 
-  const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
-  const shipping = subtotal >= shippingSettings.freeLimit ? 0 : shippingSettings.fee
-  const total = subtotal + shipping
-  const remainingForFreeShipping = shippingSettings.freeLimit - subtotal
+	const updateQuantity = async (itemId: string, newQuantity: number) => {
+		if (newQuantity < 1) return
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Toaster position="top-center" />
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4">{t('common.loading')}</p>
-        </div>
-      </div>
-    )
-  }
+		const item = cartItems.find(i => i.id === itemId)
+		if (!item) return
 
-  return (
-    <div className="min-h-screen py-8">
-      <Toaster position="top-center" />
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-8">
-          {t('cart.title')}
-        </h1>
+		if (newQuantity > item.stock) {
+			toast.error(t('cart.stockExceeded'))
+			return
+		}
 
-        {cartItems.length === 0 ? (
-          <div className="text-center py-16 bg-white dark:bg-slate-800 rounded-xl">
-            <p className="text-slate-600 dark:text-slate-400 text-lg mb-4">
-              {t('cart.empty')}
-            </p>
-            <Link
-              href="/"
-              className="inline-block px-6 py-3 bg-primary hover:bg-primary/90 text-white font-bold rounded-lg transition-colors"
-            >
-              {t('cart.continue')}
-            </Link>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Cart Items */}
-            <div className="lg:col-span-2 space-y-4">
-              {cartItems.map((item) => (
-                <div key={item.id} className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700">
-                  <div className="flex gap-4">
-                    <Link href={`/urun/${item.product_slug}`} className="relative w-24 h-24 rounded-lg overflow-hidden bg-slate-200 dark:bg-slate-700 flex-shrink-0">
-                      <Image
-                        src={item.image_url}
-                        alt={item.product_name}
-                        fill
-                        className="object-cover"
-                      />
-                    </Link>
-                    
-                    <div className="flex-1 flex flex-col justify-between">
-                      <div>
-                        <Link href={`/urun/${item.product_slug}`}>
-                          <h3 className="font-bold text-slate-900 dark:text-white mb-1 hover:text-primary">
-                            {item.product_name}
-                          </h3>
-                        </Link>
-                        <p className="text-sm text-slate-600 dark:text-slate-400">
-                          {t('product.size')}: {item.size}
-                        </p>
-                      </div>
-                      
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                            disabled={item.quantity <= 1}
-                            className="p-1 rounded border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            <Minus className="w-4 h-4" />
-                          </button>
-                          <span className="w-12 text-center font-medium">{item.quantity}</span>
-                          <button
-                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                            disabled={item.quantity >= item.stock}
-                            className="p-1 rounded border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            <Plus className="w-4 h-4" />
-                          </button>
-                        </div>
-                        <div className="flex items-center gap-4">
-                          <p className="font-bold text-slate-900 dark:text-white">
-                            ₺{(item.price * item.quantity).toFixed(2)}
-                          </p>
-                          <button
-                            onClick={() => removeItem(item.id)}
-                            className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition"
-                          >
-                            <Trash2 className="w-5 h-5" />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+		try {
+			// Önce UI'ı güncelle
+			setCartItems(items =>
+				items.map(i => i.id === itemId ? { ...i, quantity: newQuantity } : i)
+			)
 
-            {/* Order Summary */}
-            <div className="lg:col-span-1">
-              <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 sticky top-4">
-                <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-6">
-                  {t('checkout.summary')}
-                </h2>
-                
-                <div className="space-y-3 mb-6">
-                  <div className="flex justify-between text-slate-600 dark:text-slate-400">
-                    <span>{t('cart.subtotal')}</span>
-                    <span>₺{subtotal.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between text-slate-600 dark:text-slate-400">
-                    <span>{t('cart.shipping')}</span>
-                    <span>{shipping === 0 ? t('cart.freeShipping') : `₺${shipping.toFixed(2)}`}</span>
-                  </div>
-                  {shipping === 0 && (
-                    <p className="text-xs text-green-600 dark:text-green-400">
-                      ✓ {t('cart.freeShippingNote').replace('{limit}', shippingSettings.freeLimit.toString())}
-                    </p>
-                  )}
-                  {remainingForFreeShipping > 0 && shipping > 0 && (
-                    <p className="text-xs text-slate-500">
-                      {t('cart.remainingForFree').replace('{amount}', remainingForFreeShipping.toFixed(2))}
-                    </p>
-                  )}
-                  <div className="border-t border-slate-200 dark:border-slate-700 pt-3 flex justify-between text-lg font-bold text-slate-900 dark:text-white">
-                    <span>{t('cart.total')}</span>
-                    <span>₺{total.toFixed(2)}</span>
-                  </div>
-                </div>
-                
-                <Link
-                  href="/siparis"
-                  className="block w-full px-6 py-3 bg-primary hover:bg-primary/90 text-white font-bold rounded-lg text-center transition-colors"
-                >
-                  {t('cart.checkout')}
-                </Link>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  )
+			// Sonra API'ye gönder
+			const result = await cartAPI.add(item.product_id, item.size, newQuantity) as { success: boolean; error?: string }
+			if (!result.success) {
+				toast.error(result.error || t('common.error'))
+				// Hata durumunda geri al
+				await checkAuthAndLoadCart()
+			}
+		} catch (error) {
+			toast.error(t('common.error'))
+			await checkAuthAndLoadCart()
+		}
+	}
+
+	const removeItem = async (itemId: string) => {
+		try {
+			const result = await cartAPI.remove(itemId) as { success: boolean; error?: string }
+			if (result.success) {
+				setCartItems(items => items.filter(i => i.id !== itemId))
+				toast.success(t('cart.itemRemoved'))
+			} else {
+				toast.error(result.error || t('common.error'))
+			}
+		} catch (error) {
+			toast.error(t('common.error'))
+		}
+	}
+
+	const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+	const shipping = subtotal >= shippingSettings.freeLimit ? 0 : shippingSettings.fee
+	const total = subtotal + shipping
+	const remainingForFreeShipping = shippingSettings.freeLimit - subtotal
+
+	if (loading) {
+		return (
+			<div className="min-h-screen flex items-center justify-center">
+				<div className="text-center">
+					<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+					<p className="mt-4">{t('common.loading')}</p>
+				</div>
+			</div>
+		)
+	}
+
+	return (
+		<div className="min-h-screen py-8">
+			<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+				<h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-8">
+					{t('cart.title')}
+				</h1>
+
+				{cartItems.length === 0 ? (
+					<div className="text-center py-16 bg-white dark:bg-slate-800 rounded-xl">
+						<p className="text-slate-600 dark:text-slate-400 text-lg mb-4">
+							{t('cart.empty')}
+						</p>
+						<Link
+							href="/"
+							className="inline-block px-6 py-3 bg-primary hover:bg-primary/90 text-white font-bold rounded-lg transition-colors"
+						>
+							{t('cart.continue')}
+						</Link>
+					</div>
+				) : (
+					<div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+						{/* Cart Items */}
+						<div className="lg:col-span-2 space-y-4">
+							{cartItems.map((item) => (
+								<div key={item.id} className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700">
+									<div className="flex gap-4">
+										<Link href={`/urun/${item.product_slug}`} className="relative w-24 h-24 rounded-lg overflow-hidden bg-slate-200 dark:bg-slate-700 flex-shrink-0">
+											<Image
+												src={item.image_url}
+												alt={item.product_name}
+												fill
+												className="object-cover"
+											/>
+										</Link>
+
+										<div className="flex-1 flex flex-col justify-between">
+											<div>
+												<Link href={`/urun/${item.product_slug}`}>
+													<h3 className="font-bold text-slate-900 dark:text-white mb-1 hover:text-primary">
+														{item.product_name}
+													</h3>
+												</Link>
+												<p className="text-sm text-slate-600 dark:text-slate-400">
+													{t('product.size')}: {item.size}
+												</p>
+											</div>
+
+											<div className="flex items-center justify-between">
+												<div className="flex items-center gap-2">
+													<button
+														onClick={() => updateQuantity(item.id, item.quantity - 1)}
+														disabled={item.quantity <= 1}
+														className="p-1 rounded border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
+													>
+														<Minus className="w-4 h-4" />
+													</button>
+													<span className="w-12 text-center font-medium">{item.quantity}</span>
+													<button
+														onClick={() => updateQuantity(item.id, item.quantity + 1)}
+														disabled={item.quantity >= item.stock}
+														className="p-1 rounded border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
+													>
+														<Plus className="w-4 h-4" />
+													</button>
+												</div>
+												<div className="flex items-center gap-4">
+													<p className="font-bold text-slate-900 dark:text-white">
+														₺{(item.price * item.quantity).toFixed(2)}
+													</p>
+													<button
+														onClick={() => removeItem(item.id)}
+														className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition"
+													>
+														<Trash2 className="w-5 h-5" />
+													</button>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							))}
+						</div>
+
+						{/* Order Summary */}
+						<div className="lg:col-span-1">
+							<div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 sticky top-4">
+								<h2 className="text-xl font-bold text-slate-900 dark:text-white mb-6">
+									{t('checkout.summary')}
+								</h2>
+
+								<div className="space-y-3 mb-6">
+									<div className="flex justify-between text-slate-600 dark:text-slate-400">
+										<span>{t('cart.subtotal')}</span>
+										<span>₺{subtotal.toFixed(2)}</span>
+									</div>
+									<div className="flex justify-between text-slate-600 dark:text-slate-400">
+										<span>{t('cart.shipping')}</span>
+										<span>{shipping === 0 ? t('cart.freeShipping') : `₺${shipping.toFixed(2)}`}</span>
+									</div>
+									{shipping === 0 && (
+										<p className="text-xs text-green-600 dark:text-green-400">
+											✓ {t('cart.freeShippingNote').replace('{limit}', shippingSettings.freeLimit.toString())}
+										</p>
+									)}
+									{remainingForFreeShipping > 0 && shipping > 0 && (
+										<p className="text-xs text-slate-500">
+											{t('cart.remainingForFree').replace('{amount}', remainingForFreeShipping.toFixed(2))}
+										</p>
+									)}
+									<div className="border-t border-slate-200 dark:border-slate-700 pt-3 flex justify-between text-lg font-bold text-slate-900 dark:text-white">
+										<span>{t('cart.total')}</span>
+										<span>₺{total.toFixed(2)}</span>
+									</div>
+								</div>
+
+								<Link
+									href="/siparis"
+									className="block w-full px-6 py-3 bg-primary hover:bg-primary/90 text-white font-bold rounded-lg text-center transition-colors"
+								>
+									{t('cart.checkout')}
+								</Link>
+							</div>
+						</div>
+					</div>
+				)}
+			</div>
+		</div>
+	)
 }

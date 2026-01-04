@@ -45,7 +45,7 @@ export default function RootLayout({
 				<LanguageProvider>
 					{children}
 					<CookieBanner />
-					<Toaster position="top-right" />
+					<Toaster position="top-center" />
 				</LanguageProvider>
 			</body>
 		</html>

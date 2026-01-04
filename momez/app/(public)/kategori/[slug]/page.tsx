@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { Heart, ShoppingCart } from 'lucide-react'
 import { use, useEffect, useState } from 'react'
 import { productsAPI, categoriesAPI, authAPI } from '@/lib/api'
-import toast, { Toaster } from 'react-hot-toast'
+import toast from 'react-hot-toast'
 import ProductCard from '@/components/ProductCard'
 import { useLanguage } from '@/lib/i18n'
 
@@ -66,7 +66,6 @@ export default function CategoryPage({ params }: PageProps) {
 	if (loading) {
 		return (
 			<div className="min-h-screen flex items-center justify-center">
-				<Toaster position="top-center" />
 				<div className="text-center">
 					<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#ee2b2b] mx-auto"></div>
 					<p className="mt-4">{t('common.loading')}</p>
@@ -77,7 +76,6 @@ export default function CategoryPage({ params }: PageProps) {
 
 	return (
 		<div className="min-h-screen py-8">
-			<Toaster position="top-center" />
 			<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 				{/* Breadcrumb */}
 				<nav className="flex items-center gap-2 text-sm mb-6">
