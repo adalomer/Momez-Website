@@ -109,7 +109,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
 				toast.success(t('product.addedToCart'), { id: 'cart-add-success' })
 			} else {
 				// Giriş gerekiyor
-				if (result.error?.includes('Giriş')) {
+				if (result.error === 'LOGIN_REQUIRED') {
 					toast.error(t('product.loginRequired'), {
 						duration: 3000,
 						icon: '🔒',
@@ -134,7 +134,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
 			if (result.success) {
 				toast.success(t('product.addedToFavorites'), { id: 'favorite-add' })
 			} else {
-				if (result.error?.includes('Giriş')) {
+				if (result.error === 'LOGIN_REQUIRED') {
 					toast.error(t('product.loginRequired'), {
 						duration: 3000,
 						icon: '🔒',
@@ -242,7 +242,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
 											<button
 												onClick={() => setSelectedImage((selectedImage - 1 + displayImages.length) % displayImages.length)}
 												className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 dark:bg-slate-900/80 hover:bg-white dark:hover:bg-slate-900 text-slate-800 dark:text-white p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm"
-												aria-label="Önceki resim"
+												aria-label={t('accessibility.previousImage')}
 											>
 												<svg className="w-6 h-6 rtl-mirror" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 													<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -251,7 +251,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
 											<button
 												onClick={() => setSelectedImage((selectedImage + 1) % displayImages.length)}
 												className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 dark:bg-slate-900/80 hover:bg-white dark:hover:bg-slate-900 text-slate-800 dark:text-white p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm"
-												aria-label="Sonraki resim"
+												aria-label={t('accessibility.nextImage')}
 											>
 												<svg className="w-6 h-6 rtl-mirror" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 													<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

@@ -235,7 +235,7 @@ export const cartAPI = {
 				body: JSON.stringify({ product_id, size, quantity })
 			})
 			if (res.status === 401) {
-				return { success: false, error: 'Please login' }
+				return { success: false, error: 'LOGIN_REQUIRED' }
 			}
 			return res.json()
 		} catch (error) {
@@ -250,7 +250,7 @@ export const cartAPI = {
 				method: 'DELETE'
 			})
 			if (res.status === 401) {
-				return { success: false, error: 'Please login' }
+				return { success: false, error: 'LOGIN_REQUIRED' }
 			}
 			return res.json()
 		} catch (error) {

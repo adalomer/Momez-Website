@@ -424,11 +424,12 @@ export const translations: Record<Language, Record<string, string>> = {
 		'footer.contact': 'Contact',
 		'footer.privacy': 'Privacy Policy',
 		'footer.terms': 'Terms of Use',
+		'footer.legal': 'Legal',
 		'footer.returns': 'Returns & Exchanges',
 		'footer.shipping': 'Shipping & Delivery',
 		'footer.faq': 'FAQ',
 		'footer.kvkk': 'Privacy Notice',
-		'footer.copyright': '© 2024 momez. All rights reserved.',
+		'footer.copyright': '© 2026 momez. All rights reserved.',
 
 		// Common
 		'common.loading': 'Loading...',
@@ -760,6 +761,12 @@ export const translations: Record<Language, Record<string, string>> = {
 		'termsPage.changesDesc': 'We reserve the right to change these terms without prior notice. You can follow the current terms on this page.',
 		'termsPage.contact': '9. Contact',
 		'termsPage.contactDesc': 'For questions about terms of use, please contact us:',
+
+		// Accessibility
+		'accessibility.previousCategories': 'Previous categories',
+		'accessibility.nextCategories': 'Next categories',
+		'accessibility.previousImage': 'Previous image',
+		'accessibility.nextImage': 'Next image',
 	},
 
 	ar: {
@@ -1292,11 +1299,12 @@ export const translations: Record<Language, Record<string, string>> = {
 		'footer.contact': 'اتصل بنا',
 		'footer.privacy': 'سياسة الخصوصية',
 		'footer.terms': 'شروط الاستخدام',
+		'footer.legal': 'قانوني',
 		'footer.returns': 'الإرجاع والاستبدال',
 		'footer.shipping': 'الشحن والتوصيل',
 		'footer.faq': 'الأسئلة الشائعة',
 		'footer.kvkk': 'إشعار الخصوصية',
-		'footer.copyright': '© 2024 momez. جميع الحقوق محفوظة.',
+		'footer.copyright': '© 2026 momez. جميع الحقوق محفوظة.',
 
 		// Common
 		'common.loading': 'جاري التحميل...',
@@ -1494,6 +1502,12 @@ export const translations: Record<Language, Record<string, string>> = {
 
 		// Admin
 		'admin.loadError': 'حدث خطأ في تحميل البيانات',
+
+		// Accessibility
+		'accessibility.previousCategories': 'الفئات السابقة',
+		'accessibility.nextCategories': 'الفئات التالية',
+		'accessibility.previousImage': 'الصورة السابقة',
+		'accessibility.nextImage': 'الصورة التالية',
 	},
 }
 

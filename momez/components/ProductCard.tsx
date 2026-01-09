@@ -170,9 +170,9 @@ export default function ProductCard({ product, user }: ProductCardProps) {
 					</div>
 				</Link>
 
-				<div className="p-4 space-y-3">
+				<div className="p-2 md:p-4 space-y-2 md:space-y-3">
 					<Link href={`/urun/${product.slug}`}>
-						<h3 className="font-bold text-slate-900 dark:text-white group-hover:text-red-500 dark:group-hover:text-red-400 transition-colors duration-300 line-clamp-2 min-h-[3rem]">
+						<h3 className="font-bold text-slate-900 dark:text-white group-hover:text-red-500 dark:group-hover:text-red-400 transition-colors duration-300 line-clamp-2 text-xs md:text-base min-h-[2rem] md:min-h-[3rem]">
 							{product.name}
 						</h3>
 					</Link>
@@ -188,8 +188,8 @@ export default function ProductCard({ product, user }: ProductCardProps) {
 										setSelectedColorId(color.id)
 									}}
 									className={`w-5 h-5 rounded-full border-2 transition-all hover:scale-110 ${selectedColorId === color.id || (!selectedColorId && color.is_default === 1)
-											? 'border-slate-900 dark:border-white ring-1 ring-offset-1 ring-slate-400'
-											: 'border-slate-300 dark:border-slate-600'
+										? 'border-slate-900 dark:border-white ring-1 ring-offset-1 ring-slate-400'
+										: 'border-slate-300 dark:border-slate-600'
 										}`}
 									style={{ backgroundColor: color.color_hex }}
 									title={color.color_name}
@@ -206,15 +206,15 @@ export default function ProductCard({ product, user }: ProductCardProps) {
 					<div className="flex items-center gap-2">
 						{product.discount_price ? (
 							<>
-								<p className="text-xl font-bold text-red-500">
+								<p className="text-sm md:text-xl font-bold text-red-500">
 									{formatPrice(Number(displayPrice), language)}
 								</p>
-								<p className="text-sm text-gray-500 dark:text-gray-400 line-through">
+								<p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 line-through">
 									{formatPrice(Number(product.price), language)}
 								</p>
 							</>
 						) : (
-							<p className="text-xl font-bold text-red-500">
+							<p className="text-sm md:text-xl font-bold text-red-500">
 								{formatPrice(Number(product.price), language)}
 							</p>
 						)}
@@ -223,19 +223,19 @@ export default function ProductCard({ product, user }: ProductCardProps) {
 					<div className="flex items-center gap-2 mt-auto">
 						<button
 							onClick={handleAddToFavorites}
-							className="group/fav p-3 border-2 border-gray-200 dark:border-slate-600 hover:border-red-500 dark:hover:border-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-all duration-300"
+							className="group/fav p-2 md:p-3 border-2 border-gray-200 dark:border-slate-600 hover:border-red-500 dark:hover:border-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg md:rounded-xl transition-all duration-300"
 							title={t('product.addToFavorites')}
 						>
-							<Heart className="w-5 h-5 text-gray-600 dark:text-gray-400 transition-all group-hover/fav:fill-red-500 group-hover/fav:text-red-500 dark:group-hover/fav:text-red-400 group-hover/fav:scale-110" />
+							<Heart className="w-4 h-4 md:w-5 md:h-5 text-gray-600 dark:text-gray-400 transition-all group-hover/fav:fill-red-500 group-hover/fav:text-red-500 dark:group-hover/fav:text-red-400 group-hover/fav:scale-110" />
 						</button>
 						<button
 							onClick={handleAddToCart}
-							className="flex-1 px-4 py-3 bg-red-500 text-white hover:bg-red-600 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-bold shadow-md hover:shadow-lg active:scale-95"
+							className="flex-1 px-2 md:px-4 py-2 md:py-3 bg-red-500 text-white hover:bg-red-600 rounded-lg md:rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1 md:gap-2 font-bold shadow-md hover:shadow-lg active:scale-95"
 							disabled={!product.in_stock}
 							title={t('product.addToCart')}
 						>
-							<ShoppingCart className="w-5 h-5" />
-							<span className="text-sm font-bold">{t('product.addToCart')}</span>
+							<ShoppingCart className="w-4 h-4 md:w-5 md:h-5" />
+							<span className="hidden md:inline text-sm font-bold">{t('product.addToCart')}</span>
 						</button>
 					</div>
 				</div>

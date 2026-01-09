@@ -6,6 +6,7 @@ import { Search, Plus, Edit, Trash2, Upload, X, Save, Palette } from 'lucide-rea
 import toast, { Toaster } from 'react-hot-toast'
 import { uploadAPI } from '@/lib/api'
 import { useLanguage } from '@/lib/i18n/LanguageContext'
+import { colorPalette, getColorNameByHex } from '@/lib/colors'
 
 interface ColorVariant {
 	id: string
@@ -30,23 +31,8 @@ interface Product {
 	stock?: Array<{ size: string; quantity: number }>
 }
 
-const PRESET_COLORS = [
-	{ name: 'Black', hex: '#000000' },
-	{ name: 'White', hex: '#FFFFFF' },
-	{ name: 'Red', hex: '#EF4444' },
-	{ name: 'Blue', hex: '#3B82F6' },
-	{ name: 'Navy', hex: '#1E3A5F' },
-	{ name: 'Green', hex: '#22C55E' },
-	{ name: 'Gray', hex: '#6B7280' },
-	{ name: 'Brown', hex: '#92400E' },
-	{ name: 'Pink', hex: '#EC4899' },
-	{ name: 'Purple', hex: '#8B5CF6' },
-	{ name: 'Orange', hex: '#F97316' },
-	{ name: 'Yellow', hex: '#EAB308' },
-	{ name: 'Beige', hex: '#D4B896' },
-	{ name: 'Burgundy', hex: '#881337' },
-	{ name: 'Khaki', hex: '#4B5320' },
-]
+// Use colorPalette from lib/colors.ts for translated color names
+const PRESET_COLORS = colorPalette.slice(0, 15).map(c => ({ name: c.names.en, hex: c.hex }))
 
 interface EditColorVariant {
 	id: string
@@ -57,7 +43,7 @@ interface EditColorVariant {
 }
 
 export default function AdminProductsPage() {
-	const { t } = useLanguage()
+	const { t, language } = useLanguage()
 	const [searchTerm, setSearchTerm] = useState('')
 	const [products, setProducts] = useState<Product[]>([])
 	const [loading, setLoading] = useState(true)
@@ -299,24 +285,24 @@ export default function AdminProductsPage() {
 
 			<div className="flex items-center justify-between">
 				<div>
-					<h1 className="text-2xl font-bold text-slate-900 dark:text-white">Product Management</h1>
-					<p className="text-slate-600 dark:text-slate-400 mt-1">{filteredProducts.length} products</p>
+					<h1 className="text-2xl font-bold text-slate-900 dark:text-white">{t('admin.productManagement')}</h1>
+					<p className="text-slate-600 dark:text-slate-400 mt-1">{filteredProducts.length} {t('admin.products')}</p>
 				</div>
 				<Link href="/admin/urunler/yeni" className="px-4 py-2 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg flex items-center gap-2">
-					<Plus className="h-5 w-5" />New Product
+					<Plus className="h-5 w-5" />{t('admin.newProduct')}
 				</Link>
 			</div>
 
 			<div className="relative">
 				<Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
-				<input type="text" placeholder="Search products..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
+				<input type="text" placeholder={t('admin.searchProduct')} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
 			</div>
 
 			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
 				{loading ? (
 					<div className="col-span-full p-12 text-center"><div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-slate-300 border-t-primary"></div></div>
 				) : filteredProducts.length === 0 ? (
-					<div className="col-span-full p-12 text-center text-slate-500">No products found</div>
+					<div className="col-span-full p-12 text-center text-slate-500">{t('admin.noProducts')}</div>
 				) : (
 					filteredProducts.map((product) => {
 						const mainImage = getProductMainImage(product)
@@ -325,7 +311,7 @@ export default function AdminProductsPage() {
 							<div key={product.id} className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden group hover:shadow-xl transition-all">
 								<div className="relative aspect-square bg-slate-100 dark:bg-slate-700">
 									{mainImage ? <img src={mainImage} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" /> : <div className="w-full h-full flex items-center justify-center text-slate-400"><Upload className="h-12 w-12 opacity-50" /></div>}
-									{product.discount_price && product.discount_price > 0 && <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-xs font-bold">SALE</div>}
+									{product.discount_price && product.discount_price > 0 && <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-xs font-bold">{t('admin.discount')}</div>}
 									{product.colors && product.colors.length > 0 && (
 										<div className="absolute bottom-2 left-2 flex gap-1">
 											{product.colors.slice(0, 4).map((color, idx) => <div key={idx} className="w-5 h-5 rounded-full border-2 border-white shadow" style={{ backgroundColor: color.color_hex }} title={color.color_name} />)}
@@ -343,11 +329,11 @@ export default function AdminProductsPage() {
 										)}
 									</div>
 									<div className="flex items-center justify-between text-xs mb-3">
-										<span className={`font-medium ${totalStock === 0 ? 'text-red-500' : totalStock < 20 ? 'text-orange-500' : 'text-green-500'}`}>Stok: {totalStock}</span>
-										{product.colors && product.colors.length > 0 && <span className="text-slate-500">{product.colors.length} colors</span>}
+										<span className={`font-medium ${totalStock === 0 ? 'text-red-500' : totalStock < 20 ? 'text-orange-500' : 'text-green-500'}`}>{t('admin.stock')}: {totalStock}</span>
+										{product.colors && product.colors.length > 0 && <span className="text-slate-500">{product.colors.length} {t('product.color')}</span>}
 									</div>
 									<div className="flex gap-2">
-										<button onClick={() => openEditModal(product)} className="flex-1 px-3 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center gap-1"><Edit className="h-4 w-4" />Edit</button>
+										<button onClick={() => openEditModal(product)} className="flex-1 px-3 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center gap-1"><Edit className="h-4 w-4" />{t('common.edit')}</button>
 										<button onClick={() => handleDelete(product.id)} className="px-3 py-2 text-sm bg-red-600 hover:bg-red-700 text-white rounded-lg"><Trash2 className="h-4 w-4" /></button>
 									</div>
 								</div>
@@ -361,58 +347,58 @@ export default function AdminProductsPage() {
 				<div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-start justify-center z-50 p-4 overflow-y-auto">
 					<div className="bg-white dark:bg-slate-800 rounded-xl max-w-4xl w-full p-6 my-8 shadow-2xl">
 						<div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-200 dark:border-slate-700">
-							<h2 className="text-xl font-bold text-slate-900 dark:text-white">Edit Product</h2>
+							<h2 className="text-xl font-bold text-slate-900 dark:text-white">{t('admin.editProduct')}</h2>
 							<button onClick={() => setShowEditModal(false)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg"><X className="h-5 w-5" /></button>
 						</div>
 
 						<div className="space-y-6 max-h-[70vh] overflow-y-auto pr-2">
 							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 								<div>
-									<label className="block text-sm font-medium mb-1">Product Name</label>
+									<label className="block text-sm font-medium mb-1">{t('admin.productNameLabel')}</label>
 									<input type="text" value={editForm.name} onChange={(e) => setEditForm(prev => ({ ...prev, name: e.target.value }))} className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-900" />
 								</div>
 								<div>
-									<label className="block text-sm font-medium mb-1">Category</label>
+									<label className="block text-sm font-medium mb-1">{t('admin.categoryLabel')}</label>
 									<select value={editForm.category_id} onChange={(e) => setEditForm(prev => ({ ...prev, category_id: e.target.value }))} className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-900">
-										<option value="">Select category</option>
+										<option value="">{t('admin.selectCategory')}</option>
 										{categories.map((cat) => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
 									</select>
 								</div>
 							</div>
 
 							<div>
-								<label className="block text-sm font-medium mb-1">Description</label>
+								<label className="block text-sm font-medium mb-1">{t('admin.descriptionLabel')}</label>
 								<textarea rows={3} value={editForm.description} onChange={(e) => setEditForm(prev => ({ ...prev, description: e.target.value }))} className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-900 resize-none" />
 							</div>
 
 							<div className="grid grid-cols-2 gap-4">
 								<div>
-									<label className="block text-sm font-medium mb-1">Price (£)</label>
+									<label className="block text-sm font-medium mb-1">{t('admin.priceLabel')}</label>
 									<input type="number" step="0.01" value={editForm.price} onChange={(e) => setEditForm(prev => ({ ...prev, price: e.target.value }))} className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-900" />
 								</div>
 								<div>
-									<label className="block text-sm font-medium mb-1">Discount Price (£)</label>
+									<label className="block text-sm font-medium mb-1">{t('admin.discountPriceLabel')}</label>
 									<input type="number" step="0.01" value={editForm.discount_price} onChange={(e) => setEditForm(prev => ({ ...prev, discount_price: e.target.value }))} className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-900" />
 								</div>
 							</div>
 
 							<div className="border border-slate-200 dark:border-slate-700 rounded-lg p-4">
 								<div className="flex items-center justify-between mb-4">
-									<h3 className="font-semibold flex items-center gap-2"><Palette className="w-5 h-5 text-primary" />Color Variants</h3>
-									<button type="button" onClick={() => setShowColorPicker(true)} className="px-3 py-1.5 bg-primary text-white text-sm rounded-lg flex items-center gap-1"><Plus className="w-4 h-4" />Add Color</button>
+									<h3 className="font-semibold flex items-center gap-2"><Palette className="w-5 h-5 text-primary" />{t('product.color')}</h3>
+									<button type="button" onClick={() => setShowColorPicker(true)} className="px-3 py-1.5 bg-primary text-white text-sm rounded-lg flex items-center gap-1"><Plus className="w-4 h-4" />{t('common.add')}</button>
 								</div>
 
 								{showColorPicker && (
 									<div className="mb-4 p-4 bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700">
-										<h4 className="font-medium mb-3">Select Color</h4>
+										<h4 className="font-medium mb-3">{t('product.color')}</h4>
 										<div className="flex flex-wrap gap-2 mb-4">
-											{PRESET_COLORS.map(color => <button key={color.hex} type="button" onClick={() => addColor(color.name, color.hex)} className="w-8 h-8 rounded-full border-2 border-slate-200 hover:scale-110 transition-transform" style={{ backgroundColor: color.hex }} title={color.name} />)}
+											{colorPalette.slice(0, 15).map(color => <button key={color.hex} type="button" onClick={() => addColor(color.names[language] || color.names.en, color.hex)} className="w-8 h-8 rounded-full border-2 border-slate-200 hover:scale-110 transition-transform" style={{ backgroundColor: color.hex }} title={color.names[language] || color.names.en} />)}
 										</div>
 										<div className="flex items-center gap-2 pt-3 border-t border-slate-200 dark:border-slate-700">
 											<input type="color" value={customColor.hex} onChange={e => setCustomColor(prev => ({ ...prev, hex: e.target.value }))} className="w-8 h-8 rounded cursor-pointer" />
 											<input type="text" value={customColor.name} onChange={e => setCustomColor(prev => ({ ...prev, name: e.target.value }))} placeholder="Color name" className="flex-1 px-2 py-1 text-sm rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800" />
-											<button type="button" onClick={() => customColor.name && addColor(customColor.name, customColor.hex)} className="px-3 py-1 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-sm rounded">Add</button>
-											<button type="button" onClick={() => setShowColorPicker(false)} className="px-3 py-1 text-slate-500 text-sm">Cancel</button>
+											<button type="button" onClick={() => customColor.name && addColor(customColor.name, customColor.hex)} className="px-3 py-1 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-sm rounded">{t('common.add')}</button>
+											<button type="button" onClick={() => setShowColorPicker(false)} className="px-3 py-1 text-slate-500 text-sm">{t('common.cancel')}</button>
 										</div>
 									</div>
 								)}
@@ -426,7 +412,7 @@ export default function AdminProductsPage() {
 												<div className="flex items-center justify-between mb-3">
 													<div className="flex items-center gap-2">
 														<div className="w-6 h-6 rounded-full border border-slate-300" style={{ backgroundColor: color.hex }} />
-														<span className="font-medium">{color.name}</span>
+														<span className="font-medium">{getColorNameByHex(color.hex, language)}</span>
 														{color.isDefault && <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded">Default</span>}
 													</div>
 													<div className="flex items-center gap-2">
@@ -453,7 +439,7 @@ export default function AdminProductsPage() {
 							</div>
 
 							<div className="border border-slate-200 dark:border-slate-700 rounded-lg p-4">
-								<h3 className="font-semibold mb-3">Size Stocks</h3>
+								<h3 className="font-semibold mb-3">{t('admin.updateStock')}</h3>
 								<div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
 									{Array.from({ length: 11 }, (_, i) => (36 + i).toString()).map((size) => (
 										<div key={size} className="flex flex-col">
@@ -466,8 +452,8 @@ export default function AdminProductsPage() {
 						</div>
 
 						<div className="flex gap-3 mt-6 pt-4 border-t border-slate-200 dark:border-slate-700">
-							<button onClick={() => setShowEditModal(false)} className="flex-1 px-4 py-2.5 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700">Cancel</button>
-							<button onClick={handleUpdateProduct} className="flex-1 px-4 py-2.5 bg-primary hover:bg-primary/90 text-white rounded-lg font-medium flex items-center justify-center gap-2"><Save className="h-5 w-5" />Save</button>
+							<button onClick={() => setShowEditModal(false)} className="flex-1 px-4 py-2.5 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700">{t('common.cancel')}</button>
+							<button onClick={handleUpdateProduct} className="flex-1 px-4 py-2.5 bg-primary hover:bg-primary/90 text-white rounded-lg font-medium flex items-center justify-center gap-2"><Save className="h-5 w-5" />{t('common.save')}</button>
 						</div>
 					</div>
 				</div>

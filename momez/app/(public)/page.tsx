@@ -135,7 +135,7 @@ export default function HomePage() {
 								<button
 									onClick={() => scrollCategories('left')}
 									className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 shadow-lg rounded-full p-2 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
-									aria-label="Önceki kategoriler"
+									aria-label={t('accessibility.previousCategories')}
 								>
 									<ChevronLeft className="w-5 h-5 text-slate-700 dark:text-white rtl-mirror" />
 								</button>
@@ -179,7 +179,7 @@ export default function HomePage() {
 								<button
 									onClick={() => scrollCategories('right')}
 									className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-slate-800 shadow-lg rounded-full p-2 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
-									aria-label="Sonraki kategoriler"
+									aria-label={t('accessibility.nextCategories')}
 								>
 									<ChevronRight className="w-5 h-5 text-slate-700 dark:text-white rtl-mirror" />
 								</button>
@@ -245,7 +245,7 @@ export default function HomePage() {
 							)}
 						</div>
 					) : (
-						<div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">
+						<div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-2 md:gap-6">
 							{products.map((product) => (
 								<ProductCard key={product.id} product={product} user={user} />
 							))}
