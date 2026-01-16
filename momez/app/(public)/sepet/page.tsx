@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
 import { cartAPI, authAPI } from '@/lib/api'
 import { useLanguage } from '@/lib/i18n'
+import { formatPrice, type Language } from '@/lib/currency'
 
 interface CartItem {
 	id: string
@@ -224,7 +225,7 @@ export default function CartPage() {
 												</div>
 												<div className="flex items-center gap-4">
 													<p className="font-bold text-slate-900 dark:text-white">
-														₺{(item.price * item.quantity).toFixed(2)}
+														{formatPrice(item.price * item.quantity, language as Language)}
 													</p>
 													<button
 														onClick={() => removeItem(item.id)}
@@ -250,11 +251,11 @@ export default function CartPage() {
 								<div className="space-y-3 mb-6">
 									<div className="flex justify-between text-slate-600 dark:text-slate-400">
 										<span>{t('cart.subtotal')}</span>
-										<span>₺{subtotal.toFixed(2)}</span>
+										<span>{formatPrice(subtotal, language as Language)}</span>
 									</div>
 									<div className="flex justify-between text-slate-600 dark:text-slate-400">
 										<span>{t('cart.shipping')}</span>
-										<span>{shipping === 0 ? t('cart.freeShipping') : `₺${shipping.toFixed(2)}`}</span>
+										<span>{shipping === 0 ? t('cart.freeShipping') : formatPrice(shipping, language as Language)}</span>
 									</div>
 									{shipping === 0 && (
 										<p className="text-xs text-green-600 dark:text-green-400">
@@ -268,7 +269,7 @@ export default function CartPage() {
 									)}
 									<div className="border-t border-slate-200 dark:border-slate-700 pt-3 flex justify-between text-lg font-bold text-slate-900 dark:text-white">
 										<span>{t('cart.total')}</span>
-										<span>₺{total.toFixed(2)}</span>
+										<span>{formatPrice(total, language as Language)}</span>
 									</div>
 								</div>
 

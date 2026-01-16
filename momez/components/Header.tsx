@@ -202,8 +202,8 @@ export default function Header() {
 								key={link.href}
 								href={link.href}
 								className={`px-4 py-2.5 text-sm font-bold rounded-xl transition-all duration-300 ${pathname === link.href
-										? 'bg-red-500 text-white shadow-lg scale-105'
-										: 'text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 hover:text-red-600 dark:hover:text-red-400 hover:scale-105'
+									? 'bg-red-500 text-white shadow-lg scale-105'
+									: 'text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 hover:text-red-600 dark:hover:text-red-400 hover:scale-105'
 									}`}
 							>
 								{link.label}
@@ -360,14 +360,14 @@ export default function Header() {
 
 						{/* Mobile Menu Button */}
 						<button
-							className="lg:hidden flex items-center justify-center rounded-xl h-11 w-11 hover:bg-accent-lighter hover:text-primary-600 transition-all hover:scale-105 ml-1 sm:ml-2 flex-shrink-0"
+							className="lg:hidden flex items-center justify-center rounded-xl h-11 w-11 text-red-500 bg-red-50 dark:bg-red-500/10 hover:bg-red-500 hover:text-white transition-all hover:scale-105 ml-1 sm:ml-2 flex-shrink-0"
 							onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-							aria-label="Menü"
+							aria-label="Menu"
 						>
 							{mobileMenuOpen ? (
-								<X className="h-5 w-5" />
+								<X className="h-6 w-6" />
 							) : (
-								<Menu className="h-5 w-5" />
+								<Menu className="h-6 w-6" />
 							)}
 						</button>
 					</div>
@@ -383,8 +383,8 @@ export default function Header() {
 									href={link.href}
 									onClick={() => setMobileMenuOpen(false)}
 									className={`px-4 py-3 text-sm font-medium rounded-xl transition-all ${pathname === link.href
-											? 'bg-red-500 text-white'
-											: 'text-red-500 hover:bg-red-500 hover:text-white'
+										? 'bg-red-500 text-white'
+										: 'text-red-500 hover:bg-red-500 hover:text-white'
 										}`}
 								>
 									{link.label}

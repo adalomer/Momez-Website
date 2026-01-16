@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
 import { favoritesAPI, authAPI, cartAPI } from '@/lib/api'
 import { useLanguage } from '@/lib/i18n'
+import { formatPrice, type Language } from '@/lib/currency'
 
 interface FavoriteItem {
 	id: number
@@ -146,15 +147,15 @@ export default function FavoritesPage() {
 										{item.discount_price ? (
 											<>
 												<p className="text-xl font-bold text-primary">
-													₺{Number(item.discount_price).toFixed(2)}
+													{formatPrice(Number(item.discount_price), language as Language)}
 												</p>
 												<p className="text-sm text-slate-500 line-through">
-													₺{Number(item.price).toFixed(2)}
+													{formatPrice(Number(item.price), language as Language)}
 												</p>
 											</>
 										) : (
 											<p className="text-xl font-bold text-primary">
-												₺{Number(item.price).toFixed(2)}
+												{formatPrice(Number(item.price), language as Language)}
 											</p>
 										)}
 									</div>

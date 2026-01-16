@@ -13,11 +13,11 @@ interface CurrencyConfig {
 // These should be updated periodically or fetched from an API
 export const currencyConfig: Record<Language, CurrencyConfig> = {
 	en: {
-		code: 'GBP',
-		symbol: '£',
+		code: 'EUR',
+		symbol: '€',
 		symbolPosition: 'before',
-		rate: 0.025,  // 1 TRY ≈ 0.025 GBP
-		locale: 'en-GB'
+		rate: 0.027,  // 1 TRY ≈ 0.027 EUR
+		locale: 'en-EU'
 	},
 	ar: {
 		code: 'IQD',

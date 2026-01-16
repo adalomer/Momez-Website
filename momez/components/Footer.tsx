@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import { Facebook, Instagram } from 'lucide-react'
 import { useLanguage } from '@/lib/i18n'
 
 export default function Footer() {
@@ -25,26 +24,6 @@ export default function Footer() {
 						<p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
 							{t('home.hero.subtitle')}
 						</p>
-						<div className="flex gap-3">
-							<a
-								href="https://instagram.com/momez"
-								target="_blank"
-								rel="noopener noreferrer"
-								className="flex items-center justify-center h-10 w-10 rounded-full bg-gradient-to-br from-purple-600 via-pink-500 to-orange-500 text-white hover:scale-110 transition-transform shadow-lg"
-								aria-label="Instagram"
-							>
-								<Instagram className="h-5 w-5" />
-							</a>
-							<a
-								href="https://facebook.com/momez"
-								target="_blank"
-								rel="noopener noreferrer"
-								className="flex items-center justify-center h-10 w-10 rounded-full bg-blue-600 text-white hover:scale-110 transition-transform shadow-lg"
-								aria-label="Facebook"
-							>
-								<Facebook className="h-5 w-5" />
-							</a>
-						</div>
 					</div>
 
 					{/* Shop Links */}
@@ -73,8 +52,6 @@ export default function Footer() {
 							</li>
 						</ul>
 					</div>
-
-
 
 					{/* Legal Links */}
 					<div>

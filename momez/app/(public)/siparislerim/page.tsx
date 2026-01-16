@@ -7,6 +7,7 @@ import { Package, MapPin, Calendar, CreditCard } from 'lucide-react'
 import toast, { Toaster } from 'react-hot-toast'
 import { authAPI } from '@/lib/api'
 import { useLanguage } from '@/lib/i18n'
+import { formatPrice, type Language } from '@/lib/currency'
 
 interface OrderItem {
 	id: string
@@ -169,11 +170,11 @@ export default function OrdersPage() {
 											{getStatusLabel(order.status)}
 										</span>
 										<span className="text-lg font-bold text-primary">
-											₺{(() => {
+											{formatPrice((() => {
 												const calculatedTotal = (order.items?.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0) || 0) + (Number(order.shipping_cost) || 0)
 												const orderTotal = Number(order.total) || 0
-												return (orderTotal > 0 ? orderTotal : calculatedTotal).toFixed(2)
-											})()}
+												return orderTotal > 0 ? orderTotal : calculatedTotal
+											})(), language as Language)}
 										</span>
 									</div>
 								</div>
@@ -204,7 +205,7 @@ export default function OrdersPage() {
 																{t('order.size')}: {item.size} - {t('order.quantity')}: {item.quantity}
 															</p>
 															<p className="text-slate-600 dark:text-slate-400">
-																{item.quantity} x ₺{item.price.toFixed(2)} = ₺{itemTotal.toFixed(2)}
+																{item.quantity} x {formatPrice(item.price, language as Language)} = {formatPrice(itemTotal, language as Language)}
 															</p>
 														</div>
 													</div>
@@ -214,22 +215,22 @@ export default function OrdersPage() {
 										<div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700 space-y-1 text-sm">
 											<div className="flex justify-between text-slate-600 dark:text-slate-400">
 												<span>{t('order.subtotal')}</span>
-												<span>₺{((Number(order.subtotal) || 0) > 0
-													? (Number(order.subtotal) || 0).toFixed(2)
-													: (order.items?.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0) || 0).toFixed(2))}
+												<span>{formatPrice((Number(order.subtotal) || 0) > 0
+													? (Number(order.subtotal) || 0)
+													: (order.items?.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0) || 0), language as Language)}
 												</span>
 											</div>
 											<div className="flex justify-between text-slate-600 dark:text-slate-400">
 												<span>{t('order.shipping')}</span>
-												<span>{(Number(order.shipping_cost) || 0) === 0 ? t('cart.freeShipping') : `₺${(Number(order.shipping_cost) || 0).toFixed(2)}`}</span>
+												<span>{(Number(order.shipping_cost) || 0) === 0 ? t('cart.freeShipping') : formatPrice(Number(order.shipping_cost) || 0, language as Language)}</span>
 											</div>
 											<div className="flex justify-between font-bold text-slate-900 dark:text-white pt-2 border-t border-slate-200 dark:border-slate-700">
 												<span>{t('order.total')}</span>
-												<span>₺{(() => {
+												<span>{formatPrice((() => {
 													const calculatedTotal = (order.items?.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0) || 0) + (Number(order.shipping_cost) || 0)
 													const orderTotal = Number(order.total) || 0
-													return (orderTotal > 0 ? orderTotal : calculatedTotal).toFixed(2)
-												})()}
+													return orderTotal > 0 ? orderTotal : calculatedTotal
+												})(), language as Language)}
 												</span>
 											</div>
 										</div>

@@ -10,72 +10,116 @@ import nodemailer from 'nodemailer'
 
 // Lazy initialization - runtime'da environment variable'ları okur
 function getTransporter() {
-  const user = process.env.GMAIL_USER
-  const pass = process.env.GMAIL_APP_PASSWORD
-  
-  console.log('[Email] Creating transporter with user:', user ? `${user.substring(0, 5)}...` : 'NOT SET')
-  
-  return nodemailer.createTransport({
-    service: 'gmail',
-    auth: { user, pass },
-  })
+	const user = process.env.GMAIL_USER
+	const pass = process.env.GMAIL_APP_PASSWORD
+
+	console.log('[Email] Creating transporter with user:', user ? `${user.substring(0, 5)}...` : 'NOT SET')
+
+	return nodemailer.createTransport({
+		service: 'gmail',
+		auth: { user, pass },
+	})
 }
 
 interface SendEmailOptions {
-  to: string
-  subject: string
-  html: string
-  text?: string
+	to: string
+	subject: string
+	html: string
+	text?: string
 }
 
 export async function sendEmail({ to, subject, html, text }: SendEmailOptions) {
-  const gmailUser = process.env.GMAIL_USER
-  const gmailPass = process.env.GMAIL_APP_PASSWORD
-  
-  console.log('[Email] sendEmail called, GMAIL_USER:', gmailUser ? 'SET' : 'NOT SET', 'GMAIL_APP_PASSWORD:', gmailPass ? 'SET' : 'NOT SET')
-  
-  if (!gmailUser || !gmailPass) {
-    console.error('[Email] Gmail credentials not configured!')
-    return { success: false, error: 'Email credentials not configured' }
-  }
-  
-  const transporter = getTransporter()
-  
-  try {
-    // Transporter'ı doğrula
-    try {
-      await transporter.verify()
-      console.log('[Email] Transporter verified successfully')
-    } catch (verifyError: any) {
-      console.warn('[Email] Transporter verify failed:', verifyError?.message || verifyError)
-    }
+	const gmailUser = process.env.GMAIL_USER
+	const gmailPass = process.env.GMAIL_APP_PASSWORD
 
-    const info = await transporter.sendMail({
-      from: `"Momez" <${gmailUser}>`,
-      to,
-      subject,
-      html,
-      text: text || html.replace(/<[^>]*>/g, ''),
-    })
+	console.log('[Email] sendEmail called, GMAIL_USER:', gmailUser ? 'SET' : 'NOT SET', 'GMAIL_APP_PASSWORD:', gmailPass ? 'SET' : 'NOT SET')
 
-    console.log('[Email] Email sent successfully:', info.messageId)
-    return { success: true, messageId: info.messageId }
-  } catch (error: any) {
-    const errMsg = (error && error.message) ? error.message : String(error)
-    console.error('[Email] Send error:', errMsg)
-    return { success: false, error: errMsg }
-  }
+	if (!gmailUser || !gmailPass) {
+		console.error('[Email] Gmail credentials not configured!')
+		return { success: false, error: 'Email credentials not configured' }
+	}
+
+	const transporter = getTransporter()
+
+	try {
+		// Transporter'ı doğrula
+		try {
+			await transporter.verify()
+			console.log('[Email] Transporter verified successfully')
+		} catch (verifyError: any) {
+			console.warn('[Email] Transporter verify failed:', verifyError?.message || verifyError)
+		}
+
+		const info = await transporter.sendMail({
+			from: `"Momez" <${gmailUser}>`,
+			to,
+			subject,
+			html,
+			text: text || html.replace(/<[^>]*>/g, ''),
+		})
+
+		console.log('[Email] Email sent successfully:', info.messageId)
+		return { success: true, messageId: info.messageId }
+	} catch (error: any) {
+		const errMsg = (error && error.message) ? error.message : String(error)
+		console.error('[Email] Send error:', errMsg)
+		return { success: false, error: errMsg }
+	}
 }
 
+// Email templates for different languages
+const emailTemplates = {
+	en: {
+		passwordReset: {
+			subject: 'Momez - Password Reset Code',
+			title: 'Password Reset Code',
+			greeting: 'Hello,',
+			message: 'Use the following code to reset your password. This code is valid for <strong>30 minutes</strong>.',
+			warning: 'If you did not make this request, you can ignore this email. Your account is secure.',
+			footer: 'This email was sent automatically by Momez.',
+			footerNote: 'Please do not reply to this email.'
+		},
+		orderConfirmation: {
+			subject: 'Momez - Order Received',
+			title: 'Your Order Has Been Received!',
+			orderNumber: 'Order Number',
+			total: 'Total'
+		}
+	},
+	ar: {
+		passwordReset: {
+			subject: 'مومز - رمز إعادة تعيين كلمة المرور',
+			title: 'رمز إعادة تعيين كلمة المرور',
+			greeting: 'مرحباً،',
+			message: 'استخدم الرمز التالي لإعادة تعيين كلمة المرور الخاصة بك. هذا الرمز صالح لمدة <strong>30 دقيقة</strong>.',
+			warning: 'إذا لم تقم بهذا الطلب، يمكنك تجاهل هذا البريد الإلكتروني. حسابك آمن.',
+			footer: 'تم إرسال هذا البريد الإلكتروني تلقائياً بواسطة مومز.',
+			footerNote: 'يرجى عدم الرد على هذا البريد الإلكتروني.'
+		},
+		orderConfirmation: {
+			subject: 'مومز - تم استلام الطلب',
+			title: 'تم استلام طلبك!',
+			orderNumber: 'رقم الطلب',
+			total: 'المجموع'
+		}
+	}
+}
+
+type Language = 'en' | 'ar'
+
 // Şifre sıfırlama e-postası gönder
-export async function sendPasswordResetEmail(email: string, resetCode: string) {
-  const html = `
+export async function sendPasswordResetEmail(email: string, resetCode: string, language: Language = 'en') {
+	const t = emailTemplates[language]?.passwordReset || emailTemplates.en.passwordReset
+	const dir = language === 'ar' ? 'rtl' : 'ltr'
+	const textAlign = language === 'ar' ? 'right' : 'left'
+
+	const html = `
     <!DOCTYPE html>
-    <html>
+    <html dir="${dir}">
     <head>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Şifre Sıfırlama</title>
+      <title>${t.title}</title>
     </head>
     <body style="margin: 0; padding: 0; background-color: #f4f4f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
       <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f4f4f5; padding: 40px 20px;">
@@ -91,13 +135,13 @@ export async function sendPasswordResetEmail(email: string, resetCode: string) {
               
               <!-- Content -->
               <tr>
-                <td style="padding: 32px;">
+                <td style="padding: 32px; text-align: ${textAlign};">
                   <h2 style="margin: 0 0 16px; color: #18181b; font-size: 22px; font-weight: 600;">
-                    Şifre Sıfırlama Kodu
+                    ${t.title}
                   </h2>
                   <p style="margin: 0 0 24px; color: #52525b; font-size: 15px; line-height: 1.6;">
-                    Merhaba,<br><br>
-                    Şifrenizi sıfırlamak için aşağıdaki kodu kullanın. Bu kod <strong>30 dakika</strong> geçerlidir.
+                    ${t.greeting}<br><br>
+                    ${t.message}
                   </p>
                   
                   <!-- Code Box -->
@@ -108,7 +152,7 @@ export async function sendPasswordResetEmail(email: string, resetCode: string) {
                   </div>
                   
                   <p style="margin: 24px 0 0; color: #71717a; font-size: 13px; line-height: 1.5;">
-                    Bu işlemi siz yapmadıysanız, bu e-postayı görmezden gelebilirsiniz. Hesabınız güvende.
+                    ${t.warning}
                   </p>
                 </td>
               </tr>
@@ -117,8 +161,8 @@ export async function sendPasswordResetEmail(email: string, resetCode: string) {
               <tr>
                 <td style="padding: 24px 32px; background-color: #f9fafb; border-radius: 0 0 12px 12px; text-align: center;">
                   <p style="margin: 0; color: #9ca3af; font-size: 12px;">
-                    Bu e-posta Momez tarafından otomatik olarak gönderilmiştir.<br>
-                    Lütfen bu e-postayı yanıtlamayın.
+                    ${t.footer}<br>
+                    ${t.footerNote}
                   </p>
                 </td>
               </tr>
@@ -130,38 +174,39 @@ export async function sendPasswordResetEmail(email: string, resetCode: string) {
     </html>
   `
 
-  const text = `
-Momez - Şifre Sıfırlama
+	const text = `
+Momez - ${t.title}
 
-Merhaba,
+${t.greeting}
 
-Şifrenizi sıfırlamak için aşağıdaki kodu kullanın:
+${t.message.replace(/<[^>]*>/g, '')}
 
 ${resetCode}
 
-Bu kod 30 dakika geçerlidir.
+${t.warning}
 
-Bu işlemi siz yapmadıysanız, bu e-postayı görmezden gelebilirsiniz.
-
-Momez Ekibi
+${t.footer}
   `
 
-  return sendEmail({
-    to: email,
-    subject: 'Momez - Şifre Sıfırlama Kodu',
-    html,
-    text,
-  })
+	return sendEmail({
+		to: email,
+		subject: t.subject,
+		html,
+		text,
+	})
 }
 
 // Sipariş onay e-postası (örnek - ileride kullanılabilir)
-export async function sendOrderConfirmationEmail(email: string, orderNumber: string, total: number) {
-  const html = `
+export async function sendOrderConfirmationEmail(email: string, orderNumber: string, total: number, language: Language = 'en') {
+	const t = emailTemplates[language]?.orderConfirmation || emailTemplates.en.orderConfirmation
+	const dir = language === 'ar' ? 'rtl' : 'ltr'
+
+	const html = `
     <!DOCTYPE html>
-    <html>
+    <html dir="${dir}">
     <head>
       <meta charset="utf-8">
-      <title>Sipariş Onayı</title>
+      <title>${t.title}</title>
     </head>
     <body style="margin: 0; padding: 0; background-color: #f4f4f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
       <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f4f4f5; padding: 40px 20px;">
@@ -181,11 +226,11 @@ export async function sendOrderConfirmationEmail(email: string, orderNumber: str
                     </div>
                   </div>
                   <h2 style="margin: 0 0 16px; color: #18181b; font-size: 22px; text-align: center;">
-                    Siparişiniz Alındı!
+                    ${t.title}
                   </h2>
                   <p style="color: #52525b; text-align: center;">
-                    Sipariş Numarası: <strong>${orderNumber}</strong><br>
-                    Toplam: <strong>${total.toFixed(2)} TL</strong>
+                    ${t.orderNumber}: <strong>${orderNumber}</strong><br>
+                    ${t.total}: <strong>${total.toFixed(2)}</strong>
                   </p>
                 </td>
               </tr>
@@ -197,9 +242,9 @@ export async function sendOrderConfirmationEmail(email: string, orderNumber: str
     </html>
   `
 
-  return sendEmail({
-    to: email,
-    subject: `Momez - Siparişiniz Alındı #${orderNumber}`,
-    html,
-  })
+	return sendEmail({
+		to: email,
+		subject: `${t.subject} #${orderNumber}`,
+		html,
+	})
 }
