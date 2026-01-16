@@ -7,6 +7,7 @@ import toast, { Toaster } from 'react-hot-toast'
 import { uploadAPI } from '@/lib/api'
 import { useLanguage } from '@/lib/i18n/LanguageContext'
 import { colorPalette, getColorNameByHex } from '@/lib/colors'
+import { formatPrice, type Language } from '@/lib/currency'
 
 interface ColorVariant {
 	id: string
@@ -323,9 +324,9 @@ export default function AdminProductsPage() {
 									<h3 className="font-bold text-slate-900 dark:text-white mb-2 line-clamp-2">{product.name}</h3>
 									<div className="flex items-center gap-2 mb-3">
 										{product.discount_price && product.discount_price > 0 ? (
-											<><span className="text-lg font-bold text-red-600">₺{product.discount_price.toLocaleString('tr-TR')}</span><span className="text-sm text-slate-500 line-through">₺{product.price.toLocaleString('tr-TR')}</span></>
+											<><span className="text-lg font-bold text-red-600">{formatPrice(product.discount_price, language as Language)}</span><span className="text-sm text-slate-500 line-through">{formatPrice(product.price, language as Language)}</span></>
 										) : (
-											<span className="text-lg font-bold text-slate-900 dark:text-white">₺{product.price.toLocaleString('tr-TR')}</span>
+											<span className="text-lg font-bold text-slate-900 dark:text-white">{formatPrice(product.price, language as Language)}</span>
 										)}
 									</div>
 									<div className="flex items-center justify-between text-xs mb-3">
