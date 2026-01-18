@@ -519,7 +519,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
 										<div>
 											<h4 className="font-semibold text-slate-900 dark:text-white mb-1">{t('product.freeShipping')}</h4>
 											<p className="text-sm text-slate-600 dark:text-slate-400">
-												{shippingSettings.freeLimit} TL {language === 'en' ? 'and above free shipping' : 'والأكثر شحن مجاني'}
+													€{shippingSettings.freeLimit} {language === 'en' ? 'and above free shipping' : 'والأكثر شحن مجاني'}
 											</p>
 										</div>
 									</div>

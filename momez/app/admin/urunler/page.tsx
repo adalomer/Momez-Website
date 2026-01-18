@@ -7,7 +7,7 @@ import toast, { Toaster } from 'react-hot-toast'
 import { uploadAPI } from '@/lib/api'
 import { useLanguage } from '@/lib/i18n/LanguageContext'
 import { colorPalette, getColorNameByHex } from '@/lib/colors'
-import { formatPrice, type Language } from '@/lib/currency'
+import { formatPriceTRY } from '@/lib/currency'
 
 interface ColorVariant {
 	id: string
@@ -151,7 +151,7 @@ export default function AdminProductsPage() {
 		setEditForm(prev => ({ ...prev, colors: [...prev.colors, newColor] }))
 		setShowColorPicker(false)
 		setCustomColor({ name: '', hex: '#000000' })
-		toast.success(`${name} color added`)
+		toast.success(`${name} color added`, { id: 'color-added' })
 	}
 
 	const removeColor = (colorId: string) => {
@@ -190,11 +190,11 @@ export default function AdminProductsPage() {
 					...prev,
 					colors: prev.colors.map(c => c.id === colorId ? { ...c, images: [...c.images, ...uploadedUrls] } : c)
 				}))
-				toast.success(`${uploadedUrls.length} images uploaded`)
+				toast.success(`${uploadedUrls.length} images uploaded`, { id: 'images-uploaded' })
 			}
 			e.target.value = ''
 		} catch (error) {
-			toast.error('Error uploading image')
+			toast.error('Error uploading image', { id: 'upload-error' })
 		} finally {
 			setUploadingImage(null)
 		}
@@ -210,11 +210,11 @@ export default function AdminProductsPage() {
 	const handleUpdateProduct = async () => {
 		if (!selectedProduct) return
 		if (!editForm.price || parseFloat(editForm.price) <= 0) {
-			toast.error('Enter a valid price')
+			toast.error('Enter a valid price', { id: 'price-error' })
 			return
 		}
 		if (!editForm.colors.some(c => c.images.length > 0)) {
-			toast.error('Upload at least one image for a color')
+			toast.error('Upload at least one image for a color', { id: 'image-error' })
 			return
 		}
 
@@ -234,14 +234,14 @@ export default function AdminProductsPage() {
 			})
 			const data = await response.json()
 			if (data.success) {
-				toast.success('Product updated')
+				toast.success('Product updated', { id: 'product-updated' })
 				setShowEditModal(false)
 				fetchProducts()
 			} else {
-				toast.error(data.error || 'Error occurred')
+				toast.error(data.error || 'Error occurred', { id: 'update-error' })
 			}
 		} catch (error) {
-			toast.error('Error occurred')
+			toast.error('Error occurred', { id: 'update-error' })
 		}
 	}
 
@@ -254,13 +254,13 @@ export default function AdminProductsPage() {
 			const response = await fetch(`/api/products/${product.slug}`, { method: 'DELETE' })
 			const data = await response.json()
 			if (data.success) {
-				toast.success('Product deleted')
+				toast.success('Product deleted', { id: 'product-deleted' })
 				fetchProducts()
 			} else {
-				toast.error(data.error || 'Error occurred')
+				toast.error(data.error || 'Error occurred', { id: 'delete-error' })
 			}
 		} catch (error) {
-			toast.error('Error occurred')
+			toast.error('Error occurred', { id: 'delete-error' })
 		}
 	}
 
@@ -324,9 +324,9 @@ export default function AdminProductsPage() {
 									<h3 className="font-bold text-slate-900 dark:text-white mb-2 line-clamp-2">{product.name}</h3>
 									<div className="flex items-center gap-2 mb-3">
 										{product.discount_price && product.discount_price > 0 ? (
-											<><span className="text-lg font-bold text-red-600">{formatPrice(product.discount_price, language as Language)}</span><span className="text-sm text-slate-500 line-through">{formatPrice(product.price, language as Language)}</span></>
+											<><span className="text-lg font-bold text-red-600">{formatPriceTRY(product.discount_price)}</span><span className="text-sm text-slate-500 line-through">{formatPriceTRY(product.price)}</span></>
 										) : (
-											<span className="text-lg font-bold text-slate-900 dark:text-white">{formatPrice(product.price, language as Language)}</span>
+											<span className="text-lg font-bold text-slate-900 dark:text-white">{formatPriceTRY(product.price)}</span>
 										)}
 									</div>
 									<div className="flex items-center justify-between text-xs mb-3">

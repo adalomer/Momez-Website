@@ -174,7 +174,7 @@ export default function AdminOrdersPage() {
                       {order.item_count} ürün
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap font-medium text-slate-900 dark:text-white">
-                      ₺{order.total_amount.toLocaleString('tr-TR')}
+                      €{order.total_amount.toLocaleString('de-DE', { minimumFractionDigits: 2 })}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${

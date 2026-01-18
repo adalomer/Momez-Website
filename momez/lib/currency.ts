@@ -1,51 +1,50 @@
-// Currency configuration for different languages/regions
+// Currency configuration - Base currency is EUR
 export type Language = 'en' | 'ar'
 
 interface CurrencyConfig {
 	code: string
 	symbol: string
 	symbolPosition: 'before' | 'after'
-	rate: number  // Conversion rate from TRY (base currency)
+	rate: number  // Conversion rate from EUR (base currency)
 	locale: string
 }
 
-// Exchange rates (base: TRY)
-// These should be updated periodically or fetched from an API
+// Exchange rates (base: EUR)
 export const currencyConfig: Record<Language, CurrencyConfig> = {
 	en: {
 		code: 'EUR',
 		symbol: '€',
 		symbolPosition: 'before',
-		rate: 0.027,  // 1 TRY ≈ 0.027 EUR
-		locale: 'en-EU'
+		rate: 1,  // EUR to EUR (no conversion)
+		locale: 'de-DE'
 	},
 	ar: {
 		code: 'IQD',
 		symbol: 'د.ع',
 		symbolPosition: 'after',
-		rate: 39.5,   // 1 TRY ≈ 39.5 IQD
+		rate: 1454,  // 1 EUR ≈ 1454 IQD
 		locale: 'ar-IQ'
 	}
 }
 
 /**
- * Convert price from TRY to target currency
+ * Convert price from EUR to target currency based on language
  */
-export function convertPrice(amountTRY: number, language: Language): number {
+export function convertPrice(amountEUR: number, language: Language): number {
 	const config = currencyConfig[language] || currencyConfig.en
-	return amountTRY * config.rate
+	return amountEUR * config.rate
 }
 
 /**
  * Format price with currency symbol based on language
  */
-export function formatPrice(amountTRY: number, language: Language): string {
+export function formatPrice(amountEUR: number, language: Language): string {
 	const config = currencyConfig[language] || currencyConfig.en
-	const convertedAmount = convertPrice(amountTRY, language)
+	const convertedAmount = convertPrice(amountEUR, language)
 
 	// Format number with appropriate locale
 	const formattedNumber = new Intl.NumberFormat(config.locale, {
-		minimumFractionDigits: language === 'ar' ? 0 : 2,  // IQD typically has no decimals
+		minimumFractionDigits: language === 'ar' ? 0 : 2,
 		maximumFractionDigits: language === 'ar' ? 0 : 2
 	}).format(convertedAmount)
 
@@ -58,15 +57,26 @@ export function formatPrice(amountTRY: number, language: Language): string {
 }
 
 /**
+ * Format price in EUR for admin panel (no conversion)
+ */
+export function formatPriceTRY(amount: number): string {
+	const formattedNumber = new Intl.NumberFormat('de-DE', {
+		minimumFractionDigits: 2,
+		maximumFractionDigits: 2
+	}).format(amount)
+	return `€${formattedNumber}`
+}
+
+/**
  * Get currency symbol for display
  */
 export function getCurrencySymbol(language: Language): string {
-	return currencyConfig[language]?.symbol || '£'
+	return currencyConfig[language]?.symbol || '€'
 }
 
 /**
  * Get currency code for display
  */
 export function getCurrencyCode(language: Language): string {
-	return currencyConfig[language]?.code || 'GBP'
+	return currencyConfig[language]?.code || 'EUR'
 }

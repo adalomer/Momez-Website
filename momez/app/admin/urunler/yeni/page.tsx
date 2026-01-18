@@ -331,7 +331,7 @@ export default function AdminProductFormPage() {
 
 									<div>
 										<label className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
-											Price (£) *
+											{t('admin.priceLabel')}
 										</label>
 										<input
 											type="text"
