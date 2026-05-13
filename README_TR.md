@@ -130,17 +130,17 @@ Platform, ölçeklenebilirlik, performans ve kullanıcı deneyimini temel öncel
 <table>
   <tr>
     <td width="33%" align="center">
-      <img src="./anasayfa.png" width="100%">
+      <img src="./img/anasayfa.png" width="100%">
       <br>
       <sub><b>Ana Sayfa</b><br>Sezgisel navigasyon ve öne çıkan ürünler</sub>
     </td>
     <td width="33%" align="center">
-      <img src="./kategorı.png" width="100%">
+      <img src="./img/kategorı.png" width="100%">
       <br>
       <sub><b>Kategori Sayfası</b><br>Gelişmiş filtreleme ve sıralama</sub>
     </td>
     <td width="33%" align="center">
-      <img src="./urun.png" width="100%">
+      <img src="./img/urun.png" width="100%">
       <br>
       <sub><b>Ürün Detay</b><br>Görsel galeri ve detaylı bilgi</sub>
     </td>
@@ -151,17 +151,17 @@ Platform, ölçeklenebilirlik, performans ve kullanıcı deneyimini temel öncel
 <table>
   <tr>
     <td width="33%" align="center">
-      <img src="./mobilmainpage.png" width="100%">
+      <img src="./img/mobilmainpage.png" width="100%">
       <br>
       <sub><b>Mobil Ana Sayfa</b><br>Dokunmatik optimize arayüz</sub>
     </td>
     <td width="33%" align="center">
-      <img src="./kategoritum.png" width="100%">
+      <img src="./img/kategoritum.png" width="100%">
       <br>
       <sub><b>Mobil Kategori</b><br>Hızlı filtreleme & ızgara görünümü</sub>
     </td>
     <td width="33%" align="center">
-      <img src="./mobilbar.png" width="100%">
+      <img src="./img/mobilbar.png" width="100%">
       <br>
       <sub><b>Mobil Menü</b><br>Animasyonlu hamburger menü</sub>
     </td>
@@ -172,12 +172,12 @@ Platform, ölçeklenebilirlik, performans ve kullanıcı deneyimini temel öncel
 <table>
   <tr>
     <td width="50%" align="center">
-      <img src="./odeme.png" width="100%">
+      <img src="./img/odeme.png" width="100%">
       <br>
       <sub><b>Alışveriş Sepeti</b><br>Anlık hesaplama ve güncellemeler</sub>
     </td>
     <td width="50%" align="center">
-      <img src="./odemesonrası.png" width="100%">
+      <img src="./img/odemesonrası.png" width="100%">
       <br>
       <sub><b>Ödeme Süreci</b><br>İlerleme göstergeli akış</sub>
     </td>

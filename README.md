@@ -132,17 +132,17 @@ The platform was designed with scalability, performance, and user experience as 
 <table>
   <tr>
     <td width="33%" align="center">
-      <img src="./anasayfa.png" width="100%">
+      <img src="./img/anasayfa.png" width="100%">
       <br>
       <sub><b>Homepage</b><br>Intuitive navigation & featured products</sub>
     </td>
     <td width="33%" align="center">
-      <img src="./kategorı.png" width="100%">
+      <img src="./img/kategorı.png" width="100%">
       <br>
       <sub><b>Category Page</b><br>Advanced filtering and sorting</sub>
     </td>
     <td width="33%" align="center">
-      <img src="./urun.png" width="100%">
+      <img src="./img/urun.png" width="100%">
       <br>
       <sub><b>Product Detail</b><br>Visual gallery & purchase options</sub>
     </td>
@@ -153,17 +153,17 @@ The platform was designed with scalability, performance, and user experience as 
 <table>
   <tr>
     <td width="33%" align="center">
-      <img src="./mobilmainpage.png" width="100%">
+      <img src="./img/mobilmainpage.png" width="100%">
       <br>
       <sub><b>Mobile Homepage</b><br>Touch-optimized interface</sub>
     </td>
     <td width="33%" align="center">
-      <img src="./kategoritum.png" width="100%">
+      <img src="./img/kategoritum.png" width="100%">
       <br>
       <sub><b>Mobile Category</b><br>Quick filtering & grid view</sub>
     </td>
     <td width="33%" align="center">
-      <img src="./mobilbar.png" width="100%">
+      <img src="./img/mobilbar.png" width="100%">
       <br>
       <sub><b>Mobile Menu</b><br>Intuitive hamburger menu</sub>
     </td>
@@ -174,12 +174,12 @@ The platform was designed with scalability, performance, and user experience as 
 <table>
   <tr>
     <td width="50%" align="center">
-      <img src="./odeme.png" width="100%">
+      <img src="./img/odeme.png" width="100%">
       <br>
       <sub><b>Shopping Cart</b><br>Real-time updates & calculations</sub>
     </td>
     <td width="50%" align="center">
-      <img src="./odemesonrası.png" width="100%">
+      <img src="./img/odemesonrası.png" width="100%">
       <br>
       <sub><b>Checkout Process</b><br>Streamlined flow with progress</sub>
     </td>
