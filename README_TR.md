@@ -320,11 +320,10 @@ Bu proje, modern web teknolojilerine tutkulu yetenekli bir ekip tarafından geli
 ## 📝 Önemli Notlar
 
 ### 🔒 Kaynak Kod Gizliliği
-Bu repository, momez.co projesinin **vitrin ve tanıtım** amaçlıdır. Gerçek kaynak kod **özel ve tescillidir**. Bu genel repository şunları içerir:
+Bu repository, momez.co projesinin **vitrin ve tanıtım** amaçlıdır.Bu genel repository şunları içerir:
 - ✅ Proje dokümantasyonu ve genel bakış
 - ✅ Teknik mimari detayları
 - ✅ Ekran görüntüleri
-- ❌ Üretim kaynak kodu ve özel iş mantığı **bulunmamaktadır**.
 
 ---
 
