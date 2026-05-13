@@ -257,11 +257,10 @@ The platform was designed with scalability, performance, and user experience as 
 ## 📝 Important Notes
 
 ### 🔒 Source Code Privacy
-This repository serves as a **showcase and demonstration** of the momez.co project. The actual source code remains **private and proprietary**. This public repository contains:
+This repository serves as a **showcase and demonstration** of the momez.co project. This public repository contains:
 - ✅ Project documentation and overview
 - ✅ Technical specifications and architecture
 - ✅ Screenshots and visual demonstrations
-- ❌ No production source code or private business logic.
 
 ---
 
